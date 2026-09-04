@@ -9,7 +9,7 @@ import argparse
 from collections import Counter
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlencode, urlparse
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -87,7 +87,18 @@ def canonical_url(value: Any) -> str:
     parsed = urlparse(str(value))
     host = (parsed.hostname or "").removeprefix("www.").lower()
     path = parsed.path.rstrip("/") or "/"
-    return f"{parsed.scheme.lower()}://{host}{path}"
+    tracking_names = {
+        "fbclid", "gclid", "mc_cid", "mc_eid", "ref", "referrer",
+        "source", "utm_campaign", "utm_content", "utm_medium", "utm_source",
+        "utm_term",
+    }
+    query = [
+        (name, item)
+        for name, item in parse_qsl(parsed.query, keep_blank_values=True)
+        if name.lower() not in tracking_names
+    ]
+    suffix = f"?{urlencode(sorted(query))}" if query else ""
+    return f"{parsed.scheme.lower()}://{host}{path}{suffix}"
 
 
 def check_unique_key(
