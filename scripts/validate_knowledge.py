@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import sys
 import argparse
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +20,8 @@ SCHEMAS = {
         "path": REFERENCE_ROOT / "source-registry.jsonl",
         "required": {
             "id", "kind", "tier", "title", "author_org", "url", "language",
-            "access", "status", "use_for", "evidence_scope", "limitations", "reviewed_on",
+            "access", "status", "use_for", "source_lanes", "evidence_scope",
+            "limitations", "reviewed_on",
         },
     },
     "masterworks": {
@@ -27,6 +29,7 @@ SCHEMAS = {
         "required": {
             "id", "photographer", "title", "year", "direct_url", "source_org",
             "genres", "method_tags", "analysis_notes", "teaching_use", "anti_imitation",
+            "coverage_genres", "creator_regions", "historical_period", "tradition_tags",
             "rights", "verification_status", "reviewed_on",
         },
     },
@@ -89,15 +92,24 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(f"source {record.get('id')}: invalid status")
         if not str(record.get("url", "")).startswith(("https://", "http://")):
             errors.append(f"source {record.get('id')}: invalid URL")
+        if not isinstance(record.get("source_lanes"), list) or not record.get("source_lanes"):
+            errors.append(f"source {record.get('id')}: source_lanes must be a non-empty list")
 
     for record in collections["masterworks"]:
         if not str(record.get("direct_url", "")).startswith(("https://", "http://")):
             errors.append(f"masterwork {record.get('id')}: invalid direct URL")
         if not isinstance(record.get("year"), int):
             errors.append(f"masterwork {record.get('id')}: year must be an integer")
-        for field in ("genres", "method_tags", "analysis_notes"):
+        for field in (
+            "genres", "method_tags", "analysis_notes", "coverage_genres",
+            "creator_regions", "tradition_tags",
+        ):
             if not isinstance(record.get(field), list) or not record.get(field):
                 errors.append(f"masterwork {record.get('id')}: {field} must be a non-empty list")
+        if record.get("historical_period") not in {"historical", "contemporary"}:
+            errors.append(
+                f"masterwork {record.get('id')}: historical_period must be historical or contemporary"
+            )
 
     source_ids = {record.get("id") for record in collections["sources"]}
     masterwork_ids = {record.get("id") for record in collections["masterworks"]}
@@ -126,6 +138,21 @@ def count_jsonl(path: Path) -> int:
     if not path.exists():
         return 0
     return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+
+
+def count_values(records: list[dict[str, Any]], field: str) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for record in records:
+        values = record.get(field, [])
+        if isinstance(values, list):
+            counts.update(value for value in values if isinstance(value, str) and value)
+    return counts
+
+
+def format_floor_progress(actual: Counter[str], floors: dict[str, int]) -> str:
+    return ", ".join(
+        f"{name}={actual.get(name, 0)}/{minimum}" for name, minimum in floors.items()
+    )
 
 
 def main() -> int:
@@ -157,11 +184,62 @@ def main() -> int:
         "test_cases": count_jsonl(TEST_CASES_PATH),
     }
     thresholds = status.get("release_thresholds", {})
+    coverage_floors = status.get("coverage_floors", {})
+    lane_floors = coverage_floors.get("source_lanes", {})
+    genre_floors = coverage_floors.get("genres", {})
+    lane_counts = count_values(collections["sources"], "source_lanes")
+    genre_counts = count_values(collections["masterworks"], "coverage_genres")
+    region_counts = count_values(collections["masterworks"], "creator_regions")
+    tradition_counts = count_values(collections["masterworks"], "tradition_tags")
+    period_counts = Counter(
+        record.get("historical_period") for record in collections["masterworks"]
+        if record.get("historical_period")
+    )
+
+    allowed_lanes = set(status.get("coverage_requirements", {}).get("source_lanes", []))
+    allowed_genres = set(status.get("coverage_requirements", {}).get("genres", []))
+    for record in collections["sources"]:
+        unknown = sorted(set(record.get("source_lanes", [])) - allowed_lanes)
+        if unknown:
+            errors.append(f"source {record.get('id')}: unknown source lanes: {', '.join(unknown)}")
+    for record in collections["masterworks"]:
+        unknown = sorted(set(record.get("coverage_genres", [])) - allowed_genres)
+        if unknown:
+            errors.append(f"masterwork {record.get('id')}: unknown coverage genres: {', '.join(unknown)}")
+
     if args.release:
         for metric, minimum in thresholds.items():
             if actual.get(metric, 0) < minimum:
                 errors.append(
                     f"release threshold not met: {metric}={actual.get(metric, 0)} < {minimum}"
+                )
+        for lane, minimum in lane_floors.items():
+            if lane_counts[lane] < minimum:
+                errors.append(
+                    f"source-lane floor not met: {lane}={lane_counts[lane]} < {minimum}"
+                )
+        for genre, minimum in genre_floors.items():
+            if genre_counts[genre] < minimum:
+                errors.append(
+                    f"genre floor not met: {genre}={genre_counts[genre]} < {minimum}"
+                )
+        distinct_regions = len(region_counts)
+        minimum_regions = coverage_floors.get("minimum_creator_regions", 0)
+        if distinct_regions < minimum_regions:
+            errors.append(
+                f"creator-region floor not met: {distinct_regions} < {minimum_regions}"
+            )
+        distinct_traditions = len(tradition_counts)
+        minimum_traditions = coverage_floors.get("minimum_photographic_traditions", 0)
+        if distinct_traditions < minimum_traditions:
+            errors.append(
+                f"photographic-tradition floor not met: {distinct_traditions} < {minimum_traditions}"
+            )
+        for period, key in (("historical", "historical_works"), ("contemporary", "contemporary_works")):
+            minimum = coverage_floors.get(key, 0)
+            if period_counts[period] < minimum:
+                errors.append(
+                    f"period floor not met: {period}={period_counts[period]} < {minimum}"
                 )
 
     if errors:
@@ -177,6 +255,15 @@ def main() -> int:
     print(f"PASS: knowledge base is structurally valid ({counts})")
     print(f"Stage: {status.get('stage', 'unknown')} ({status.get('label', 'unlabeled')})")
     print(f"Release progress: {progress}")
+    print(f"Source-lane coverage: {format_floor_progress(lane_counts, lane_floors)}")
+    print(f"Genre coverage: {format_floor_progress(genre_counts, genre_floors)}")
+    print(
+        "Diversity coverage: "
+        f"regions={len(region_counts)}/{coverage_floors.get('minimum_creator_regions', '?')}, "
+        f"traditions={len(tradition_counts)}/{coverage_floors.get('minimum_photographic_traditions', '?')}, "
+        f"historical={period_counts['historical']}/{coverage_floors.get('historical_works', '?')}, "
+        f"contemporary={period_counts['contemporary']}/{coverage_floors.get('contemporary_works', '?')}"
+    )
     return 0
 
 

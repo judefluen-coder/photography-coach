@@ -10,6 +10,35 @@
     "admitted_patterns": 40,
     "test_cases": 100
   },
+  "coverage_floors": {
+    "source_lanes": {
+      "museum/archive/estate": 20,
+      "photographer first-person practice": 20,
+      "formal curriculum/course": 15,
+      "Chinese-language educator/creator": 15,
+      "English-language educator/creator": 15,
+      "ethics/authenticity standard": 10
+    },
+    "genres": {
+      "street/documentary": 12,
+      "portrait/environmental portrait": 12,
+      "landscape": 12,
+      "architecture/cityscape": 12,
+      "still life/product/food/macro": 12,
+      "wildlife/sports/action": 12,
+      "concept/composite": 12,
+      "series/photo essay": 12
+    },
+    "minimum_creator_regions": 6,
+    "minimum_photographic_traditions": 8,
+    "historical_works": 45,
+    "contemporary_works": 45,
+    "benchmark_quality_bands": {
+      "acclaimed": 25,
+      "ordinary": 50,
+      "failed_imitation": 25
+    }
+  },
   "coverage_requirements": {
     "genres": [
       "street/documentary",

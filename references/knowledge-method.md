@@ -6,7 +6,7 @@ Use this file when adding, selecting, or interpreting theory, courses, creator m
 
 Read `knowledge-status.json` before describing the database's maturity. While its stage is `bootstrap`, every record is an individually useful aid but the collection is not broad enough to support claims of representative coverage. Do not call it a completed or sufficient knowledge base. Continue open-source verification around any search result and run `python3 scripts/validate_knowledge.py --release` before changing the stage to `release-candidate`.
 
-The release threshold is a floor, not proof of quality. Coverage across genres, regions, eras, source lanes, ordinary photographs, and failed imitations must also pass review. Raw bulk imports do not count as teaching cards.
+The release threshold is a floor, not proof of quality. Every numerical threshold and every coverage floor in `knowledge-status.json` must pass. Coverage is counted from explicit record metadata rather than inferred from titles. Raw bulk imports, duplicate mirrors, collection hubs presented as single works, and several crops of one photograph do not count as distinct teaching cards.
 
 ## Source roles and weight
 
@@ -40,6 +40,7 @@ Required fields in `source-registry.jsonl`:
 
 - `id`, `kind`, `tier`, `title`, `author_org`, `url`;
 - `language`, `access`, `status`, `use_for`;
+- `source_lanes`, using only the controlled lane names in `knowledge-status.json`;
 - `evidence_scope`, `limitations`, `reviewed_on`.
 
 `status` is one of `verified`, `partial`, or `discovery_only`. Verified means the direct page was inspected and supports the stated scope, not that every claim on it is true.
@@ -50,10 +51,13 @@ Required fields in `masterwork-cards.jsonl`:
 
 - exact identity: `photographer`, `title`, `year`, `direct_url`, `source_org`;
 - routing: `genres`, `method_tags`;
+- coverage: `coverage_genres`, `creator_regions`, `historical_period`, `tradition_tags`;
 - `analysis_notes`, `teaching_use`, `anti_imitation`;
 - `rights`, `verification_status`, `reviewed_on`.
 
 `analysis_notes` are the coach's visible-reading notes, not claims attributed to the source. Never copy or embed an image unless the exact page verifies an allowed license.
+
+`coverage_genres` uses the eight controlled genre families in `knowledge-status.json`; `genres` may remain more specific for retrieval. `creator_regions` describes relevant working/cultural context, not ethnicity or nationality inference. `historical_period` is `historical` for works made before 2000 and `contemporary` for works made in or after 2000. Record identity demographics only when an inspected institutional or first-party source supports them; do not guess from names or photographs.
 
 ### Critique pattern
 
