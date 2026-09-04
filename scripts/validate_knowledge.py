@@ -5,12 +5,15 @@ from __future__ import annotations
 
 import json
 import sys
+import argparse
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent.parent
 REFERENCE_ROOT = ROOT / "references"
+STATUS_PATH = REFERENCE_ROOT / "knowledge-status.json"
+TEST_CASES_PATH = REFERENCE_ROOT / "benchmark-cases.jsonl"
 SCHEMAS = {
     "sources": {
         "path": REFERENCE_ROOT / "source-registry.jsonl",
@@ -119,8 +122,48 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
     return errors, collections
 
 
+def count_jsonl(path: Path) -> int:
+    if not path.exists():
+        return 0
+    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--release",
+        action="store_true",
+        help="Fail unless all numerical release thresholds are met",
+    )
+    args = parser.parse_args()
+
     errors, collections = validate()
+    try:
+        status = json.loads(STATUS_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"cannot read knowledge status: {exc}")
+        status = {"release_thresholds": {}}
+
+    actual = {
+        "sources": len(collections["sources"]),
+        "verified_sources": sum(
+            record.get("status") == "verified" for record in collections["sources"]
+        ),
+        "masterworks": len(collections["masterworks"]),
+        "patterns": len(collections["patterns"]),
+        "admitted_patterns": sum(
+            record.get("status") == "admitted" for record in collections["patterns"]
+        ),
+        "test_cases": count_jsonl(TEST_CASES_PATH),
+    }
+    thresholds = status.get("release_thresholds", {})
+    if args.release:
+        for metric, minimum in thresholds.items():
+            if actual.get(metric, 0) < minimum:
+                errors.append(
+                    f"release threshold not met: {metric}={actual.get(metric, 0)} < {minimum}"
+                )
+
     if errors:
         print(f"FAIL: {len(errors)} knowledge-base issue(s)")
         for error in errors:
@@ -128,7 +171,12 @@ def main() -> int:
         return 1
 
     counts = ", ".join(f"{name}={len(records)}" for name, records in collections.items())
+    progress = ", ".join(
+        f"{metric}={value}/{thresholds.get(metric, '?')}" for metric, value in actual.items()
+    )
     print(f"PASS: knowledge base is structurally valid ({counts})")
+    print(f"Stage: {status.get('stage', 'unknown')} ({status.get('label', 'unlabeled')})")
+    print(f"Release progress: {progress}")
     return 0
 
 

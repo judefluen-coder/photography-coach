@@ -1,0 +1,40 @@
+{
+  "stage": "bootstrap",
+  "label": "schema prototype",
+  "user_claim": "Insufficient for broad knowledge-backed critique; use records only as individually verified aids.",
+  "release_thresholds": {
+    "sources": 100,
+    "verified_sources": 80,
+    "masterworks": 150,
+    "patterns": 50,
+    "admitted_patterns": 40,
+    "test_cases": 100
+  },
+  "coverage_requirements": {
+    "genres": [
+      "street/documentary",
+      "portrait/environmental portrait",
+      "landscape",
+      "architecture/cityscape",
+      "still life/product/food/macro",
+      "wildlife/sports/action",
+      "concept/composite",
+      "series/photo essay"
+    ],
+    "source_lanes": [
+      "museum/archive/estate",
+      "photographer first-person practice",
+      "formal curriculum/course",
+      "Chinese-language educator/creator",
+      "English-language educator/creator",
+      "ethics/authenticity standard"
+    ],
+    "diversity_checks": [
+      "multiple regions and photographic traditions",
+      "historical and contemporary work",
+      "women and men photographers",
+      "Western and non-Western practices",
+      "highly regarded, ordinary, and failed-imitation samples"
+    ]
+  }
+}

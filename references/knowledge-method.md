@@ -2,6 +2,12 @@
 
 Use this file when adding, selecting, or interpreting theory, courses, creator material, or masterwork references. The knowledge base supports critique; it does not define universal taste.
 
+## Maturity gate
+
+Read `knowledge-status.json` before describing the database's maturity. While its stage is `bootstrap`, every record is an individually useful aid but the collection is not broad enough to support claims of representative coverage. Do not call it a completed or sufficient knowledge base. Continue open-source verification around any search result and run `python3 scripts/validate_knowledge.py --release` before changing the stage to `release-candidate`.
+
+The release threshold is a floor, not proof of quality. Coverage across genres, regions, eras, source lanes, ordinary photographs, and failed imitations must also pass review. Raw bulk imports do not count as teaching cards.
+
 ## Source roles and weight
 
 | Tier | Source role | Appropriate use | Never assume |
@@ -53,7 +59,7 @@ Required fields in `masterwork-cards.jsonl`:
 
 Required fields in `critique-patterns.jsonl`:
 
-- `condition`, `visible_tests`, `likely_effect`;
+- `method_tags`, `condition`, `visible_tests`, `likely_effect`;
 - `counter_conditions`, `actions`, `exercise`;
 - `source_ids`, `masterwork_ids`, `score_dimensions`;
 - `scope`, `confidence`, `status`.
