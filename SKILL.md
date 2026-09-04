@@ -21,7 +21,8 @@ Read these files before critiquing:
 
 1. `references/evaluation-standard.md` for diagnosis and decision rules.
 2. `references/response-card.md` for the user-facing output contract.
-3. Read `references/reference-policy.md` only when giving an example image, photographer, course, or external link.
+3. Read `references/reference-policy.md` and `references/knowledge-method.md` when giving an example image, photographer, course, or external link.
+4. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. Do not load every record for every photograph.
 
 ## Workflow
 
@@ -82,6 +83,8 @@ When web access exists, add at least one and at most two verified method referen
 
 Never hand the user an undirected portfolio, exhibition, or search-results link. For every reference give a 20–60 second looking task, then explain the visible relation it addresses, what to inspect in that exact frame, one important difference from the user's photograph, and one transferable experiment. Fame is never scoring evidence. If source verification cannot be completed, omit the example instead of guessing.
 
+Convert the diagnosis into two to four method tags and search the bundled knowledge base before open web search. Prefer an admitted critique pattern and an exact masterwork card that share the diagnosed relation. Treat source tiers as provenance roles, not automatic truth weights: a creator may explain an idea clearly while the original photographer, work page, or curriculum remains the source of record. Re-open direct pages before delivery because links, course access, and rights can change.
+
 ### 7. Make crop and color advice visible when requested
 
 When the user asks how the current file would look after cropping or color work, produce a non-destructive `裁切与调色示意` only after diagnosis. Show the source and treatment side by side when the surface allows. Make both parts independently legible: mark or describe the crop boundary, and ensure the proposed tone/color treatment changes at least two named visual relationships, such as wall-to-face brightness and neutral-to-saturated color competition. Preserve people, objects, gestures, text, and documentary content; change only crop and explicitly proposed tonal/color controls.
@@ -107,6 +110,7 @@ Before sending, verify every required field in the response card is present and 
 
 ```bash
 python3 scripts/validate_response.py /absolute/path/to/critique.md
+python3 scripts/validate_knowledge.py
 ```
 
-The checker verifies structural completeness only; it cannot verify whether the visual judgment is correct.
+The checkers verify structural completeness and knowledge cross-references only; they cannot verify whether the visual judgment or source interpretation is correct.
