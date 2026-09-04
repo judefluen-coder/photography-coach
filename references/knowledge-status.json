@@ -17,7 +17,9 @@
       "formal curriculum/course": 15,
       "Chinese-language educator/creator": 15,
       "English-language educator/creator": 15,
-      "ethics/authenticity standard": 10
+      "ethics/authenticity standard": 10,
+      "technical reference": 10,
+      "juried critical evaluation": 2
     },
     "genres": {
       "street/documentary": 12,
@@ -57,7 +59,9 @@
       "formal curriculum/course",
       "Chinese-language educator/creator",
       "English-language educator/creator",
-      "ethics/authenticity standard"
+      "ethics/authenticity standard",
+      "technical reference",
+      "juried critical evaluation"
     ],
     "diversity_checks": [
       "multiple regions and photographic traditions",
