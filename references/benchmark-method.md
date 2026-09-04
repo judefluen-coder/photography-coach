@@ -60,6 +60,17 @@ Score each response after revealing the key:
 
 Release reporting must show results by band and genre, not only one aggregate percentage. Failed variants must be evaluated from the materialized image, not from the original URL preview.
 
+## Run sequence
+
+1. Create the packet with `python3 scripts/prepare_blind_run.py --run-id NAME`. Interrupted downloads may be continued with the same arguments plus `--resume`.
+2. Give only `blind-inputs.jsonl`, its `images/` directory, and the response contract to a clean-context evaluator. The evaluator must not open this method, the benchmark JSONL, the materialization code, or any prior critique of the images.
+3. Save one frozen response at each declared `response_path`. Do not alter a response after grading begins.
+4. Run `python3 scripts/report_benchmark.py RUN_DIR --init`. This refuses to make a grade sheet until every response exists and records every response SHA-256.
+5. A reviewer opens the answer key, records matched zero-based `must_notice` indexes and the rubric fields, then runs `python3 scripts/report_benchmark.py RUN_DIR`.
+6. Commit a report to `references/benchmark-report.json` only when its case hash matches the current corpus. Publish failed case IDs and band/genre metrics even when the run misses release thresholds.
+
+A separate model context is acceptable as a repeatable internal reviewer when a human photography panel is unavailable, but it is not independent expert validation. Record the exact model/version and prompt policy in `reviewer_id` and keep that limitation in the release claim.
+
 ## Leakage and validity checks
 
 The validator fails on duplicate IDs, duplicate source pages or image URLs, overlap with teaching masterworks, unknown pattern IDs, unsupported labels, missing licence/provenance, undersized observation keys, missing recipes, band-count mismatches, or inadequate genre coverage. Human visual review remains required: schema validity cannot prove that the expected observation is correct.

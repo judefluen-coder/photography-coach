@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import sys
 import argparse
+import hashlib
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REFERENCE_ROOT = ROOT / "references"
 STATUS_PATH = REFERENCE_ROOT / "knowledge-status.json"
 TEST_CASES_PATH = REFERENCE_ROOT / "benchmark-cases.jsonl"
+BENCHMARK_REPORT_PATH = REFERENCE_ROOT / "benchmark-report.json"
 SCHEMAS = {
     "sources": {
         "path": REFERENCE_ROOT / "source-registry.jsonl",
@@ -322,6 +324,10 @@ def count_jsonl(path: Path) -> int:
     return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
 
 
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def count_values(records: list[dict[str, Any]], field: str) -> Counter[str]:
     counts: Counter[str] = Counter()
     for record in records:
@@ -358,6 +364,15 @@ def main() -> int:
         errors.append(f"cannot read knowledge status: {exc}")
         status = {"release_thresholds": {}}
 
+    benchmark_report: dict[str, Any] = {}
+    if BENCHMARK_REPORT_PATH.exists():
+        try:
+            benchmark_report = json.loads(BENCHMARK_REPORT_PATH.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"cannot read benchmark report: {exc}")
+        if benchmark_report.get("benchmark_cases_sha256") != file_sha256(TEST_CASES_PATH):
+            errors.append("benchmark report does not match the current benchmark cases")
+
     actual = {
         "sources": len(collections["sources"]),
         "verified_sources": sum(
@@ -369,6 +384,7 @@ def main() -> int:
             record.get("status") == "admitted" for record in collections["patterns"]
         ),
         "test_cases": len(collections["benchmarks"]),
+        "blind_cases_evaluated": benchmark_report.get("metrics", {}).get("evaluated_cases", 0),
     }
     thresholds = status.get("release_thresholds", {})
     coverage_floors = status.get("coverage_floors", {})
@@ -406,6 +422,10 @@ def main() -> int:
             errors.append(f"masterwork {record.get('id')}: unknown coverage genres: {', '.join(unknown)}")
 
     if args.release:
+        if not benchmark_report:
+            errors.append("release requires references/benchmark-report.json")
+        elif benchmark_report.get("passed") is not True:
+            errors.append("latest blind benchmark report did not pass acceptance checks")
         for metric, minimum in thresholds.items():
             if actual.get(metric, 0) < minimum:
                 errors.append(

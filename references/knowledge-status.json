@@ -1,14 +1,15 @@
 {
   "stage": "bootstrap",
-  "label": "schema prototype",
-  "user_claim": "Insufficient for broad knowledge-backed critique; use records only as individually verified aids.",
+  "label": "corpus complete; blind validation pending",
+  "user_claim": "Corpus floors are met, but critique performance is not yet validated; use records as individually verified aids and do not claim release readiness.",
   "release_thresholds": {
     "sources": 100,
     "verified_sources": 80,
     "masterworks": 150,
     "patterns": 50,
     "admitted_patterns": 40,
-    "test_cases": 100
+    "test_cases": 100,
+    "blind_cases_evaluated": 100
   },
   "coverage_floors": {
     "source_lanes": {
@@ -49,7 +50,16 @@
       "wildlife/action": 10,
       "abstract/concept": 10
     },
-    "minimum_benchmark_genres_per_band": 5
+    "minimum_benchmark_genres_per_band": 5,
+    "benchmark_acceptance": {
+      "minimum_overall_pass_rate": 0.8,
+      "minimum_band_pass_rate": 0.72,
+      "minimum_genre_pass_rate": 0.7,
+      "minimum_observation_recall": 0.75,
+      "minimum_failed_variant_detection_rate": 0.84,
+      "maximum_acclaimed_overcorrection_rate": 0.16,
+      "maximum_hallucination_violation_rate": 0.05
+    }
   },
   "coverage_requirements": {
     "genres": [
