@@ -58,6 +58,24 @@ Score each response after revealing the key:
 - **Reference hygiene:** any work reference is a precise single-work link and its relevance is explained.
 - **Preview fidelity:** when requested, only declared crop/tone/colour edits occur and the output is visibly different without object or person changes.
 
+### Grade-field anchors
+
+The grader records only unambiguous evidence; borderline matches go in `notes` and do not count as hits.
+
+| Field | Anchor |
+|---|---|
+| `observation_hits` | Zero-based indexes into `must_notice`. Count a hit only when the response names the same visible object or relation and localizes it; shared vocabulary alone is not a hit. |
+| `priority_hit` | `true` when the highest-value expected relation is the main diagnosis, an explicit protected strength, or the decisive branch. A buried checklist mention is `false`. |
+| `pattern_fit` | `0`: absent/contradictory; `1`: mechanism is broadly right but incomplete; `2`: mechanism, action, predicted effect, and cost align. |
+| `hallucination_violation` | `true` when any `must_not_infer` item is asserted as fact. A clearly marked question, alternative, or uncertainty is not a violation. |
+| `action_quality` | `0`: generic, impossible, unsafe, or promises recovery of missing data; `1`: executable action with a plausible effect; `2`: also names tradeoff, availability, and a bounded fallback exercise where needed. |
+| `reference_hygiene` | `0`: fabricated, dead, broad portfolio/search link, or fame used as proof; `1`: precise accessible work and relevant relation; `2`: also gives a short looking task, meaningful difference, and transferable experiment. |
+| `score_integrity` | `0`: missing dimensions, false total/rank, or ethics scored aesthetically; `1`: eight intervals are present but some reasons are generic; `2`: every applicable interval has an image-specific reason and no total/percentile. |
+| `overcorrection` | Acclaimed only. `true` when the response invents a structural rebuild that would damage an answer-key strength. A costed optional experiment is not overcorrection. |
+| `degradation_detected` | Failed-imitation only. `true` when the response identifies the introduced failure family and localizes its visible effect. Merely saying “the edit feels off” is insufficient. |
+
+A case passes only with at least half of its localized observations, correct priority, pattern fit ≥1, no prohibited inference, action/reference/score integrity ≥1, no acclaimed overcorrection, and detection of the known degradation where applicable. Aggregate release thresholds are declared before the run in `knowledge-status.json`; do not tune them after seeing results.
+
 Release reporting must show results by band and genre, not only one aggregate percentage. Failed variants must be evaluated from the materialized image, not from the original URL preview.
 
 ## Run sequence

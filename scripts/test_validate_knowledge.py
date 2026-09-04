@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import unittest
 
-from validate_knowledge import canonical_url
+from validate_knowledge import canonical_url, validate_benchmark_report
 
 
 class CanonicalURLTests(unittest.TestCase):
@@ -28,6 +28,81 @@ class CanonicalURLTests(unittest.TestCase):
         second = canonical_url("https://www.example.com/search?id=42&year=2025")
 
         self.assertEqual(first, second)
+
+
+class BenchmarkReportTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.thresholds = {
+            "minimum_overall_pass_rate": .8,
+            "minimum_band_pass_rate": .72,
+            "minimum_genre_pass_rate": .7,
+            "minimum_observation_recall": .75,
+            "minimum_failed_variant_detection_rate": .84,
+            "maximum_acclaimed_overcorrection_rate": .16,
+            "maximum_hallucination_violation_rate": .05,
+        }
+        self.status = {
+            "release_thresholds": {"blind_cases_evaluated": 100},
+            "coverage_floors": {"benchmark_acceptance": self.thresholds},
+        }
+        self.report = {
+            "thresholds": self.thresholds,
+            "blind_integrity": {
+                "labels_in_blind_packet": False,
+                "answers_in_blind_packet": False,
+                "response_freeze_enforced": True,
+            },
+            "metrics": {
+                "evaluated_cases": 100,
+                "overall_pass_rate": .9,
+                "observation_recall": .8,
+                "failed_variant_detection_rate": .88,
+                "acclaimed_overcorrection_rate": .08,
+                "hallucination_violation_rate": .02,
+                "band_pass_rates": {
+                    "acclaimed": .88,
+                    "ordinary": .9,
+                    "failed_imitation": .92,
+                },
+                "genre_pass_rates": {
+                    "people/documentary": .9,
+                    "landscape/nature": .9,
+                    "architecture/cityscape": .9,
+                    "still-life/food/macro": .9,
+                    "wildlife/action": .9,
+                    "abstract/concept": .9,
+                },
+            },
+            "checks": {
+                "all_cases_evaluated": True,
+                "overall_pass_rate": True,
+                "every_band_pass_rate": True,
+                "every_genre_pass_rate": True,
+                "observation_recall": True,
+                "failed_variant_detection_rate": True,
+                "acclaimed_overcorrection_rate": True,
+                "hallucination_violation_rate": True,
+            },
+            "passed": True,
+        }
+
+    def test_valid_report_recomputes_cleanly(self) -> None:
+        errors: list[str] = []
+        validate_benchmark_report(self.report, self.status, errors)
+        self.assertEqual(errors, [])
+
+    def test_forged_pass_flag_is_rejected(self) -> None:
+        self.report["metrics"]["overall_pass_rate"] = .2
+        errors: list[str] = []
+        validate_benchmark_report(self.report, self.status, errors)
+        self.assertIn(
+            "benchmark report acceptance checks do not recompute from its metrics",
+            errors,
+        )
+        self.assertIn(
+            "benchmark report passed flag does not match recomputed checks",
+            errors,
+        )
 
 
 if __name__ == "__main__":

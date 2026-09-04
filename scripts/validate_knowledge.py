@@ -328,6 +328,67 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def validate_benchmark_report(
+    report: dict[str, Any],
+    status: dict[str, Any],
+    errors: list[str],
+) -> None:
+    thresholds = status.get("coverage_floors", {}).get("benchmark_acceptance", {})
+    if report.get("thresholds") != thresholds:
+        errors.append("benchmark report thresholds do not match the preregistered status file")
+    integrity = report.get("blind_integrity", {})
+    if integrity.get("labels_in_blind_packet") is not False:
+        errors.append("benchmark report does not prove that labels were hidden")
+    if integrity.get("answers_in_blind_packet") is not False:
+        errors.append("benchmark report does not prove that answer keys were hidden")
+    if integrity.get("response_freeze_enforced") is not True:
+        errors.append("benchmark report does not prove that responses were frozen")
+
+    metrics = report.get("metrics", {})
+    band_rates = metrics.get("band_pass_rates", {})
+    genre_rates = metrics.get("genre_pass_rates", {})
+    expected_bands = {"acclaimed", "ordinary", "failed_imitation"}
+    expected_genres = {
+        "people/documentary", "landscape/nature", "architecture/cityscape",
+        "still-life/food/macro", "wildlife/action", "abstract/concept",
+    }
+    if set(band_rates) != expected_bands:
+        errors.append("benchmark report band metrics are incomplete")
+    if set(genre_rates) != expected_genres:
+        errors.append("benchmark report genre metrics are incomplete")
+    required_metrics = {
+        "evaluated_cases", "overall_pass_rate", "observation_recall",
+        "failed_variant_detection_rate", "acclaimed_overcorrection_rate",
+        "hallucination_violation_rate", "band_pass_rates", "genre_pass_rates",
+    }
+    if not required_metrics.issubset(metrics):
+        errors.append("benchmark report is missing required metrics")
+        return
+
+    checks = {
+        "all_cases_evaluated": metrics["evaluated_cases"]
+        == status.get("release_thresholds", {}).get("blind_cases_evaluated"),
+        "overall_pass_rate": metrics["overall_pass_rate"]
+        >= thresholds.get("minimum_overall_pass_rate", 1),
+        "every_band_pass_rate": bool(band_rates)
+        and min(band_rates.values()) >= thresholds.get("minimum_band_pass_rate", 1),
+        "every_genre_pass_rate": bool(genre_rates)
+        and min(genre_rates.values()) >= thresholds.get("minimum_genre_pass_rate", 1),
+        "observation_recall": metrics["observation_recall"]
+        >= thresholds.get("minimum_observation_recall", 1),
+        "failed_variant_detection_rate": metrics["failed_variant_detection_rate"]
+        >= thresholds.get("minimum_failed_variant_detection_rate", 1),
+        "acclaimed_overcorrection_rate": metrics["acclaimed_overcorrection_rate"]
+        <= thresholds.get("maximum_acclaimed_overcorrection_rate", 0),
+        "hallucination_violation_rate": metrics["hallucination_violation_rate"]
+        <= thresholds.get("maximum_hallucination_violation_rate", 0),
+    }
+    if report.get("checks") != checks:
+        errors.append("benchmark report acceptance checks do not recompute from its metrics")
+    if report.get("passed") is not all(checks.values()):
+        errors.append("benchmark report passed flag does not match recomputed checks")
+
+
 def count_values(records: list[dict[str, Any]], field: str) -> Counter[str]:
     counts: Counter[str] = Counter()
     for record in records:
@@ -372,6 +433,8 @@ def main() -> int:
             errors.append(f"cannot read benchmark report: {exc}")
         if benchmark_report.get("benchmark_cases_sha256") != file_sha256(TEST_CASES_PATH):
             errors.append("benchmark report does not match the current benchmark cases")
+        if benchmark_report:
+            validate_benchmark_report(benchmark_report, status, errors)
 
     actual = {
         "sources": len(collections["sources"]),
