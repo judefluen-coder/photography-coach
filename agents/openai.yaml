@@ -1,0 +1,4 @@
+interface:
+  display_name: "摄影教练"
+  short_description: "全画面诊断照片，并给出参考、裁调方案和可验证练习"
+  default_prompt: "请使用 $photography-coach 盲读并完整诊断这张照片，自适应检查全画面并突出一个重点，同时给出八维评分、精确参考和裁调方案。"
