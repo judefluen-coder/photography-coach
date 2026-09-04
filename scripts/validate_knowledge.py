@@ -79,6 +79,47 @@ def load(name: str, path: Path, required: set[str], errors: list[str]) -> list[d
     return records
 
 
+def normalized_text(value: Any) -> str:
+    return " ".join(str(value).lower().split())
+
+
+def canonical_url(value: Any) -> str:
+    parsed = urlparse(str(value))
+    host = (parsed.hostname or "").removeprefix("www.").lower()
+    path = parsed.path.rstrip("/") or "/"
+    return f"{parsed.scheme.lower()}://{host}{path}"
+
+
+def check_unique_key(
+    records: list[dict[str, Any]],
+    collection: str,
+    label: str,
+    make_key: Any,
+    errors: list[str],
+) -> None:
+    seen: dict[Any, str] = {}
+    for record in records:
+        key = make_key(record)
+        if not key:
+            continue
+        record_id = str(record.get("id", "<missing>"))
+        if key in seen:
+            errors.append(
+                f"{collection}: duplicate {label}: {record_id} conflicts with {seen[key]}"
+            )
+        else:
+            seen[key] = record_id
+
+
+def check_unique_list(record: dict[str, Any], field: str, errors: list[str]) -> None:
+    values = record.get(field)
+    if not isinstance(values, list):
+        return
+    normalized = [normalized_text(value) for value in values]
+    if len(normalized) != len(set(normalized)):
+        errors.append(f"{record.get('id')}: {field} contains duplicate values")
+
+
 def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
     errors: list[str] = []
     collections = {
@@ -95,6 +136,8 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(f"source {record.get('id')}: invalid URL")
         if not isinstance(record.get("source_lanes"), list) or not record.get("source_lanes"):
             errors.append(f"source {record.get('id')}: source_lanes must be a non-empty list")
+        for field in ("use_for", "source_lanes"):
+            check_unique_list(record, field, errors)
 
     for record in collections["masterworks"]:
         if not str(record.get("direct_url", "")).startswith(("https://", "http://")):
@@ -111,6 +154,10 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(
                 f"masterwork {record.get('id')}: historical_period must be historical or contemporary"
             )
+        for field in (
+            "genres", "method_tags", "coverage_genres", "creator_regions", "tradition_tags",
+        ):
+            check_unique_list(record, field, errors)
 
     source_ids = {record.get("id") for record in collections["sources"]}
     masterwork_ids = {record.get("id") for record in collections["masterworks"]}
@@ -131,6 +178,40 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(f"pattern {record.get('id')}: at least one counter-condition is required")
         if not record.get("actions") or not record.get("exercise"):
             errors.append(f"pattern {record.get('id')}: action and exercise are required")
+        for field in (
+            "method_tags", "visible_tests", "counter_conditions", "actions", "source_ids",
+            "masterwork_ids", "score_dimensions",
+        ):
+            check_unique_list(record, field, errors)
+
+    check_unique_key(
+        collections["sources"], "sources", "canonical URL",
+        lambda record: canonical_url(record.get("url")), errors,
+    )
+    check_unique_key(
+        collections["sources"], "sources", "title and author",
+        lambda record: (
+            normalized_text(record.get("title")), normalized_text(record.get("author_org"))
+        ),
+        errors,
+    )
+    check_unique_key(
+        collections["masterworks"], "masterworks", "direct work URL",
+        lambda record: canonical_url(record.get("direct_url")), errors,
+    )
+    check_unique_key(
+        collections["masterworks"], "masterworks", "work identity",
+        lambda record: (
+            normalized_text(record.get("photographer")),
+            normalized_text(record.get("title")),
+            record.get("year"),
+        ),
+        errors,
+    )
+    check_unique_key(
+        collections["patterns"], "patterns", "condition",
+        lambda record: normalized_text(record.get("condition")), errors,
+    )
 
     return errors, collections
 
