@@ -6,7 +6,7 @@ Use this file when adding, selecting, or interpreting theory, courses, creator m
 
 Read `knowledge-status.json` before describing the database's maturity. While its stage is `bootstrap`, every record is an individually useful aid but the collection is not broad enough to support claims of representative coverage. Do not call it a completed or sufficient knowledge base. Continue open-source verification around any search result and run `python3 scripts/validate_knowledge.py --release` before changing the stage to `release-candidate`.
 
-The release threshold is a floor, not proof of quality. Every numerical threshold and every coverage floor in `knowledge-status.json` must pass. Coverage is counted from explicit record metadata rather than inferred from titles. Raw bulk imports, duplicate mirrors, collection hubs presented as single works, and several crops of one photograph do not count as distinct teaching cards.
+The release threshold is a floor, not proof of quality. Every numerical threshold and every coverage floor in `knowledge-status.json` must pass. Coverage is counted from explicit record metadata rather than inferred from titles. The minimum-host floor prevents one publisher or platform from satisfying the corpus by itself. Raw bulk imports, duplicate mirrors, collection hubs presented as single works, and several crops of one photograph do not count as distinct teaching cards.
 
 ## Source roles and weight
 

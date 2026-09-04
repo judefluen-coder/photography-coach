@@ -9,6 +9,7 @@ import argparse
 from collections import Counter
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -155,6 +156,11 @@ def format_floor_progress(actual: Counter[str], floors: dict[str, int]) -> str:
     )
 
 
+def source_host(url: str) -> str:
+    host = urlparse(url).hostname or ""
+    return host.removeprefix("www.")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -195,6 +201,9 @@ def main() -> int:
         record.get("historical_period") for record in collections["masterworks"]
         if record.get("historical_period")
     )
+    source_hosts = {
+        source_host(str(record.get("url", ""))) for record in collections["sources"]
+    } - {""}
 
     allowed_lanes = set(status.get("coverage_requirements", {}).get("source_lanes", []))
     allowed_genres = set(status.get("coverage_requirements", {}).get("genres", []))
@@ -224,6 +233,9 @@ def main() -> int:
                     f"genre floor not met: {genre}={genre_counts[genre]} < {minimum}"
                 )
         distinct_regions = len(region_counts)
+        minimum_hosts = coverage_floors.get("minimum_source_hosts", 0)
+        if len(source_hosts) < minimum_hosts:
+            errors.append(f"source-host floor not met: {len(source_hosts)} < {minimum_hosts}")
         minimum_regions = coverage_floors.get("minimum_creator_regions", 0)
         if distinct_regions < minimum_regions:
             errors.append(
@@ -259,6 +271,7 @@ def main() -> int:
     print(f"Genre coverage: {format_floor_progress(genre_counts, genre_floors)}")
     print(
         "Diversity coverage: "
+        f"source-hosts={len(source_hosts)}/{coverage_floors.get('minimum_source_hosts', '?')}, "
         f"regions={len(region_counts)}/{coverage_floors.get('minimum_creator_regions', '?')}, "
         f"traditions={len(tradition_counts)}/{coverage_floors.get('minimum_photographic_traditions', '?')}, "
         f"historical={period_counts['historical']}/{coverage_floors.get('historical_works', '?')}, "

@@ -29,6 +29,7 @@
       "concept/composite": 12,
       "series/photo essay": 12
     },
+    "minimum_source_hosts": 20,
     "minimum_creator_regions": 6,
     "minimum_photographic_traditions": 8,
     "historical_works": 45,
