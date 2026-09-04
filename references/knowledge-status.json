@@ -40,7 +40,16 @@
       "acclaimed": 25,
       "ordinary": 50,
       "failed_imitation": 25
-    }
+    },
+    "benchmark_genres": {
+      "people/documentary": 10,
+      "landscape/nature": 10,
+      "architecture/cityscape": 10,
+      "still-life/food/macro": 10,
+      "wildlife/action": 10,
+      "abstract/concept": 10
+    },
+    "minimum_benchmark_genres_per_band": 5
   },
   "coverage_requirements": {
     "genres": [

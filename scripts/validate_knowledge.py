@@ -42,6 +42,16 @@ SCHEMAS = {
             "scope", "confidence", "status",
         },
     },
+    "benchmarks": {
+        "path": TEST_CASES_PATH,
+        "required": {
+            "id", "quality_band", "genre", "title", "creator", "source_page",
+            "image_url", "preview_url", "source_sha1", "license", "provenance_status",
+            "reviewed_on", "split",
+            "blind_prompt", "expected_pattern_ids", "must_notice", "must_not_infer",
+            "difficulty", "selection_rationale", "variant_recipe",
+        },
+    },
 }
 
 
@@ -195,6 +205,68 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
         ):
             check_unique_list(record, field, errors)
 
+    pattern_ids = {record.get("id") for record in collections["patterns"]}
+    benchmark_bands = {"acclaimed", "ordinary", "failed_imitation"}
+    benchmark_genres = {
+        "people/documentary",
+        "landscape/nature",
+        "architecture/cityscape",
+        "still-life/food/macro",
+        "wildlife/action",
+        "abstract/concept",
+    }
+    for record in collections["benchmarks"]:
+        record_id = record.get("id")
+        if record.get("quality_band") not in benchmark_bands:
+            errors.append(f"benchmark {record_id}: invalid quality_band")
+        if record.get("genre") not in benchmark_genres:
+            errors.append(f"benchmark {record_id}: invalid genre")
+        if record.get("provenance_status") != "official-page-verified":
+            errors.append(
+                f"benchmark {record_id}: provenance_status must be official-page-verified"
+            )
+        if record.get("split") != "blind_holdout":
+            errors.append(f"benchmark {record_id}: split must be blind_holdout")
+        if record.get("difficulty") not in {"low", "medium", "high"}:
+            errors.append(f"benchmark {record_id}: invalid difficulty")
+        for field in ("source_page", "image_url", "preview_url"):
+            if not str(record.get(field, "")).startswith(("https://", "http://")):
+                errors.append(f"benchmark {record_id}: invalid {field} URL")
+        if not isinstance(record.get("source_sha1"), str) or len(record.get("source_sha1", "")) != 40:
+            errors.append(f"benchmark {record_id}: source_sha1 must be a 40-character SHA-1")
+        for field, minimum in (
+            ("expected_pattern_ids", 1),
+            ("must_notice", 2),
+            ("must_not_infer", 1),
+        ):
+            values = record.get(field)
+            if not isinstance(values, list) or len(values) < minimum:
+                errors.append(
+                    f"benchmark {record_id}: {field} must contain at least {minimum} item(s)"
+                )
+            check_unique_list(record, field, errors)
+        missing_patterns = sorted(
+            set(record.get("expected_pattern_ids", [])) - pattern_ids
+        )
+        if missing_patterns:
+            errors.append(
+                f"benchmark {record_id}: unknown pattern ids: {', '.join(missing_patterns)}"
+            )
+        recipe = record.get("variant_recipe")
+        if record.get("quality_band") == "failed_imitation":
+            if not isinstance(recipe, dict):
+                errors.append(f"benchmark {record_id}: failed imitation requires variant_recipe")
+            else:
+                if recipe.get("operation") not in {
+                    "crop_pressure", "shadow_crush", "highlight_clip", "color_excess",
+                    "tilt_and_crop", "detail_damage",
+                }:
+                    errors.append(f"benchmark {record_id}: invalid variant operation")
+                if not isinstance(recipe.get("parameters"), dict) or not recipe.get("parameters"):
+                    errors.append(f"benchmark {record_id}: variant parameters are required")
+        elif recipe is not None:
+            errors.append(f"benchmark {record_id}: unmodified case must have null variant_recipe")
+
     check_unique_key(
         collections["sources"], "sources", "canonical URL",
         lambda record: canonical_url(record.get("url")), errors,
@@ -223,6 +295,23 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
         collections["patterns"], "patterns", "condition",
         lambda record: normalized_text(record.get("condition")), errors,
     )
+    check_unique_key(
+        collections["benchmarks"], "benchmarks", "source page",
+        lambda record: canonical_url(record.get("source_page")), errors,
+    )
+    check_unique_key(
+        collections["benchmarks"], "benchmarks", "source image URL",
+        lambda record: canonical_url(record.get("image_url")), errors,
+    )
+
+    masterwork_urls = {
+        canonical_url(record.get("direct_url")) for record in collections["masterworks"]
+    }
+    for record in collections["benchmarks"]:
+        if canonical_url(record.get("source_page")) in masterwork_urls:
+            errors.append(
+                f"benchmark {record.get('id')}: source page overlaps the teaching masterwork set"
+            )
 
     return errors, collections
 
@@ -279,7 +368,7 @@ def main() -> int:
         "admitted_patterns": sum(
             record.get("status") == "admitted" for record in collections["patterns"]
         ),
-        "test_cases": count_jsonl(TEST_CASES_PATH),
+        "test_cases": len(collections["benchmarks"]),
     }
     thresholds = status.get("release_thresholds", {})
     coverage_floors = status.get("coverage_floors", {})
@@ -292,6 +381,14 @@ def main() -> int:
     period_counts = Counter(
         record.get("historical_period") for record in collections["masterworks"]
         if record.get("historical_period")
+    )
+    benchmark_band_counts = Counter(
+        record.get("quality_band") for record in collections["benchmarks"]
+        if record.get("quality_band")
+    )
+    benchmark_genre_counts = Counter(
+        record.get("genre") for record in collections["benchmarks"]
+        if record.get("genre")
     )
     source_hosts = {
         source_host(str(record.get("url", ""))) for record in collections["sources"]
@@ -345,6 +442,27 @@ def main() -> int:
                 errors.append(
                     f"period floor not met: {period}={period_counts[period]} < {minimum}"
                 )
+        for band, minimum in coverage_floors.get("benchmark_quality_bands", {}).items():
+            if benchmark_band_counts[band] != minimum:
+                errors.append(
+                    f"benchmark-band target not met: {band}={benchmark_band_counts[band]} != {minimum}"
+                )
+        for genre, minimum in coverage_floors.get("benchmark_genres", {}).items():
+            if benchmark_genre_counts[genre] < minimum:
+                errors.append(
+                    f"benchmark-genre floor not met: {genre}={benchmark_genre_counts[genre]} < {minimum}"
+                )
+        minimum_band_genres = coverage_floors.get("minimum_benchmark_genres_per_band", 0)
+        for band in coverage_floors.get("benchmark_quality_bands", {}):
+            distinct = {
+                record.get("genre") for record in collections["benchmarks"]
+                if record.get("quality_band") == band and record.get("genre")
+            }
+            if len(distinct) < minimum_band_genres:
+                errors.append(
+                    f"benchmark diversity floor not met: {band} has {len(distinct)} genres "
+                    f"< {minimum_band_genres}"
+                )
 
     if errors:
         print(f"FAIL: {len(errors)} knowledge-base issue(s)")
@@ -368,6 +486,11 @@ def main() -> int:
         f"traditions={len(tradition_counts)}/{coverage_floors.get('minimum_photographic_traditions', '?')}, "
         f"historical={period_counts['historical']}/{coverage_floors.get('historical_works', '?')}, "
         f"contemporary={period_counts['contemporary']}/{coverage_floors.get('contemporary_works', '?')}"
+    )
+    print(
+        "Benchmark coverage: "
+        f"bands={dict(sorted(benchmark_band_counts.items()))}, "
+        f"genres={dict(sorted(benchmark_genre_counts.items()))}"
     )
     return 0
 

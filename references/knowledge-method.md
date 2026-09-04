@@ -8,6 +8,8 @@ Read `knowledge-status.json` before describing the database's maturity. While it
 
 The release threshold is a floor, not proof of quality. Every numerical threshold and every coverage floor in `knowledge-status.json` must pass. Coverage is counted from explicit record metadata rather than inferred from titles. The minimum-host floor prevents one publisher or platform from satisfying the corpus by itself. Raw bulk imports, duplicate mirrors, collection hubs presented as single works, and several crops of one photograph do not count as distinct teaching cards.
 
+The 100-case holdout is governed by `benchmark-method.md`. Passing source, masterwork, and rule counts does not change the stage by itself: all benchmark images must materialize, the blind responses must be scored by band and genre, and the published result must include failures. Never search `benchmark-cases.jsonl` while critiquing a benchmark image; that file is an answer key, not coaching evidence.
+
 ## Source roles and weight
 
 | Tier | Source role | Appropriate use | Never assume |

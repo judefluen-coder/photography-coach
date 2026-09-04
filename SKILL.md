@@ -25,6 +25,8 @@ Read these files before critiquing:
 4. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. Do not load every record for every photograph.
 5. Read `references/knowledge-status.json` before making any claim about knowledge-base coverage. While it says `bootstrap`, treat results as individually verified aids and continue targeted web verification; do not imply that the corpus is sufficient or representative.
 
+Never read `references/benchmark-cases.jsonl` during an ordinary critique or while producing a blind benchmark response. It contains holdout labels and answer keys. Use it only after a response is frozen for scoring or when maintaining the benchmark itself; follow `references/benchmark-method.md` in that mode.
+
 ## Workflow
 
 ### 1. Inspect before interpreting
