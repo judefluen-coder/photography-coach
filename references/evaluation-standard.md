@@ -1,6 +1,6 @@
-# Evaluation standard v0.9
+# Evaluation standard v1.0
 
-This standard was revised from a 10-case pilot, a preregistered 30-case public-consensus benchmark, and a new 30-case v0.6 holdout. The holdout found 15/26 exact-or-partial matches and 9/26 exact matches, below the preregistered thresholds. It is not independently validated and must not be described as objective truth, expert certification, or proven learning improvement.
+This standard was revised from a 10-case pilot, a preregistered 30-case public-consensus benchmark, a 30-case v0.6 holdout, and a clean-context 100-case v0.9 blind baseline completed on September 6, 2026. The blind baseline passed 83/100 cases and recalled 94.33% of required observations, but detected only 40% of deliberately degraded variants. Its repeated misses were crop pressure, shadow compression, color excess, and small roll-plus-crop changes. The standard therefore remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
 
 The v0.9 taxonomy is also calibrated against two external practices: the Getty Museum's progression from description to reflection and formal analysis, including first fixation, viewer response, intent, and surprise; and World Press Photo's separation of visual quality/story from representation, authenticity, context, accountability, and ethics. These sources inform coverage and boundary design, not universal taste rules:
 
@@ -63,6 +63,10 @@ For every image, silently answer these concrete miss checks before moving to mea
 3. Does a large reflection, pole, branch, sign, bin, white patch, or background line interrupt the main relation?
 4. Is the tightness or empty area doing visible work, and are horizon or architectural axes internally deliberate?
 5. Do the brightest, darkest, or most saturated areas support the first two fixations rather than create a third unrelated target?
+
+Then run the six-family integrity challenge in `integrity-preflight.md`. Test each family as a falsifiable hypothesis and classify it internally as `absent`, `plausible`, or `evidenced`. A style explanation is not a result: it is a counter-condition that must be tested against the visible state. Diagnose what the image shows, not an unobservable editing history.
+
+An integrity candidate becomes `evidenced` only with at least two independent observations, for example two opposite edges, two unrelated dark regions, repeated nominal neutrals, or one stability reference plus collateral edge pressure. If the same evidenced issue weakens the core under both plausible intent branches, it must enter the candidate ledger and cannot be demoted merely because the subject, moment, or graphic idea still works.
 
 Do not infer the cause of softness from a finished image. Compare relative readability and say that focus, motion, shake, denoising, or compression may be indistinguishable.
 
@@ -140,6 +144,11 @@ Apply two additional constraints from the v0.6 holdout:
 4. **Branch does not erase shared defects.** A purpose-dependent fork may protect blur, darkness, context, tilt, or negative space, but an edge cut, focus miss, intrusive object, or processing excess that weakens both branches stays in the ledger and may outrank the fork.
 5. **Separate severity from existence.** Classify the best-supported issue internally as `rebuild`, `correctable`, or `preference`. A correctable issue may be mentioned without declaring the whole image structurally broken; a minor but concrete adjustment must not disappear merely because the core works.
 
+Apply two integrity constraints from the 100-case blind baseline:
+
+6. **Whole-frame defects outrank purpose forks when both branches pay the cost.** Uneven crop pressure, global shadow compression, pervasive color excess, or camera roll with collateral edge loss is not resolved by choosing “documentary” versus “expressive.” First state the common visible cost; branch only on how much to correct it.
+7. **A technical candidate needs an exit test, not a reassuring adjective.** Before rejecting the strongest integrity candidate, name the observation that disproves it: retained separation in multiple dark materials, stable independent axes, balanced opposite-edge intervals, or preserved hue/value variation in repeated surfaces. “Atmospheric,” “graphic,” “cinematic,” and “intentional” do not count as falsifiers by themselves.
+
 ## Decision rules
 
 ### STRUCTURAL_BOTTLENECK
@@ -161,7 +170,7 @@ For both A and B give target, action, effect, and cost. Do not declare a winner 
 
 ### NO_STRUCTURAL_BOTTLENECK
 
-Use only when no candidate reaches impact ≥2, evidence ≥2, repair value ≥2, intent dependence ≤1, and strength cost ≤1. Explicitly check key-region readability, visible low-level error, and high-salience competition. If one exists, explain why it does not block the core.
+Use only when no candidate reaches impact ≥2, evidence ≥2, repair value ≥2, intent dependence ≤1, and strength cost ≤1. Explicitly check key-region readability, visible low-level error, high-salience competition, and all six integrity families. Before choosing this class, name internally the strongest integrity candidate, its two best supporting observations, and its falsifier. If it remains evidenced and correctable, it must appear publicly as the leading correction even when the image does not need a rebuild.
 
 Use this protection statement:
 

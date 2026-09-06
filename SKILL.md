@@ -20,10 +20,11 @@ Turn one photograph into a prioritized but whole-frame critique, a falsifiable d
 Read these files before critiquing:
 
 1. `references/evaluation-standard.md` for diagnosis and decision rules.
-2. `references/response-card.md` for the user-facing output contract.
-3. Read `references/reference-policy.md` and `references/knowledge-method.md` when giving an example image, photographer, course, or external link.
-4. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. Do not load every record for every photograph.
-5. Read `references/knowledge-status.json` before making any claim about knowledge-base coverage. While it says `bootstrap`, treat results as individually verified aids and continue targeted web verification; do not imply that the corpus is sufficient or representative.
+2. `references/integrity-preflight.md` for the mandatory six-family error-detection gate.
+3. `references/response-card.md` for the user-facing output contract.
+4. Read `references/reference-policy.md` and `references/knowledge-method.md` when giving an example image, photographer, course, or external link.
+5. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. Do not load every record for every photograph.
+6. Read `references/knowledge-status.json` before making any claim about knowledge-base coverage. While it says `bootstrap`, treat results as individually verified aids and continue targeted web verification; do not imply that the corpus is sufficient or representative.
 
 Never read `references/benchmark-cases.jsonl` during an ordinary critique or while producing a blind benchmark response. It contains holdout labels and answer keys. Use it only after a response is frozen for scoring or when maintaining the benchmark itself; follow `references/benchmark-method.md` in that mode.
 
@@ -46,7 +47,7 @@ Ignore title, author, award, source, likes, comments, and the user's intended me
 
 Do not let a plausible story erase a visible technical or relational failure. Do not treat rule-breaking as a defect unless it obstructs the image's own core.
 
-Before interpreting mood or story, complete a silent preflight gate. Compare the intended key region with adjacent detail at full useful resolution; inspect all four edges; identify the brightest, darkest, and most saturated competitors; check major reflections, poles, branches, signs, and background lines; then test horizon/axis and crop pressure. Record the strongest plausible objection even when the photograph basically works.
+Before interpreting mood or story, complete the silent six-family gate in `references/integrity-preflight.md`: edge/crop pressure, shadow compression, highlight clipping, color excess/cast, roll/convergence with collateral crop, and detail damage. Compare the intended key region with adjacent detail at full useful resolution. Classify each family internally as `absent`, `plausible`, or `evidenced`; `evidenced` requires at least two independent observations. Record the strongest plausible objection and its falsifier even when the photograph basically works. Diagnose the visible state without inventing an editing history.
 
 ### 3. Choose exactly one decision class
 
@@ -57,6 +58,8 @@ Before interpreting mood or story, complete a silent preflight gate. Compare the
 Never invent a flaw merely to sound useful. Never hide a key-region failure behind “style.”
 
 `CONDITIONAL_BRANCH` may resolve a genuine purpose fork, but it cannot absorb an execution issue that harms both branches. Fix or name that shared issue first. `NO_STRUCTURAL_BOTTLENECK` means “no rebuild required,” not “nothing could improve”: name one concrete watch item when a small, visible correction remains, and keep it clearly below the protected strength.
+
+Before choosing `CONDITIONAL_BRANCH` or `NO_STRUCTURAL_BOTTLENECK`, run an exit gate: state internally the strongest integrity candidate, its two supporting observations, and the visible fact that would falsify it. If crop pressure, shadow compression, color excess, roll/collateral crop, highlight loss, or detail damage remains evidenced and has repair value under both intent branches, it must be the public leading correction or be explicitly outranked by a better-supported issue. Words such as “atmospheric,” “graphic,” “cinematic,” or “intentional” are not falsifiers on their own.
 
 ### 4. Build a prioritized whole-frame critique
 
@@ -109,7 +112,7 @@ End by inviting, not requiring, the user's purpose or intended meaning. A second
 
 ## Quality check
 
-Before sending, verify every required field in the response card is present and every central claim points to visible evidence. Run the full adaptive observation bank silently, then the five-item miss audit one last time: eye/key-region focus, frame-edge cuts, background mergers or intrusions, tonal/color extremes, and crop/axis pressure. Verify that the public map selected rather than dumped dimensions, and that any contextual gate stayed outside the score. For a saved Markdown critique, run:
+Before sending, verify every required field in the response card is present and every central claim points to visible evidence. Run the full adaptive observation bank and the six-family integrity preflight silently one last time. Confirm that every `evidenced` family has two observations and is either prioritized or explicitly falsified; confirm that a purpose branch did not hide a shared execution issue. Verify that the public map selected rather than dumped dimensions, and that any contextual gate stayed outside the score. For a saved Markdown critique, run:
 
 ```bash
 python3 scripts/validate_response.py /absolute/path/to/critique.md

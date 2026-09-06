@@ -1,0 +1,71 @@
+{
+  "run_id": "baseline-v1-20260904",
+  "generated_at": "2026-09-06T06:41:32.092142+00:00",
+  "evaluated_skill_revision": "6a21799",
+  "benchmark_cases_sha256": "d46c3f94e84758548abed87617cf3ce8edd88708232796873902bb55e2940d36",
+  "blind_integrity": {
+    "labels_in_blind_packet": false,
+    "answers_in_blind_packet": false,
+    "response_freeze_enforced": true
+  },
+  "thresholds": {
+    "minimum_overall_pass_rate": 0.8,
+    "minimum_band_pass_rate": 0.72,
+    "minimum_genre_pass_rate": 0.7,
+    "minimum_observation_recall": 0.75,
+    "minimum_failed_variant_detection_rate": 0.84,
+    "maximum_acclaimed_overcorrection_rate": 0.16,
+    "maximum_hallucination_violation_rate": 0.05
+  },
+  "metrics": {
+    "evaluated_cases": 100,
+    "overall_pass_rate": 0.83,
+    "observation_recall": 0.9433,
+    "failed_variant_detection_rate": 0.4,
+    "acclaimed_overcorrection_rate": 0.0,
+    "hallucination_violation_rate": 0.0,
+    "band_pass_rates": {
+      "acclaimed": 1.0,
+      "failed_imitation": 0.32,
+      "ordinary": 1.0
+    },
+    "genre_pass_rates": {
+      "abstract/concept": 0.5789,
+      "architecture/cityscape": 0.95,
+      "landscape/nature": 0.9231,
+      "people/documentary": 0.9375,
+      "still-life/food/macro": 0.9412,
+      "wildlife/action": 0.6667
+    }
+  },
+  "checks": {
+    "all_cases_evaluated": true,
+    "overall_pass_rate": true,
+    "every_band_pass_rate": false,
+    "every_genre_pass_rate": false,
+    "observation_recall": true,
+    "failed_variant_detection_rate": false,
+    "acclaimed_overcorrection_rate": true,
+    "hallucination_violation_rate": true
+  },
+  "passed": false,
+  "failed_case_ids": [
+    "bench-060",
+    "bench-076",
+    "bench-079",
+    "bench-081",
+    "bench-082",
+    "bench-084",
+    "bench-085",
+    "bench-087",
+    "bench-088",
+    "bench-089",
+    "bench-090",
+    "bench-091",
+    "bench-093",
+    "bench-094",
+    "bench-096",
+    "bench-097",
+    "bench-099"
+  ]
+}

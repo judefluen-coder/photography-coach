@@ -240,6 +240,8 @@ def main() -> int:
         "passed": all(checks.values()),
         "failed_case_ids": [item["id"] for item in evaluated if not item["passed"]],
     }
+    if run.get("coaching_protocol_sha256"):
+        report["coaching_protocol_sha256"] = run["coaching_protocol_sha256"]
     output = args.output or args.run_dir / "report.json"
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
