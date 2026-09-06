@@ -1,7 +1,7 @@
 {
   "stage": "bootstrap",
-  "label": "corpus complete; first blind baseline failed; integrity revision active",
-  "user_claim": "Corpus floors are met and a 100-case clean-context baseline was completed, but it failed the degraded-variant threshold; use records as individually verified aids and do not claim release readiness until a fresh blind rerun passes.",
+  "label": "corpus complete; two 100-case blind runs failed; visible-integrity revision active",
+  "user_claim": "Corpus floors are met and two 100-case blind runs were completed, but both failed the degraded-variant threshold; use records as individually verified aids and do not claim release readiness until a fresh blind rerun of the visible-integrity protocol passes.",
   "release_thresholds": {
     "sources": 100,
     "verified_sources": 80,

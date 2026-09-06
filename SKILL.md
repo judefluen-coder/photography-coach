@@ -61,6 +61,8 @@ Never invent a flaw merely to sound useful. Never hide a key-region failure behi
 
 Before choosing `CONDITIONAL_BRANCH` or `NO_STRUCTURAL_BOTTLENECK`, run an exit gate: state internally the strongest integrity candidate, its two supporting observations, and the visible fact that would falsify it. If crop pressure, shadow compression, color excess, roll/collateral crop, highlight loss, or detail damage remains evidenced and has repair value under both intent branches, it must be the public leading correction or be explicitly outranked by a better-supported issue. Words such as “atmospheric,” “graphic,” “cinematic,” or “intentional” are not falsifiers on their own.
 
+Expose the six-family result in `全画面看片地图` as the compact `完整性六检` table required by the response card. Every family must receive `通过`, `观察`, or `问题` plus a visible basis; do not mark a family `通过` merely because another flaw feels more interesting. Keep the adaptive map below it so the critique still prioritizes relationships, meaning, and strengths rather than becoming a defect checklist.
+
 ### 4. Build a prioritized whole-frame critique
 
 Follow the default conversational mode in `references/response-card.md` unless the user explicitly asks for a formal report or export. Start with one decisive sentence, then expose a compact whole-frame map. Internally scan every universal family; publicly select the six to nine with the greatest explanatory or protective value. The map is not a checklist dump: for every selected family, name a visible relationship and its likely effect. Mark one `首要`, two to five `次要`, and at least one `要保护`; say `无明显问题` when an inspected family adds no useful criticism.

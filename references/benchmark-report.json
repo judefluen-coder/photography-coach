@@ -1,7 +1,16 @@
 {
-  "run_id": "baseline-v1-20260904",
-  "generated_at": "2026-09-06T06:41:32.092142+00:00",
-  "evaluated_skill_revision": "6a21799",
+  "run_id": "integrity-v1-20260906",
+  "generated_at": "2026-09-06T09:58:58.492661+00:00",
+  "evaluated_skill_revision": "9499405",
+  "validation_design": {
+    "response_generation": "Cross-blind split: each writer handled only images it had not seen in the prior run; neither writer read the answer key.",
+    "writer_split": {
+      "blind_writer_resume": 92,
+      "blind_writer": 8
+    },
+    "grader_independence": "The grader was separate from both writers and saw responses only after SHA-256 freeze, but the same grader context had scored the earlier baseline.",
+    "limitation": "Internal model evaluation, not independent human expert validation."
+  },
   "benchmark_cases_sha256": "d46c3f94e84758548abed87617cf3ce8edd88708232796873902bb55e2940d36",
   "blind_integrity": {
     "labels_in_blind_packet": false,
@@ -20,8 +29,8 @@
   "metrics": {
     "evaluated_cases": 100,
     "overall_pass_rate": 0.83,
-    "observation_recall": 0.9433,
-    "failed_variant_detection_rate": 0.4,
+    "observation_recall": 0.93,
+    "failed_variant_detection_rate": 0.32,
     "acclaimed_overcorrection_rate": 0.0,
     "hallucination_violation_rate": 0.0,
     "band_pass_rates": {
@@ -30,12 +39,12 @@
       "ordinary": 1.0
     },
     "genre_pass_rates": {
-      "abstract/concept": 0.5789,
+      "abstract/concept": 0.6316,
       "architecture/cityscape": 0.95,
-      "landscape/nature": 0.9231,
+      "landscape/nature": 1.0,
       "people/documentary": 0.9375,
       "still-life/food/macro": 0.9412,
-      "wildlife/action": 0.6667
+      "wildlife/action": 0.5333
     }
   },
   "checks": {
@@ -52,20 +61,21 @@
   "failed_case_ids": [
     "bench-060",
     "bench-076",
+    "bench-077",
+    "bench-078",
     "bench-079",
     "bench-081",
-    "bench-082",
+    "bench-083",
     "bench-084",
     "bench-085",
-    "bench-087",
     "bench-088",
     "bench-089",
     "bench-090",
     "bench-091",
-    "bench-093",
     "bench-094",
+    "bench-095",
     "bench-096",
-    "bench-097",
-    "bench-099"
-  ]
+    "bench-097"
+  ],
+  "coaching_protocol_sha256": "3f12609b5475ebe793e78012ae12c2498fe5e03d74c3d108cf75daff9784bfa3"
 }

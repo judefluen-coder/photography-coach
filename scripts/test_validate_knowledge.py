@@ -138,6 +138,20 @@ class BenchmarkReportTests(unittest.TestCase):
             errors,
         )
 
+    def test_stale_failed_report_can_remain_as_iteration_evidence(self) -> None:
+        self.report["metrics"]["overall_pass_rate"] = .2
+        self.report["checks"]["overall_pass_rate"] = False
+        self.report["passed"] = False
+        self.report["coaching_protocol_sha256"] = "a" * 64
+        errors: list[str] = []
+        validate_benchmark_report(
+            self.report,
+            self.status,
+            errors,
+            current_protocol_sha256="b" * 64,
+        )
+        self.assertEqual(errors, [])
+
     def test_release_requires_protocol_fingerprint(self) -> None:
         errors: list[str] = []
         validate_benchmark_report(

@@ -24,6 +24,14 @@ def valid_response(marker: str) -> str:
 主体左侧轮廓与右侧亮面分开，距离关系可读。
 
 ## 全画面看片地图
+完整性六检：
+- 边缘/裁切｜通过｜四边主体轮廓完整。
+- 暗部｜通过｜左下与右下暗面仍可分。
+- 高光｜通过｜中央亮面保留纹理。
+- 色彩｜通过｜冷暖区域各有内部变化。
+- 轴线/透视｜通过｜两条独立竖线与画框一致。
+- 细节｜通过｜主体边缘与附近纹理自然。
+
 - 技术清晰：关键区域可辨。首要
 - 取景边缘：右边保留间隔。次要
 - 注意力与线条：主线指向中央。次要
@@ -104,6 +112,25 @@ class BlindResponseValidationTests(unittest.TestCase):
         errors, valid, total = validate_run(self.root)
         self.assertEqual((valid, total), (1, 2))
         self.assertTrue(any("byte-identical response duplicates" in error for error in errors))
+
+    def test_missing_visible_integrity_gate_is_rejected(self) -> None:
+        self.write_inputs(1)
+        text = valid_response("中央主体").replace("完整性六检：\n", "")
+        (self.responses / "bench-001.md").write_text(text, encoding="utf-8")
+        errors, valid, total = validate_run(self.root)
+        self.assertEqual((valid, total), (0, 1))
+        self.assertTrue(any("must expose 完整性六检" in error for error in errors))
+
+    def test_missing_integrity_family_is_rejected(self) -> None:
+        self.write_inputs(1)
+        text = valid_response("中央主体").replace(
+            "- 轴线/透视｜通过｜两条独立竖线与画框一致。\n",
+            "",
+        )
+        (self.responses / "bench-001.md").write_text(text, encoding="utf-8")
+        errors, valid, total = validate_run(self.root)
+        self.assertEqual((valid, total), (0, 1))
+        self.assertTrue(any("missing family: 轴线/透视" in error for error in errors))
 
 
 if __name__ == "__main__":

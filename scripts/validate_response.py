@@ -51,6 +51,15 @@ DIMENSIONS = [
     "表达一致性与完成度",
 ]
 
+INTEGRITY_FAMILIES = (
+    "边缘/裁切",
+    "暗部",
+    "高光",
+    "色彩",
+    "轴线/透视",
+    "细节",
+)
+
 
 def validate(text: str) -> list[str]:
     errors: list[str] = []
@@ -82,6 +91,18 @@ def validate(text: str) -> list[str]:
         re.M,
     )
     map_text = map_match.group(1) if map_match else ""
+
+    if "完整性六检" not in map_text:
+        errors.append("whole-frame map must expose 完整性六检")
+    for family in INTEGRITY_FAMILIES:
+        family_line = next(
+            (line for line in map_text.splitlines() if family in line),
+            "",
+        )
+        if not family_line:
+            errors.append(f"integrity check missing family: {family}")
+        elif not re.search(r"通过|观察|问题", family_line):
+            errors.append(f"integrity family needs 通过/观察/问题 verdict: {family}")
 
     covered_families = [
         family for family, pattern in OBSERVATION_FAMILIES.items()

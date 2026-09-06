@@ -381,6 +381,7 @@ def validate_benchmark_report(
         report_protocol_sha256
         and current_protocol_sha256
         and report_protocol_sha256 != current_protocol_sha256
+        and (require_protocol_fingerprint or report.get("passed") is True)
     ):
         errors.append("benchmark report does not match the current coaching protocol")
 

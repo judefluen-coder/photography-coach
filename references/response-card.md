@@ -7,14 +7,14 @@ Write in the user's language. Prefer concrete, compact prose over photography ja
 For an ordinary chat critique, keep the hierarchy clear without reducing the photograph to one issue:
 
 1. `一句话判断` — where the eye went, what holds, and the main bottleneck or protection;
-2. `全画面看片地图` — a compact table covering the six to nine observation families that matter most in this frame;
+2. `全画面看片地图` — a six-line integrity check followed by a compact table covering the six to nine observation families that matter most in this frame;
 3. `八维评分` — always visible, with one image-specific reason per interval and no total;
 4. `最值得改的一件事` — one diagnosis, purpose branch, or explicit protection, with evidence and why it outranks the rest;
 5. `下次这样拍` — a scene-ready action followed naturally by effect and cost;
 6. `这张怎么裁、怎么调` — crop landmarks, adjustment order, tradeoff, and recovery limit; include a labeled preview when requested and image editing is available;
 7. `参考方向` — one or two exact named photographs with verified direct pages and method matches.
 
-In `全画面看片地图`, select six to nine relevant families from the standard's adaptive observation bank. Do not use a fixed six-row template. Across the selected rows, cover capture/technical quality, frame/edge control, attention/form, light/tone or color, space/figure-ground, moment or subject relationships, and information/meaning whenever applicable. Add genre-specific families when they explain more than a generic one. Each line must contain a localized visible fact and its likely effect, then mark it `首要`, `次要`, `要保护`, or `无明显问题`. Do not fill the map with textbook definitions or force a fault into every row.
+In `全画面看片地图`, first show `完整性六检` with one concise line each for `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, and `细节`. Mark every family `通过`, `观察`, or `问题` and give a visible basis; `观察` or `问题` needs two localized signs. `通过` means the checked relation has a visible falsifier, not that the photograph is perfect. Then select six to nine relevant families from the standard's adaptive observation bank. Across the selected rows, cover capture/technical quality, frame/edge control, attention/form, light/tone or color, space/figure-ground, moment or subject relationships, and information/meaning whenever applicable. Add genre-specific families when they explain more than a generic one. Each adaptive-map line must contain a localized visible fact and its likely effect, then mark it `首要`, `次要`, `要保护`, or `无明显问题`. Do not force a fault into every row.
 
 Then add a compact exercise. Put the decision token, research status, and detailed unknowns after the main feedback or in expandable detail when the surface supports it. Never hide or omit the eight score intervals. Do not make the user walk through a formal numbered report before receiving the useful answer.
 
@@ -48,7 +48,9 @@ Name one relationship that already works. Cite at least two visible, localized o
 
 ## 3. 全画面看片地图
 
-Select six to nine relevant observation families rather than repeating a fixed list. For each, write evidence before interpretation and assign a priority mark. Keep one `首要`, two to five `次要`, at least one `要保护`, and use `无明显问题` honestly. The map must mention relevant surroundings and object/person spacing, not only the presumed subject. A row may combine neighboring families only when one visible relation truly links them.
+Begin with a table or six labeled lines under `完整性六检`. Include exactly these families: `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, `细节`. Give each one verdict—`通过`, `观察`, or `问题`—and a short visible basis. An `观察` or `问题` line must localize two independent signs. Do not infer an invisible editing history.
+
+Below that, select six to nine relevant observation families for the adaptive map. For each, write evidence before interpretation and assign a priority mark. Keep one `首要`, two to five `次要`, at least one `要保护`, and use `无明显问题` honestly. The map must mention relevant surroundings and object/person spacing, not only the presumed subject. A row may combine neighboring families only when one visible relation truly links them. If an integrity family is `问题` and weakens all plausible intent branches, put it at `首要` or explicitly explain why a better-supported issue outranks it.
 
 ## 4. 决策
 

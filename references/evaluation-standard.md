@@ -1,6 +1,6 @@
-# Evaluation standard v1.0
+# Evaluation standard v1.1
 
-This standard was revised from a 10-case pilot, a preregistered 30-case public-consensus benchmark, a 30-case v0.6 holdout, and a clean-context 100-case v0.9 blind baseline completed on September 6, 2026. The blind baseline passed 83/100 cases and recalled 94.33% of required observations, but detected only 40% of deliberately degraded variants. Its repeated misses were crop pressure, shadow compression, color excess, and small roll-plus-crop changes. The standard therefore remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
+This standard was revised from a 10-case pilot, a preregistered 30-case public-consensus benchmark, a 30-case v0.6 holdout, and two 100-case blind runs completed on September 6, 2026. The first 100-case baseline passed 83/100 cases and recalled 94.33% of required observations, but detected only 40% of deliberately degraded variants. The v1.0 cross-blind rerun again passed 83/100 and recalled 93%, while degraded-variant detection fell to 32%. Crop-pressure detection improved from 1/5 to 3/5 and shadow compression from 0/4 to 1/4, but highlight clipping, color excess, and roll-plus-crop were each detected in 0/4 cases. This showed that a silent preflight was not executed reliably, so v1.1 makes its result visible and structurally checkable. The standard remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
 
 The v0.9 taxonomy is also calibrated against two external practices: the Getty Museum's progression from description to reflection and formal analysis, including first fixation, viewer response, intent, and surprise; and World Press Photo's separation of visual quality/story from representation, authenticity, context, accountability, and ethics. These sources inform coverage and boundary design, not universal taste rules:
 
@@ -65,6 +65,8 @@ For every image, silently answer these concrete miss checks before moving to mea
 5. Do the brightest, darkest, or most saturated areas support the first two fixations rather than create a third unrelated target?
 
 Then run the six-family integrity challenge in `integrity-preflight.md`. Test each family as a falsifiable hypothesis and classify it internally as `absent`, `plausible`, or `evidenced`. A style explanation is not a result: it is a counter-condition that must be tested against the visible state. Diagnose what the image shows, not an unobservable editing history.
+
+In the public response, expose the completed scan as a compact `完整性六检` table before the adaptive whole-frame map. Give one line each for edge/crop, shadows, highlights, color, axis/perspective, and detail. Use only `通过`, `观察`, or `问题`; every line needs a short visible basis, and `观察` or `问题` needs two localized signs. This table is evidence that the scan ran, not six mandatory faults. It does not replace the prioritized whole-frame map.
 
 An integrity candidate becomes `evidenced` only with at least two independent observations, for example two opposite edges, two unrelated dark regions, repeated nominal neutrals, or one stability reference plus collateral edge pressure. If the same evidenced issue weakens the core under both plausible intent branches, it must enter the candidate ledger and cannot be demoted merely because the subject, moment, or graphic idea still works.
 
