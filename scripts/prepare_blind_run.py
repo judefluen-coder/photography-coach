@@ -11,31 +11,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from materialize_benchmark import CASES_PATH, DEFAULT_OUTPUT, load_cases, materialize
+from protocol_fingerprint import protocol_sha256
 
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_RUN_ROOT = ROOT / ".benchmark-runs"
-PROTOCOL_PATHS = (
-    ROOT / "SKILL.md",
-    ROOT / "references" / "evaluation-standard.md",
-    ROOT / "references" / "integrity-preflight.md",
-    ROOT / "references" / "response-card.md",
-    ROOT / "references" / "critique-patterns.jsonl",
-)
 
 
 def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def protocol_sha256() -> str:
-    digest = hashlib.sha256()
-    for path in PROTOCOL_PATHS:
-        digest.update(str(path.relative_to(ROOT)).encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(path.read_bytes())
-        digest.update(b"\0")
-    return digest.hexdigest()
 
 
 def main() -> int:

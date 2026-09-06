@@ -104,6 +104,31 @@ class BenchmarkReportTests(unittest.TestCase):
             errors,
         )
 
+    def test_protocol_mismatch_is_rejected(self) -> None:
+        self.report["coaching_protocol_sha256"] = "a" * 64
+        errors: list[str] = []
+        validate_benchmark_report(
+            self.report,
+            self.status,
+            errors,
+            current_protocol_sha256="b" * 64,
+        )
+        self.assertIn(
+            "benchmark report does not match the current coaching protocol",
+            errors,
+        )
+
+    def test_release_requires_protocol_fingerprint(self) -> None:
+        errors: list[str] = []
+        validate_benchmark_report(
+            self.report,
+            self.status,
+            errors,
+            current_protocol_sha256="b" * 64,
+            require_protocol_fingerprint=True,
+        )
+        self.assertIn("release requires a coaching protocol fingerprint", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

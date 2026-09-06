@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlparse
 
+from protocol_fingerprint import protocol_sha256
+
 
 ROOT = Path(__file__).resolve().parent.parent
 REFERENCE_ROOT = ROOT / "references"
@@ -332,6 +334,8 @@ def validate_benchmark_report(
     report: dict[str, Any],
     status: dict[str, Any],
     errors: list[str],
+    current_protocol_sha256: str | None = None,
+    require_protocol_fingerprint: bool = False,
 ) -> None:
     thresholds = status.get("coverage_floors", {}).get("benchmark_acceptance", {})
     if report.get("thresholds") != thresholds:
@@ -343,6 +347,15 @@ def validate_benchmark_report(
         errors.append("benchmark report does not prove that answer keys were hidden")
     if integrity.get("response_freeze_enforced") is not True:
         errors.append("benchmark report does not prove that responses were frozen")
+    report_protocol_sha256 = report.get("coaching_protocol_sha256")
+    if require_protocol_fingerprint and not report_protocol_sha256:
+        errors.append("release requires a coaching protocol fingerprint")
+    elif (
+        report_protocol_sha256
+        and current_protocol_sha256
+        and report_protocol_sha256 != current_protocol_sha256
+    ):
+        errors.append("benchmark report does not match the current coaching protocol")
 
     metrics = report.get("metrics", {})
     band_rates = metrics.get("band_pass_rates", {})
@@ -434,7 +447,13 @@ def main() -> int:
         if benchmark_report.get("benchmark_cases_sha256") != file_sha256(TEST_CASES_PATH):
             errors.append("benchmark report does not match the current benchmark cases")
         if benchmark_report:
-            validate_benchmark_report(benchmark_report, status, errors)
+            validate_benchmark_report(
+                benchmark_report,
+                status,
+                errors,
+                current_protocol_sha256=protocol_sha256(),
+                require_protocol_fingerprint=args.release,
+            )
 
     actual = {
         "sources": len(collections["sources"]),

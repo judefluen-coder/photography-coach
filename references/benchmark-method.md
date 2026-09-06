@@ -91,4 +91,4 @@ A separate model context is acceptable as a repeatable internal reviewer when a 
 
 ## Leakage and validity checks
 
-The validator fails on duplicate IDs, duplicate source pages or image URLs, overlap with teaching masterworks, unknown pattern IDs, unsupported labels, missing licence/provenance, undersized observation keys, missing recipes, band-count mismatches, or inadequate genre coverage. Human visual review remains required: schema validity cannot prove that the expected observation is correct.
+The validator fails on duplicate IDs, duplicate source pages or image URLs, overlap with teaching masterworks, unknown pattern IDs, unsupported labels, missing licence/provenance, undersized observation keys, missing recipes, band-count mismatches, or inadequate genre coverage. Release validation also rejects a missing or stale coaching-protocol fingerprint, so a passing score from an older protocol cannot certify the current skill. Human visual review remains required: schema validity cannot prove that the expected observation is correct.
