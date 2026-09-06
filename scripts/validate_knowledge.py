@@ -20,6 +20,7 @@ REFERENCE_ROOT = ROOT / "references"
 STATUS_PATH = REFERENCE_ROOT / "knowledge-status.json"
 TEST_CASES_PATH = REFERENCE_ROOT / "benchmark-cases.jsonl"
 BENCHMARK_REPORT_PATH = REFERENCE_ROOT / "benchmark-report.json"
+SEARCH_ALIASES_PATH = REFERENCE_ROOT / "search-aliases.json"
 SCHEMAS = {
     "sources": {
         "path": REFERENCE_ROOT / "source-registry.jsonl",
@@ -95,6 +96,32 @@ def load(name: str, path: Path, required: set[str], errors: list[str]) -> list[d
 
 def normalized_text(value: Any) -> str:
     return " ".join(str(value).lower().split())
+
+
+def validate_search_aliases(path: Path, errors: list[str]) -> None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"cannot read search aliases: {exc}")
+        return
+    if not isinstance(payload, dict) or not isinstance(payload.get("version"), int):
+        errors.append("search aliases require an integer version")
+    aliases = payload.get("aliases")
+    if not isinstance(aliases, dict) or not aliases:
+        errors.append("search aliases must be a non-empty object")
+        return
+    for phrase, expansions in aliases.items():
+        if not isinstance(phrase, str) or not phrase.strip():
+            errors.append("search alias phrases must be non-empty strings")
+            continue
+        if not isinstance(expansions, list) or not expansions:
+            errors.append(f"search alias {phrase!r}: expansions must be a non-empty list")
+            continue
+        if any(not isinstance(item, str) or not item.strip() for item in expansions):
+            errors.append(f"search alias {phrase!r}: expansions must be non-empty strings")
+        normalized = [normalized_text(item) for item in expansions]
+        if len(normalized) != len(set(normalized)):
+            errors.append(f"search alias {phrase!r}: duplicate expansions")
 
 
 def canonical_url(value: Any) -> str:
@@ -432,6 +459,7 @@ def main() -> int:
     args = parser.parse_args()
 
     errors, collections = validate()
+    validate_search_aliases(SEARCH_ALIASES_PATH, errors)
     try:
         status = json.loads(STATUS_PATH.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:

@@ -80,7 +80,7 @@ Release reporting must show results by band and genre, not only one aggregate pe
 
 ## Run sequence
 
-1. Create the packet with `python3 scripts/prepare_blind_run.py --run-id NAME`. Interrupted downloads may be continued with the same arguments plus `--resume`. The run metadata freezes a `coaching_protocol_sha256` over the skill, evaluation standard, integrity preflight, response card, and critique rules so the eventual score can be tied to the exact coaching protocol rather than only a mutable branch name.
+1. Create the packet with `python3 scripts/prepare_blind_run.py --run-id NAME`. Interrupted downloads may be continued with the same arguments plus `--resume`. The run metadata freezes a `coaching_protocol_sha256` over the coaching instructions, response contract, critique rules, searchable sources/masterworks, bilingual aliases, and retrieval code so the eventual score can be tied to the exact coaching protocol and knowledge snapshot rather than only a mutable branch name.
 2. Give only `blind-inputs.jsonl`, its `images/` directory, and the response contract to a clean-context evaluator. The evaluator must not open this method, the benchmark JSONL, the materialization code, or any prior critique of the images.
 3. Save one frozen response at each declared `response_path`. Do not alter a response after grading begins.
 4. Run `python3 scripts/report_benchmark.py RUN_DIR --init`. This refuses to make a grade sheet until every response exists and records every response SHA-256.

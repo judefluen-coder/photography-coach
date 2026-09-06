@@ -23,7 +23,7 @@ Read these files before critiquing:
 2. `references/integrity-preflight.md` for the mandatory six-family error-detection gate.
 3. `references/response-card.md` for the user-facing output contract.
 4. Read `references/reference-policy.md` and `references/knowledge-method.md` when giving an example image, photographer, course, or external link.
-5. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. Do not load every record for every photograph.
+5. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. The search expands Chinese photography vocabulary through `references/search-aliases.json`; use the user's natural Chinese terms or two to four method tags. Do not load every record for every photograph.
 6. Read `references/knowledge-status.json` before making any claim about knowledge-base coverage. While it says `bootstrap`, treat results as individually verified aids and continue targeted web verification; do not imply that the corpus is sufficient or representative.
 
 Never read `references/benchmark-cases.jsonl` during an ordinary critique or while producing a blind benchmark response. It contains holdout labels and answer keys. Use it only after a response is frozen for scoring or when maintaining the benchmark itself; follow `references/benchmark-method.md` in that mode.

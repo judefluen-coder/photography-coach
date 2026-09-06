@@ -74,10 +74,11 @@ Required fields in `critique-patterns.jsonl`:
 
 1. Finish the blind image scan before searching the knowledge base.
 2. Convert the leading candidate into two to four method tags, such as `figure-ground`, `gesture`, `edge-control`, or `color-anchor`.
-3. Search critique patterns first, then exact masterwork cards, then broader sources.
-4. Prefer one strong method match over two famous but superficial matches.
-5. Re-open the direct source page before giving a user a web link; registry verification can become stale.
-6. State the meaningful difference between the reference and the user's image so the reference cannot become a copying recipe.
+3. Search with `scripts/search_knowledge.py`; Chinese photography terms are expanded through the versioned `search-aliases.json` vocabulary while the original query terms remain active.
+4. Search critique patterns first, then exact masterwork cards, then broader sources.
+5. Prefer one strong method match over two famous but superficial matches.
+6. Re-open the direct source page before giving a user a web link; registry verification can become stale.
+7. State the meaningful difference between the reference and the user's image so the reference cannot become a copying recipe.
 
 ## Copyright and evidence boundaries
 

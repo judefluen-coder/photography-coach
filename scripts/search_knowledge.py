@@ -17,6 +17,7 @@ COLLECTIONS = {
     "masterworks": SKILL_ROOT / "references" / "masterwork-cards.jsonl",
     "patterns": SKILL_ROOT / "references" / "critique-patterns.jsonl",
 }
+ALIASES_PATH = SKILL_ROOT / "references" / "search-aliases.json"
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -40,6 +41,32 @@ def searchable_text(record: dict[str, Any]) -> str:
 
 def tokenize(query: str) -> list[str]:
     return [token for token in re.split(r"[\s,;/]+", query.lower()) if token]
+
+
+def load_aliases(path: Path = ALIASES_PATH) -> dict[str, list[str]]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    aliases = payload.get("aliases")
+    if not isinstance(aliases, dict):
+        raise ValueError(f"{path}: aliases must be an object")
+    for phrase, expansions in aliases.items():
+        if (
+            not isinstance(phrase, str)
+            or not phrase.strip()
+            or not isinstance(expansions, list)
+            or not expansions
+            or any(not isinstance(item, str) or not item.strip() for item in expansions)
+        ):
+            raise ValueError(f"{path}: invalid alias entry for {phrase!r}")
+    return aliases
+
+
+def expand_query(query: str, aliases: dict[str, list[str]]) -> list[str]:
+    query_lower = query.lower()
+    expanded = tokenize(query)
+    for phrase, replacements in aliases.items():
+        if phrase.lower() in query_lower:
+            expanded.extend(item.lower() for item in replacements)
+    return list(dict.fromkeys(expanded))
 
 
 def score(record: dict[str, Any], tokens: list[str]) -> int:
@@ -103,11 +130,12 @@ def main() -> int:
     selected = COLLECTIONS.values() if args.collection == "all" else (COLLECTIONS[args.collection],)
     try:
         records = [record for path in selected for record in load_jsonl(path)]
+        aliases = load_aliases()
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    tokens = tokenize(args.query)
+    tokens = expand_query(args.query, aliases)
     if not tokens:
         parser.error("query must contain at least one word")
 

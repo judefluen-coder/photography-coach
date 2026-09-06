@@ -13,7 +13,13 @@ PROTOCOL_RELATIVE_PATHS = (
     Path("references/evaluation-standard.md"),
     Path("references/integrity-preflight.md"),
     Path("references/response-card.md"),
+    Path("references/reference-policy.md"),
+    Path("references/knowledge-method.md"),
     Path("references/critique-patterns.jsonl"),
+    Path("references/masterwork-cards.jsonl"),
+    Path("references/source-registry.jsonl"),
+    Path("references/search-aliases.json"),
+    Path("scripts/search_knowledge.py"),
 )
 
 

@@ -3,9 +3,16 @@
 
 from __future__ import annotations
 
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
-from validate_knowledge import canonical_url, validate_benchmark_report
+from validate_knowledge import (
+    canonical_url,
+    validate_benchmark_report,
+    validate_search_aliases,
+)
 
 
 class CanonicalURLTests(unittest.TestCase):
@@ -28,6 +35,19 @@ class CanonicalURLTests(unittest.TestCase):
         second = canonical_url("https://www.example.com/search?id=42&year=2025")
 
         self.assertEqual(first, second)
+
+
+class SearchAliasValidationTests(unittest.TestCase):
+    def test_duplicate_expansion_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "aliases.json"
+            path.write_text(
+                json.dumps({"version": 1, "aliases": {"暗部": ["shadow", "shadow"]}}),
+                encoding="utf-8",
+            )
+            errors: list[str] = []
+            validate_search_aliases(path, errors)
+        self.assertIn("search alias '暗部': duplicate expansions", errors)
 
 
 class BenchmarkReportTests(unittest.TestCase):
