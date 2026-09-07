@@ -81,13 +81,15 @@ Release reporting must show results by band and genre, not only one aggregate pe
 ## Run sequence
 
 1. Create the packet with `python3 scripts/prepare_blind_run.py --run-id NAME`. Interrupted downloads may be continued with the same arguments plus `--resume`. The run metadata freezes a `coaching_protocol_sha256` over the coaching instructions, response contract, critique rules, searchable sources/masterworks, bilingual aliases, and retrieval code so the eventual score can be tied to the exact coaching protocol and knowledge snapshot rather than only a mutable branch name.
-2. Give only `blind-inputs.jsonl`, its `images/` directory, and the response contract to a clean-context evaluator. The evaluator must not open this method, the benchmark JSONL, the materialization code, or any prior critique of the images.
-3. Save one frozen response at each declared `response_path`. Do not alter a response after grading begins.
-4. Run `python3 scripts/report_benchmark.py RUN_DIR --init`. This refuses to make a grade sheet until every response exists and records every response SHA-256.
+2. Give only `blind-inputs.jsonl`, its `images/` directory, the current coaching protocol, and the teaching knowledge assets to a clean-context evaluator. The evaluator must not open this method, the benchmark JSONL, the materialization code, or any prior critique of the images. It must run `scripts/analyze_image_integrity.py` on each local image and may search the teaching masterwork cards for an unrelated exact-work method reference.
+3. Save one frozen response at each declared `response_path`. Run `python3 scripts/validate_response.py --benchmark RESPONSE.md` per response or `python3 scripts/validate_blind_responses.py RUN_DIR` for the packet. Benchmark responses must record a completed integrity probe and include at least one compliant exact-work reference; the no-reference omission is not accepted when bundled verified cards are available. Do not alter a response after grading begins.
+4. Run `python3 scripts/report_benchmark.py RUN_DIR --init`. This rechecks the benchmark response contract, refuses to make a grade sheet until every response exists and passes, and records every response SHA-256.
 5. A reviewer opens the answer key, records matched zero-based `must_notice` indexes and the rubric fields, then runs `python3 scripts/report_benchmark.py RUN_DIR`.
 6. Commit a report to `references/benchmark-report.json` only when its case hash matches the current corpus. For new runs, preserve the packet's `coaching_protocol_sha256` in the report. Publish failed case IDs and band/genre metrics even when the run misses release thresholds.
 
 A separate model context is acceptable as a repeatable internal reviewer when a human photography panel is unavailable, but it is not independent expert validation. Record the exact model/version and prompt policy in `reviewer_id` and keep that limitation in the release claim.
+
+Once answer keys, failed IDs, operation families, or response-specific errors from a holdout influence prompts, thresholds, retrieval, or code, that set becomes a development benchmark for the revised protocol. A rerun can measure regression on known failures but cannot restore independence. Release validation for the revision requires newly sourced photographs and frozen keys that were not used to design it.
 
 ## Leakage and validity checks
 

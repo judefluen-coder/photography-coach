@@ -25,6 +25,7 @@ def valid_response(marker: str) -> str:
 
 ## 全画面看片地图
 完整性六检：
+- 完整性量化：已运行（本夹具未触发阈值信号，仍继续人工六检）。
 - 边缘/裁切｜通过｜四边主体轮廓完整。
 - 暗部｜通过｜左下与右下暗面仍可分。
 - 高光｜通过｜中央亮面保留纹理。
@@ -58,7 +59,13 @@ def valid_response(marker: str) -> str:
 用二十分钟拍十二张，只改变左右位置，以轮廓是否分开为通过标准。
 
 ## 方法图例与摄影师方向
-本次未提供未经核验的图例。
+作者：Henri Cartier-Bresson，《Behind the Gare Saint-Lazare》，1932
+来源：https://www.moma.org/collection/works/98333
+看片任务：用二十秒标出人物、倒影与栏杆的三个间隔。
+对应本图：都用边缘间隔决定动作是否清楚。
+重点看：脚、倒影和栏杆之间没有粘连。
+关键差异：参考图是动态瞬间，本图夹具只验证结构。
+可迁移实验：固定机位，只改变动作相位拍十二张。
 
 ## 八维区间
 {scores}
@@ -131,6 +138,28 @@ class BlindResponseValidationTests(unittest.TestCase):
         errors, valid, total = validate_run(self.root)
         self.assertEqual((valid, total), (0, 1))
         self.assertTrue(any("missing family: 轴线/透视" in error for error in errors))
+
+    def test_missing_integrity_probe_is_rejected(self) -> None:
+        self.write_inputs(1)
+        text = valid_response("中央主体").replace(
+            "- 完整性量化：已运行（本夹具未触发阈值信号，仍继续人工六检）。\n",
+            "",
+        )
+        (self.responses / "bench-001.md").write_text(text, encoding="utf-8")
+        errors, valid, total = validate_run(self.root)
+        self.assertEqual((valid, total), (0, 1))
+        self.assertTrue(any("must record 完整性量化" in error for error in errors))
+
+    def test_missing_reference_is_rejected_in_benchmark(self) -> None:
+        self.write_inputs(1)
+        text = valid_response("中央主体")
+        start = text.index("## 方法图例与摄影师方向")
+        end = text.index("## 八维区间")
+        text = text[:start] + "## 方法图例与摄影师方向\n本次未提供未经核验的图例。\n\n" + text[end:]
+        (self.responses / "bench-001.md").write_text(text, encoding="utf-8")
+        errors, valid, total = validate_run(self.root)
+        self.assertEqual((valid, total), (0, 1))
+        self.assertTrue(any("needs at least one verified exact-work reference" in error for error in errors))
 
 
 if __name__ == "__main__":

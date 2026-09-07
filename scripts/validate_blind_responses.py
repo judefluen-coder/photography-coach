@@ -45,7 +45,11 @@ def validate_run(run_dir: Path) -> tuple[list[str], int, int]:
         if not text.strip():
             errors.append(f"{case_id}: response is empty")
             continue
-        response_errors = validate(text)
+        response_errors = validate(
+            text,
+            require_integrity_probe=True,
+            require_reference=True,
+        )
         if response_errors:
             errors.extend(f"{case_id}: {error}" for error in response_errors)
             continue

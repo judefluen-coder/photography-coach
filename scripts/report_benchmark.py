@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from validate_response import validate
+
 
 ROOT = Path(__file__).resolve().parent.parent
 CASES_PATH = ROOT / "references" / "benchmark-cases.jsonl"
@@ -60,6 +62,24 @@ def init_grades(run_dir: Path, destination: Path) -> int:
             file=sys.stderr,
         )
         return 2
+    invalid: list[str] = []
+    for case_id, path in responses.items():
+        response_errors = validate(
+            path.read_text(encoding="utf-8"),
+            require_integrity_probe=True,
+            require_reference=True,
+        )
+        invalid.extend(f"{case_id}: {error}" for error in response_errors)
+    if invalid:
+        print(
+            f"ERROR: freeze refused; {len(invalid)} benchmark response-contract issue(s)",
+            file=sys.stderr,
+        )
+        for error in invalid[:30]:
+            print(f"- {error}", file=sys.stderr)
+        if len(invalid) > 30:
+            print(f"- ... {len(invalid) - 30} additional issue(s) omitted", file=sys.stderr)
+        return 1
     rows = []
     for case_id, path in responses.items():
         case = cases[case_id]

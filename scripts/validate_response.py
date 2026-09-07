@@ -61,7 +61,12 @@ INTEGRITY_FAMILIES = (
 )
 
 
-def validate(text: str) -> list[str]:
+def validate(
+    text: str,
+    *,
+    require_integrity_probe: bool = False,
+    require_reference: bool = False,
+) -> list[str]:
     errors: list[str] = []
 
     positions: list[int] = []
@@ -94,6 +99,11 @@ def validate(text: str) -> list[str]:
 
     if "完整性六检" not in map_text:
         errors.append("whole-frame map must expose 完整性六检")
+    probe_match = re.search(r"完整性量化[：:]\s*(已运行|不可用)", map_text)
+    if not probe_match:
+        errors.append("whole-frame map must record 完整性量化 as 已运行 or 不可用")
+    elif require_integrity_probe and probe_match.group(1) != "已运行":
+        errors.append("benchmark response must record 完整性量化：已运行")
     for family in INTEGRITY_FAMILIES:
         family_line = next(
             (line for line in map_text.splitlines() if family in line),
@@ -164,6 +174,8 @@ def validate(text: str) -> list[str]:
                 errors.append(f"linked reference missing method-match field: {label}")
         if not re.search(r"\b(?:18|19|20)\d{2}\b", reference_text):
             errors.append("linked reference needs a named photograph year")
+    elif require_reference:
+        errors.append("benchmark response needs at least one verified exact-work reference")
     elif "本次未提供未经核验的图例。" not in reference_text:
         errors.append("reference section needs verified links or the explicit omission line")
 
@@ -176,6 +188,11 @@ def validate(text: str) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("response", type=Path, help="Markdown critique to validate")
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="Require a completed integrity probe and one exact-work reference",
+    )
     args = parser.parse_args()
 
     try:
@@ -184,7 +201,11 @@ def main() -> int:
         print(f"ERROR: cannot read {args.response}: {exc}", file=sys.stderr)
         return 2
 
-    errors = validate(text)
+    errors = validate(
+        text,
+        require_integrity_probe=args.benchmark,
+        require_reference=args.benchmark,
+    )
     if errors:
         print(f"FAIL: {len(errors)} structural issue(s)")
         for error in errors:

@@ -1,0 +1,70 @@
+{
+  "artifact_type": "failed_blind_sentinel_and_development_audit",
+  "run_id": "visible-integrity-v1-20260906",
+  "graded_on": "2026-09-07",
+  "protocol_under_test": "v1.1 visible six-family integrity table",
+  "coaching_protocol_sha256": "b65b35b52ab92ebed9733f32d0eb0bae652d76aa8631cfcee000c8620c18f586",
+  "benchmark_cases_sha256": "d46c3f94e84758548abed87617cf3ce8edd88708232796873902bb55e2940d36",
+  "blind_design": {
+    "writer": "fresh clean-context model; answer keys and earlier runs prohibited",
+    "grader": "separate fresh clean-context model; responses frozen before answer-key access",
+    "reviewer_id": "fresh-sentinel-grader-gpt-5.6-terra-20260907",
+    "cases": 31,
+    "failed_imitation_cases": 25,
+    "acclaimed_controls": 6,
+    "pre_registered_thresholds": {
+      "minimum_failed_imitation_degradation_detected": 21,
+      "maximum_acclaimed_overcorrections": 0,
+      "maximum_hallucination_violations": 0
+    }
+  },
+  "blind_results": {
+    "sentinel_passed": false,
+    "failed_imitation_degradation_detected": 4,
+    "failed_imitation_degradation_total": 25,
+    "degradation_detection_rate": 0.16,
+    "detected_case_ids": [
+      "bench-080",
+      "bench-086",
+      "bench-092",
+      "bench-098"
+    ],
+    "acclaimed_overcorrections": 1,
+    "acclaimed_overcorrection_case_ids": [
+      "bench-005"
+    ],
+    "hallucination_violations": 0,
+    "observation_recall_macro": 0.6935,
+    "reference_hygiene_passes": 0,
+    "reference_hygiene_total": 31
+  },
+  "failure_diagnosis": {
+    "visible_table_compliance": "All frozen responses could be made structurally valid, but the writer marked every non-detail degradation family as passed.",
+    "expected_family_verdicts": {
+      "crop_pressure": {"passed_verdicts": 5, "cases": 5},
+      "shadow_crush": {"passed_verdicts": 4, "cases": 4},
+      "highlight_clip": {"passed_verdicts": 4, "cases": 4},
+      "color_excess": {"passed_verdicts": 4, "cases": 4},
+      "tilt_and_crop": {"passed_verdicts": 4, "cases": 4},
+      "detail_damage": {"problem_verdicts": 4, "cases": 4}
+    },
+    "contract_gap": "The structural validator accepted the explicit no-reference omission even though benchmark scoring assigns reference_hygiene=0."
+  },
+  "v1_2_development_change": {
+    "change": "Add a deterministic pixel-level attention probe and require every raised family to be resolved with localized visual evidence or a falsifier; require an exact-work reference before benchmark freezing.",
+    "probe_replay_on_known_failed_variants": {
+      "status": "development-set diagnostic only; thresholds were inspected against these known cases and this is not a blind result",
+      "expected_family_signal_hits": 21,
+      "failed_variant_total": 25,
+      "by_operation": {
+        "crop_pressure": "2/5",
+        "shadow_crush": "4/4",
+        "highlight_clip": "4/4",
+        "color_excess": "4/4",
+        "tilt_and_crop": "3/4",
+        "detail_damage": "4/4"
+      }
+    }
+  },
+  "validity_boundary": "The existing 100 cases are now a development benchmark for v1.2 because their failures informed the revision. Release claims require a newly sourced, untouched blind holdout and an independent reviewer. A model-only reviewer is not a human expert panel."
+}

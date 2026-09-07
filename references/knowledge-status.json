@@ -1,7 +1,7 @@
 {
   "stage": "bootstrap",
-  "label": "corpus complete; two 100-case blind runs failed; visible-integrity revision active",
-  "user_claim": "Corpus floors are met and two 100-case blind runs were completed, but both failed the degraded-variant threshold; use records as individually verified aids and do not claim release readiness until a fresh blind rerun of the visible-integrity protocol passes.",
+  "label": "corpus complete; two 100-case runs and one 31-case sentinel failed; quantitative-integrity revision active",
+  "user_claim": "Corpus floors are met, but two 100-case blind runs and a fresh 31-case visible-integrity sentinel failed the degraded-variant threshold. The known 100 cases now serve as a development benchmark because their failures informed v1.2. Use records as individually verified aids and do not claim release readiness until a newly sourced untouched holdout passes independent blind review.",
   "release_thresholds": {
     "sources": 100,
     "verified_sources": 80,

@@ -3,11 +3,14 @@
 
 from __future__ import annotations
 
+import json
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
-from report_benchmark import sha256, validate_grade
+from report_benchmark import init_grades, sha256, validate_grade
 
 
 class GradeValidationTests(unittest.TestCase):
@@ -59,6 +62,21 @@ class GradeValidationTests(unittest.TestCase):
         result = validate_grade(self.grade, self.case, self.response, errors)
         self.assertIsNone(result)
         self.assertIn("bench-001: pattern_fit must be 0, 1, or 2", errors)
+
+    def test_freeze_rejects_response_outside_benchmark_contract(self) -> None:
+        run_dir = Path(self.temp.name) / "run"
+        run_dir.mkdir()
+        (run_dir / "blind-inputs.jsonl").write_text(
+            json.dumps(
+                {"case_id": "bench-001", "response_path": str(self.response)}
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        with redirect_stderr(io.StringIO()):
+            result = init_grades(run_dir, run_dir / "grades.jsonl")
+        self.assertEqual(result, 1)
+        self.assertFalse((run_dir / "grades.jsonl").exists())
 
 
 if __name__ == "__main__":

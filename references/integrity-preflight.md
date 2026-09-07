@@ -4,6 +4,16 @@ Use this compact preflight on every finished photograph before interpreting mood
 
 For each family, record internally `absent`, `plausible`, or `evidenced`. `Evidenced` requires at least two independent observations. One vague impression is not enough.
 
+## Quantitative attention probe
+
+When the image is a local file, first run `python3 scripts/analyze_image_integrity.py /absolute/path/to/image --json`. Record whether it ran. Its thresholds are intentionally asymmetric: they are designed to make the reviewer look again, not to certify failure or quality.
+
+- A raised signal must be resolved at full useful resolution. Do not answer it with mood words or a generic claim that detail remains.
+- A family may be marked `问题` or `观察` when one measured cue and one localized visible sign agree; two localized visible signs remain sufficient without a measured cue.
+- A raised signal may still be marked `通过`, but only with a localized falsifier—for example, the clipped pixels are confined to pin-point speculars while two named important bright surfaces retain texture.
+- No signal never proves `通过`. Crop pressure, subject-specific clipping, local colour contamination, and intentional/non-intentional roll often need semantic visual inspection that whole-image statistics cannot perform.
+- Never expose a raw metric dump unless the user asks. Translate only the cue that changes the diagnosis into visible photographic language.
+
 ## 1. Edge and crop pressure
 
 - Compare opposite-edge intervals, not one isolated cut. Look at repeated spacing, limbs, line endpoints, circles, faces, signage, wings, and directional space.

@@ -34,6 +34,8 @@ Never read `references/benchmark-cases.jsonl` during an ordinary critique or whi
 
 Inspect the actual image at the highest useful resolution. If only a thumbnail, compressed screenshot, or inaccessible URL is available, state that limitation and lower confidence. Never infer invisible EXIF or off-frame events.
 
+When a local image file is accessible, run `python3 scripts/analyze_image_integrity.py /absolute/path/to/image --json` before the visual six-family review. This probe measures pixel-level cues for tonal clipping, saturation/cast, weak detail, axis deviation, and edge-density imbalance. It routes attention only: a signal is not a defect verdict, and no signal is not a pass. If the probe raises a family, inspect that family at full useful resolution and do not mark it `通过` unless the response names a localized visual falsifier. If the probe cannot run, record why, continue the manual gate, and lower confidence for pixel-level claims.
+
 ### 2. Perform a blind first pass
 
 Ignore title, author, award, source, likes, comments, and the user's intended meaning on the first pass. Record internally:
@@ -62,6 +64,8 @@ Never invent a flaw merely to sound useful. Never hide a key-region failure behi
 Before choosing `CONDITIONAL_BRANCH` or `NO_STRUCTURAL_BOTTLENECK`, run an exit gate: state internally the strongest integrity candidate, its two supporting observations, and the visible fact that would falsify it. If crop pressure, shadow compression, color excess, roll/collateral crop, highlight loss, or detail damage remains evidenced and has repair value under both intent branches, it must be the public leading correction or be explicitly outranked by a better-supported issue. Words such as “atmospheric,” “graphic,” “cinematic,” or “intentional” are not falsifiers on their own.
 
 Expose the six-family result in `全画面看片地图` as the compact `完整性六检` table required by the response card. Every family must receive `通过`, `观察`, or `问题` plus a visible basis; do not mark a family `通过` merely because another flaw feels more interesting. Keep the adaptive map below it so the critique still prioritizes relationships, meaning, and strengths rather than becoming a defect checklist.
+
+Record `完整性量化：已运行` or `完整性量化：不可用（原因）` immediately above the six-family rows. Never copy the probe's threshold label into the verdict. Resolve it with visible evidence: a raised cue plus a localized failure supports `观察/问题`; a raised cue plus a localized falsifier may still support `通过`.
 
 ### 4. Build a prioritized whole-frame critique
 
@@ -93,6 +97,8 @@ Never hand the user an undirected portfolio, exhibition, or search-results link.
 
 Convert the diagnosis into two to four method tags and search the bundled knowledge base before open web search. Prefer an admitted critique pattern and an exact masterwork card that share the diagnosed relation. Treat source tiers as provenance roles, not automatic truth weights: a creator may explain an idea clearly while the original photographer, work page, or curriculum remains the source of record. Re-open direct pages before delivery because links, course access, and rights can change.
 
+In benchmark/audit runs with local knowledge assets, an exact-work reference is mandatory rather than optional. Use an admitted, verified masterwork card that matches the diagnosed relation and include the response-card comparison fields. A frozen benchmark response with only the omission sentence is structurally invalid.
+
 ### 7. Make crop and color advice visible when requested
 
 When the user asks how the current file would look after cropping or color work, produce a non-destructive `裁切与调色示意` only after diagnosis. Show the source and treatment side by side when the surface allows. Make both parts independently legible: mark or describe the crop boundary, and ensure the proposed tone/color treatment changes at least two named visual relationships, such as wall-to-face brightness and neutral-to-saturated color competition. Preserve people, objects, gestures, text, and documentary content; change only crop and explicitly proposed tonal/color controls.
@@ -120,5 +126,7 @@ Before sending, verify every required field in the response card is present and 
 python3 scripts/validate_response.py /absolute/path/to/critique.md
 python3 scripts/validate_knowledge.py
 ```
+
+For a benchmark response, run `python3 scripts/validate_response.py --benchmark /absolute/path/to/critique.md`; benchmark mode also requires a completed integrity probe and one exact-work reference.
 
 The checkers verify structural completeness and knowledge cross-references only; they cannot verify whether the visual judgment or source interpretation is correct.

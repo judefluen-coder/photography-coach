@@ -20,6 +20,7 @@ PROTOCOL_RELATIVE_PATHS = (
     Path("references/source-registry.jsonl"),
     Path("references/search-aliases.json"),
     Path("scripts/search_knowledge.py"),
+    Path("scripts/analyze_image_integrity.py"),
 )
 
 
