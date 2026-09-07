@@ -1,0 +1,32 @@
+{
+  "split": "blind_holdout_v3",
+  "case_count": 100,
+  "quality_roles": {
+    "acclaimed": 25,
+    "ordinary": 50,
+    "failed_base": 25
+  },
+  "genre_role_counts": {
+    "architecture/cityscape": {"acclaimed": 4, "ordinary": 9, "failed_base": 4},
+    "landscape/nature": {"acclaimed": 4, "ordinary": 9, "failed_base": 4},
+    "people/documentary": {"acclaimed": 4, "ordinary": 9, "failed_base": 4},
+    "wildlife/action": {"acclaimed": 4, "ordinary": 8, "failed_base": 4},
+    "still-life/food/macro": {"acclaimed": 4, "ordinary": 8, "failed_base": 4},
+    "abstract/concept": {"acclaimed": 5, "ordinary": 7, "failed_base": 5}
+  },
+  "failed_operation_counts": {
+    "crop_pressure": 5,
+    "shadow_crush": 4,
+    "highlight_clip": 4,
+    "color_excess": 4,
+    "tilt_and_crop": 4,
+    "detail_damage": 4
+  },
+  "source_disjoint_from": [
+    "references/benchmark-development-cases.jsonl",
+    "references/benchmark-cases.jsonl",
+    "references/masterwork-cards.jsonl"
+  ],
+  "annotation_rule": "Every must_notice relation must be checked against the exact materialized image and frozen image hash before blind writing begins.",
+  "threshold_policy": "Reuse the preregistered acceptance thresholds in references/knowledge-status.json without tuning after responses are seen."
+}
