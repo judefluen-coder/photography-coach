@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from validate_response import validate
+from validate_response import integrity_signal_map, validate
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -55,6 +55,7 @@ def response_files(run_dir: Path) -> dict[str, Path]:
 def init_grades(run_dir: Path, destination: Path) -> int:
     cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
     responses = response_files(run_dir)
+    inputs = {item["case_id"]: item for item in load_jsonl(run_dir / "blind-inputs.jsonl")}
     missing = [case_id for case_id, path in responses.items() if not path.exists() or not path.read_text(encoding="utf-8").strip()]
     if missing:
         print(
@@ -64,10 +65,19 @@ def init_grades(run_dir: Path, destination: Path) -> int:
         return 2
     invalid: list[str] = []
     for case_id, path in responses.items():
+        image_path_value = inputs[case_id].get("image_path")
+        integrity_signals = None
+        if image_path_value and not Path(image_path_value).exists():
+            image_path = Path(image_path_value)
+            invalid.append(f"{case_id}: benchmark image is missing: {image_path}")
+            continue
+        if image_path_value:
+            integrity_signals = integrity_signal_map(Path(image_path_value))
         response_errors = validate(
             path.read_text(encoding="utf-8"),
             require_integrity_probe=True,
             require_reference=True,
+            integrity_signals=integrity_signals,
         )
         invalid.extend(f"{case_id}: {error}" for error in response_errors)
     if invalid:

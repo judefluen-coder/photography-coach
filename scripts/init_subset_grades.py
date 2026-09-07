@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from report_benchmark import CASES_PATH, load_jsonl, response_files, sha256
-from validate_response import validate
+from validate_response import integrity_signal_map, validate
 
 
 def initialize_subset(
@@ -25,6 +25,10 @@ def initialize_subset(
 
     cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
     responses = response_files(run_dir)
+    inputs = {
+        item["case_id"]: item
+        for item in load_jsonl(run_dir / "blind-inputs.jsonl")
+    }
     unknown = sorted(set(case_ids) - cases.keys())
     outside_packet = sorted(set(case_ids) - responses.keys())
     if unknown:
@@ -41,10 +45,18 @@ def initialize_subset(
             errors.append(f"{case_id}: response is missing or empty")
             continue
         response_text = path.read_text(encoding="utf-8")
+        image_path_value = inputs[case_id].get("image_path")
+        integrity_signals = None
+        if image_path_value and not Path(image_path_value).exists():
+            errors.append(f"{case_id}: benchmark image is missing")
+            continue
+        if image_path_value:
+            integrity_signals = integrity_signal_map(Path(image_path_value))
         response_errors = validate(
             response_text,
             require_integrity_probe=True,
             require_reference=True,
+            integrity_signals=integrity_signals,
         )
         if response_errors:
             errors.extend(f"{case_id}: {error}" for error in response_errors)

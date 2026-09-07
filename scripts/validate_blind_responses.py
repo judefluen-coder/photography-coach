@@ -9,7 +9,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from validate_response import validate
+from validate_response import integrity_signal_map, validate
 
 
 def validate_run(run_dir: Path) -> tuple[list[str], int, int]:
@@ -45,10 +45,19 @@ def validate_run(run_dir: Path) -> tuple[list[str], int, int]:
         if not text.strip():
             errors.append(f"{case_id}: response is empty")
             continue
+        image_path_value = item.get("image_path")
+        integrity_signals = None
+        if image_path_value:
+            image_path = Path(image_path_value)
+            if not image_path.exists():
+                errors.append(f"{case_id}: benchmark image is missing: {image_path}")
+                continue
+            integrity_signals = integrity_signal_map(image_path)
         response_errors = validate(
             text,
             require_integrity_probe=True,
             require_reference=True,
+            integrity_signals=integrity_signals,
         )
         if response_errors:
             errors.extend(f"{case_id}: {error}" for error in response_errors)

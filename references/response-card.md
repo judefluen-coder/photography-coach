@@ -48,9 +48,9 @@ Name one relationship that already works. Cite at least two visible, localized o
 
 ## 3. 全画面看片地图
 
-Begin by recording `完整性量化：已运行（触发的复核项）` or `完整性量化：不可用（具体原因）`, then use a table or six labeled lines under `完整性六检`. Include exactly these families: `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, `细节`. Give each one verdict—`通过`, `观察`, or `问题`—and a short visible basis. An `观察` or `问题` line must localize two independent signs, or pair one measured cue with one localized sign. When a cue was raised but the verdict is `通过`, name the visible falsifier. Do not infer an invisible editing history.
+Begin by recording `完整性量化：已运行（触发：暗部[强]、轴线/透视[复核]）`, or `完整性量化：已运行（无阈值信号）`, or `完整性量化：不可用（具体原因）`. In benchmark mode the trigger families and strengths must match the actual probe output. Then use a table or six labeled lines under `完整性六检`. Include exactly these families: `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, `细节`. Give each one verdict—`通过`, `观察`, or `问题`—and a short visible basis. In audit mode, bind every line to a paired comparison: `对边：左…与右…` or `上…与下…`; `暗面：…与…`; `亮面：…与…`; `色彩对照：…与…`; `参照：…与…`; `同尺度：…与…`. An `观察` or `问题` line must localize two independent signs, or pair one measured cue with one localized sign. When a cue was raised but the verdict is `通过`, append `反证：` and name the localized falsifier. A `轴线/透视[强]` cue cannot be marked `通过`; describe it as an intentional or problematic orientation decision. Do not infer an invisible editing history.
 
-Below that, select six to nine relevant observation families for the adaptive map. For each, write evidence before interpretation and assign a priority mark. Keep one `首要`, two to five `次要`, at least one `要保护`, and use `无明显问题` honestly. The map must mention relevant surroundings and object/person spacing, not only the presumed subject. A row may combine neighboring families only when one visible relation truly links them. If an integrity family is `问题` and weakens all plausible intent branches, put it at `首要` or explicitly explain why a better-supported issue outranks it.
+Below that, select six to nine relevant observation families for the adaptive map. For each, write evidence before interpretation and assign a priority mark. Keep one `首要`, two to five `次要`, at least one `要保护`, and use `无明显问题` honestly. The map must mention relevant surroundings and object/person spacing, not only the presumed subject. A row may combine neighboring families only when one visible relation truly links them. If an integrity family is `问题` and weakens all plausible intent branches, put it at `首要` or explicitly explain why a better-supported issue outranks it. If the probe returned any `强` cue that remains `观察/问题`, the `首要` row must address at least one such family; an unrelated compositional preference cannot silently outrank visible information loss.
 
 ## 4. 决策
 
@@ -100,7 +100,7 @@ For copyrighted masterwork or photographer directions, use official links withou
 
 ## 10. 八维区间
 
-List all eight stable dimensions with integer intervals such as `3–4/5`: `技术可读性`, `取景与边缘控制`, `注意力与形式组织`, `光线影调色彩`, `空间与层次`, `时机与关键关系`, `信息叙事情绪`, `表达一致性与完成度`. Add one image-specific reason to each, use `N/A` where needed, and never total or average them. These scores are mandatory in both conversational and audit modes. Purpose fit, originality, ethics, consent, authenticity, and safety may appear as observations or conditional gates but must not be silently folded into a taste score.
+List all eight stable dimensions with integer intervals such as `3–4/5`: `技术可读性`, `取景与边缘控制`, `注意力与形式组织`, `光线影调色彩`, `空间与层次`, `时机与关键关系`, `信息叙事情绪`, `表达一致性与完成度`. Add one image-specific reason to each, use `N/A` where needed, and never total or average them. Each reason must explain that dimension rather than repeating one stock sentence across all eight rows. These scores are mandatory in both conversational and audit modes. Purpose fit, originality, ethics, consent, authenticity, and safety may appear as observations or conditional gates but must not be silently folded into a taste score.
 
 ## 11. 未知项与事实边界
 

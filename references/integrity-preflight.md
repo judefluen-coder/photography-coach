@@ -13,6 +13,10 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 - A raised signal may still be marked `通过`, but only with a localized falsifier—for example, the clipped pixels are confined to pin-point speculars while two named important bright surfaces retain texture.
 - No signal never proves `通过`. Crop pressure, subject-specific clipping, local colour contamination, and intentional/non-intentional roll often need semantic visual inspection that whole-image statistics cannot perform.
 - Never expose a raw metric dump unless the user asks. Translate only the cue that changes the diagnosis into visible photographic language.
+- In an audit response, transcribe the probe's family and strength exactly as `触发：暗部[强]、轴线/透视[复核]`; write `无阈值信号` only when the probe returned none. This binds the manual review to the image that was measured.
+- Use paired visible comparisons rather than assurances: `对边：左…与右…`, `暗面：…与…`, `亮面：…与…`, `色彩对照：…与…`, `参照：…与…`, and `同尺度：…与…`. These labels are audit rails, not wording required in ordinary conversation.
+- When one or more `强` cues remain `观察/问题`, the single public `首要` must address at least one of those families. A strong cue may be marked `通过` only with localized counter-evidence in the same line; generic phrases such as “仍有层次” do not falsify it.
+- Exception: a `轴线/透视[强]` cue is derived from agreeing horizontal and vertical edge populations, so it cannot be marked `通过`. Mark the visible tilt `观察` or `问题`, then decide whether it is an intentional organizing choice or a repairable roll.
 
 ## 1. Edge and crop pressure
 

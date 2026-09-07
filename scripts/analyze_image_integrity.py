@@ -124,6 +124,8 @@ def _gradient_metrics(image: Image.Image) -> dict[str, Any]:
     values = list(gray.get_flattened_data())
     gradients: list[int] = []
     orientation_energy = [0.0] * 91
+    horizontal_axis_energy = [0.0] * 31
+    vertical_axis_energy = [0.0] * 31
     border_energy = {"left": 0.0, "right": 0.0, "top": 0.0, "bottom": 0.0}
     border_samples = {key: 0 for key in border_energy}
     border_x = max(2, round(width * 0.04))
@@ -143,6 +145,12 @@ def _gradient_metrics(image: Image.Image) -> dict[str, Any]:
                 )
                 bin_index = min(90, round(deviation + 45))
                 orientation_energy[bin_index] += magnitude
+                if line_angle <= 15 or line_angle >= 165:
+                    horizontal_deviation = line_angle if line_angle <= 15 else line_angle - 180
+                    horizontal_axis_energy[round(horizontal_deviation) + 15] += magnitude
+                elif 75 <= line_angle <= 105:
+                    vertical_deviation = line_angle - 90
+                    vertical_axis_energy[round(vertical_deviation) + 15] += magnitude
             for key, inside in (
                 ("left", x < border_x),
                 ("right", x >= width - border_x),
@@ -180,6 +188,34 @@ def _gradient_metrics(image: Image.Image) -> dict[str, Any]:
     axis_band_energy = sum(axis_energy)
     dominant_deviation = peak_index - 45 if axis_band_energy else None
 
+    def axis_peak(energy: list[float]) -> tuple[int | None, float]:
+        total = sum(energy)
+        if not total:
+            return None, 0.0
+        index = max(range(len(energy)), key=energy.__getitem__)
+        start = max(0, index - 2)
+        end = min(len(energy), index + 3)
+        return index - 15, sum(energy[start:end])
+
+    horizontal_deviation, horizontal_peak_support = axis_peak(horizontal_axis_energy)
+    vertical_deviation, vertical_peak_support = axis_peak(vertical_axis_energy)
+    horizontal_band_energy = sum(horizontal_axis_energy)
+    vertical_band_energy = sum(vertical_axis_energy)
+    consensus_deviation = None
+    if (
+        horizontal_deviation is not None
+        and vertical_deviation is not None
+        and abs(horizontal_deviation - vertical_deviation) <= 3
+    ):
+        consensus_deviation = round(
+            (
+                horizontal_deviation * horizontal_peak_support
+                + vertical_deviation * vertical_peak_support
+            )
+            / max(horizontal_peak_support + vertical_peak_support, 1e-9),
+            2,
+        )
+
     whole_mean = total_gradient / len(gradients)
     normalized = {
         key: round((border_energy[key] / max(border_samples[key], 1)) / max(whole_mean, 1e-9), 4)
@@ -204,6 +240,13 @@ def _gradient_metrics(image: Image.Image) -> dict[str, Any]:
             if total_orientation else 0.0,
             "axis_peak_fraction": round(peak_support / axis_band_energy, 6)
             if axis_band_energy else 0.0,
+            "horizontal_axis_deviation_degrees": horizontal_deviation,
+            "vertical_axis_deviation_degrees": vertical_deviation,
+            "axis_consensus_deviation_degrees": consensus_deviation,
+            "independent_axis_support_fraction": round(
+                min(horizontal_band_energy, vertical_band_energy) / total_orientation,
+                6,
+            ) if total_orientation else 0.0,
         },
         "border": {
             "normalized_edge_energy": normalized,
@@ -277,6 +320,16 @@ def _signals(metrics: dict[str, Any]) -> list[dict[str, str]]:
         )
 
     if (
+        axis.get("axis_consensus_deviation_degrees") is not None
+        and abs(axis["axis_consensus_deviation_degrees"]) >= 3
+        and axis.get("independent_axis_support_fraction", 0) >= 0.035
+    ):
+        add(
+            "轴线/透视",
+            "strong",
+            "水平与垂直边缘在同一偏角形成独立共识；必须以画面中的两条具名稳定参照复核全局滚转。",
+        )
+    elif (
         axis["dominant_axis_deviation_degrees"] is not None
         and abs(axis["dominant_axis_deviation_degrees"]) >= 3
         and axis["axis_support_fraction"] >= 0.25

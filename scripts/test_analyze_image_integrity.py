@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from analyze_image_integrity import analyze
 
@@ -46,6 +46,21 @@ class IntegrityProbeTests(unittest.TestCase):
         self.assertEqual(result["image"]["original_width"], 96)
         self.assertIsInstance(result["metrics"]["shadow"]["deep_shadow_fraction"], float)
         self.assertIn("interpretation_rule", result)
+
+    def test_rotated_grid_routes_strong_axis_review(self) -> None:
+        image = Image.new("RGB", (180, 180), "white")
+        draw = ImageDraw.Draw(image)
+        for coordinate in (40, 90, 140):
+            draw.line((coordinate, 15, coordinate, 165), fill="black", width=4)
+            draw.line((15, coordinate, 165, coordinate), fill="black", width=4)
+        rotated = image.rotate(6, resample=Image.Resampling.BICUBIC, expand=False, fillcolor="white")
+        result = analyze(self.save("rotated-grid.png", rotated))
+        axis_signal = next(item for item in result["signals"] if item["family"] == "轴线/透视")
+        self.assertEqual(axis_signal["strength"], "strong")
+        self.assertGreaterEqual(
+            abs(result["metrics"]["axis"]["axis_consensus_deviation_degrees"]),
+            3,
+        )
 
 
 if __name__ == "__main__":
