@@ -4,8 +4,10 @@ This benchmark tests whether the coach can observe, prioritize, and bound its cl
 
 ## Independent holdout
 
+- The active answer key is the source-disjoint 100-case `blind_holdout_v2`; the earlier 100 cases are retained in `benchmark-development-cases.jsonl` because their failures informed v1.2.
 - Every case uses an exact Wikimedia Commons file page and an open licence or public-domain mark.
 - No benchmark source page may appear in `masterwork-cards.jsonl`.
+- No active holdout source page, image URL, or source SHA-1 may appear in the archived development benchmark.
 - The blind prompt contains only the image and the requested critique format. Author, title, community assessment, quality band, and expected observations stay hidden until scoring.
 - One source photograph may appear only once. Failed-imitation cases use their own source photographs and never reuse acclaimed or ordinary cases.
 - Image files are materialized locally for evaluation and remain untracked. The repository stores URLs, attribution, licence metadata, transformations, and checks—not a duplicate image archive.

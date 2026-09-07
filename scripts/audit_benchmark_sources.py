@@ -10,13 +10,23 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 
 ROOT = Path(__file__).resolve().parent.parent
 CASES_PATH = ROOT / "references" / "benchmark-cases.jsonl"
 API = "https://commons.wikimedia.org/w/api.php"
 USER_AGENT = "PhotographyCoachBenchmarkAudit/0.1 (+https://github.com/judefluen-coder/photography-coach)"
+
+
+def assessment_present(categories: set[str], quality_band: str) -> bool:
+    if quality_band == "acclaimed":
+        return any(
+            category.startswith("Category:Featured pictures ")
+            and "candidate" not in category.lower()
+            for category in categories
+        )
+    return "Category:Quality images" in categories
 
 
 def load_cases() -> list[dict[str, Any]]:
@@ -54,6 +64,35 @@ def query(params: dict[str, str], retries: int = 3) -> dict[str, Any]:
     raise RuntimeError("unreachable")
 
 
+def fetch_pages(
+    titles: list[str],
+    query_fn: Callable[[dict[str, str]], dict[str, Any]] = query,
+) -> dict[str, dict[str, Any]]:
+    """Merge category-continuation pages without losing first-page image info."""
+    params = {
+        "titles": "|".join(titles),
+        "prop": "categories|imageinfo",
+        "cllimit": "max",
+        "iiprop": "sha1|url|extmetadata",
+    }
+    continuation: dict[str, str] = {}
+    pages: dict[str, dict[str, Any]] = {}
+    while True:
+        result = query_fn({**params, **continuation})
+        for page in result.get("query", {}).get("pages", []):
+            title = page["title"]
+            current = pages.setdefault(title, {**page, "categories": []})
+            current["categories"].extend(page.get("categories", []))
+            if page.get("imageinfo"):
+                current["imageinfo"] = page["imageinfo"]
+        raw_continuation = result.get("continue")
+        if not raw_continuation:
+            return pages
+        continuation = {
+            str(name): str(value) for name, value in raw_continuation.items()
+        }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--batch-size", type=int, default=20)
@@ -70,17 +109,7 @@ def main() -> int:
     for offset in range(0, len(cases), args.batch_size):
         batch = cases[offset : offset + args.batch_size]
         titles = [commons_title(case["source_page"]) for case in batch]
-        result = query(
-            {
-                "titles": "|".join(titles),
-                "prop": "categories|imageinfo",
-                "cllimit": "max",
-                "iiprop": "sha1|url|extmetadata",
-            }
-        )
-        pages = {
-            page["title"]: page for page in result.get("query", {}).get("pages", [])
-        }
+        pages = fetch_pages(titles)
         for case, title in zip(batch, titles):
             page = pages.get(title)
             if not page or page.get("missing"):
@@ -90,12 +119,7 @@ def main() -> int:
             if info.get("sha1") != case["source_sha1"]:
                 errors.append(f"{case['id']}: source SHA-1 changed")
             categories = {item["title"] for item in page.get("categories", [])}
-            expected = (
-                "Category:Featured pictures on Wikimedia Commons"
-                if case["quality_band"] == "acclaimed"
-                else "Category:Quality images"
-            )
-            if expected not in categories:
+            if not assessment_present(categories, case["quality_band"]):
                 errors.append(f"{case['id']}: assessment category changed")
             licence = (
                 info.get("extmetadata", {})

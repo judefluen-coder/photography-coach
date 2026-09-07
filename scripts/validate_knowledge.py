@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REFERENCE_ROOT = ROOT / "references"
 STATUS_PATH = REFERENCE_ROOT / "knowledge-status.json"
 TEST_CASES_PATH = REFERENCE_ROOT / "benchmark-cases.jsonl"
+DEVELOPMENT_CASES_PATH = REFERENCE_ROOT / "benchmark-development-cases.jsonl"
 BENCHMARK_REPORT_PATH = REFERENCE_ROOT / "benchmark-report.json"
 SEARCH_ALIASES_PATH = REFERENCE_ROOT / "search-aliases.json"
 SCHEMAS = {
@@ -256,8 +257,8 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(
                 f"benchmark {record_id}: provenance_status must be official-page-verified"
             )
-        if record.get("split") != "blind_holdout":
-            errors.append(f"benchmark {record_id}: split must be blind_holdout")
+        if record.get("split") != "blind_holdout_v2":
+            errors.append(f"benchmark {record_id}: split must be blind_holdout_v2")
         if record.get("difficulty") not in {"low", "medium", "high"}:
             errors.append(f"benchmark {record_id}: invalid difficulty")
         for field in ("source_page", "image_url", "preview_url"):
@@ -343,6 +344,35 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(
                 f"benchmark {record.get('id')}: source page overlaps the teaching masterwork set"
             )
+
+    if DEVELOPMENT_CASES_PATH.exists():
+        development = load(
+            "development benchmarks",
+            DEVELOPMENT_CASES_PATH,
+            SCHEMAS["benchmarks"]["required"],
+            errors,
+        )
+        development_pages = {
+            canonical_url(record.get("source_page")) for record in development
+        }
+        development_urls = {
+            canonical_url(record.get("image_url")) for record in development
+        }
+        development_sha1s = {record.get("source_sha1") for record in development}
+        for record in collections["benchmarks"]:
+            record_id = record.get("id")
+            if canonical_url(record.get("source_page")) in development_pages:
+                errors.append(
+                    f"benchmark {record_id}: source page overlaps the development benchmark"
+                )
+            if canonical_url(record.get("image_url")) in development_urls:
+                errors.append(
+                    f"benchmark {record_id}: source image overlaps the development benchmark"
+                )
+            if record.get("source_sha1") in development_sha1s:
+                errors.append(
+                    f"benchmark {record_id}: source SHA-1 overlaps the development benchmark"
+                )
 
     return errors, collections
 
