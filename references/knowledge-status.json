@@ -1,7 +1,7 @@
 {
   "stage": "bootstrap",
-  "label": "corpus complete; quantitative-integrity revision active; untouched 100-case holdout v2 staged for independent blind review",
-  "user_claim": "Corpus floors are met. Two earlier 100-case blind runs and a 31-case visible-integrity sentinel failed the degraded-variant threshold, so those known cases are archived as a development benchmark. A source-disjoint 100-case holdout v2 is now frozen but not yet scored. Use records as individually verified aids and do not claim release readiness until holdout v2 passes independent blind review.",
+  "label": "corpus complete; source-disjoint 100-case holdout v2 failed; integrity prioritization revision required",
+  "user_claim": "Corpus floors are met, but the source-disjoint 100-case holdout v2 failed independent model review: 63% overall pass, 70% observation recall, and 52% degraded-variant detection. Acclaimed overcorrection (12%) and hallucination violations (3%) met their preregistered limits. Crop pressure and global roll were detected in 0/5 and 0/4 derived cases; color excess was detected in 1/4. Use records as individually verified aids and do not claim release readiness or proven learning improvement.",
   "release_thresholds": {
     "sources": 100,
     "verified_sources": 80,

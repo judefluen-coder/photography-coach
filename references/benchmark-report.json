@@ -1,0 +1,91 @@
+{
+  "run_id": "holdout-v2-20260907",
+  "generated_at": "2026-09-07T09:16:20.804623+00:00",
+  "benchmark_cases_sha256": "28ad556e4d14bf34be43f06920bf1253af2ba68a0ff8a08988540017310a9463",
+  "blind_integrity": {
+    "labels_in_blind_packet": false,
+    "answers_in_blind_packet": false,
+    "response_freeze_enforced": true
+  },
+  "thresholds": {
+    "minimum_overall_pass_rate": 0.8,
+    "minimum_band_pass_rate": 0.72,
+    "minimum_genre_pass_rate": 0.7,
+    "minimum_observation_recall": 0.75,
+    "minimum_failed_variant_detection_rate": 0.84,
+    "maximum_acclaimed_overcorrection_rate": 0.16,
+    "maximum_hallucination_violation_rate": 0.05
+  },
+  "metrics": {
+    "evaluated_cases": 100,
+    "overall_pass_rate": 0.63,
+    "observation_recall": 0.7,
+    "failed_variant_detection_rate": 0.52,
+    "acclaimed_overcorrection_rate": 0.12,
+    "hallucination_violation_rate": 0.03,
+    "band_pass_rates": {
+      "acclaimed": 0.8,
+      "failed_imitation": 0.16,
+      "ordinary": 0.78
+    },
+    "genre_pass_rates": {
+      "abstract/concept": 0.5333,
+      "architecture/cityscape": 0.6471,
+      "landscape/nature": 0.6471,
+      "people/documentary": 0.6667,
+      "still-life/food/macro": 0.6875,
+      "wildlife/action": 0.5882
+    }
+  },
+  "checks": {
+    "all_cases_evaluated": true,
+    "overall_pass_rate": false,
+    "every_band_pass_rate": false,
+    "every_genre_pass_rate": false,
+    "observation_recall": false,
+    "failed_variant_detection_rate": false,
+    "acclaimed_overcorrection_rate": true,
+    "hallucination_violation_rate": true
+  },
+  "passed": false,
+  "failed_case_ids": [
+    "v2-006",
+    "v2-016",
+    "v2-020",
+    "v2-022",
+    "v2-024",
+    "v2-029",
+    "v2-039",
+    "v2-040",
+    "v2-044",
+    "v2-047",
+    "v2-056",
+    "v2-062",
+    "v2-064",
+    "v2-067",
+    "v2-068",
+    "v2-074",
+    "v2-076",
+    "v2-077",
+    "v2-078",
+    "v2-079",
+    "v2-080",
+    "v2-082",
+    "v2-083",
+    "v2-084",
+    "v2-085",
+    "v2-087",
+    "v2-088",
+    "v2-089",
+    "v2-090",
+    "v2-092",
+    "v2-093",
+    "v2-094",
+    "v2-095",
+    "v2-097",
+    "v2-098",
+    "v2-099",
+    "v2-100"
+  ],
+  "coaching_protocol_sha256": "3edc80f5b18944ec84f311d36a2d24c6c29a630e44c28d1539cda5b126d38f94"
+}
