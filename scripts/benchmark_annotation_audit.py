@@ -87,6 +87,56 @@ def init_audit(
     return 0
 
 
+def complete_audit(
+    audit_path: Path,
+    annotation_paths: list[Path],
+) -> list[str]:
+    errors: list[str] = []
+    try:
+        templates = load_jsonl(audit_path)
+        annotations = [
+            row for path in annotation_paths for row in load_jsonl(path)
+        ]
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"cannot read audit completion inputs: {exc}"]
+    annotation_ids = [row.get("case_id") for row in annotations]
+    if len(annotation_ids) != len(set(annotation_ids)):
+        errors.append("annotation completion inputs contain duplicate case IDs")
+    expected_ids = [row.get("case_id") for row in templates]
+    if set(annotation_ids) != set(expected_ids):
+        missing = set(expected_ids) - set(annotation_ids)
+        extra = set(annotation_ids) - set(expected_ids)
+        if missing:
+            errors.append(f"annotation completion is missing: {', '.join(sorted(missing))}")
+        if extra:
+            errors.append(f"annotation completion has unknown IDs: {', '.join(sorted(extra))}")
+    if errors:
+        return errors
+
+    by_id = {row["case_id"]: row for row in annotations}
+    completed = []
+    for template in templates:
+        row = by_id[template["case_id"]]
+        updated = dict(template)
+        updated.update(
+            {
+                "reviewer_id": row.get("reviewer_id"),
+                "image_key_alignment": row.get("image_key_alignment"),
+                "observation_support": [
+                    True for _ in template["observation_support"]
+                ],
+                "visible_anchors_checked": row.get("visible_anchors_checked", []),
+                "notes": row.get("notes", ""),
+            }
+        )
+        completed.append(updated)
+    audit_path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in completed),
+        encoding="utf-8",
+    )
+    return []
+
+
 def validate_audit(
     run_dir: Path,
     audit_path: Path,
@@ -155,10 +205,20 @@ def main() -> int:
     parser.add_argument("--audit", type=Path)
     parser.add_argument("--cases", type=Path, default=CASES_PATH)
     parser.add_argument("--init", action="store_true")
+    parser.add_argument("--annotations", type=Path, nargs="+")
     args = parser.parse_args()
     audit_path = args.audit or args.run_dir / "annotation-audit.jsonl"
     if args.init:
-        return init_audit(args.run_dir, audit_path, args.cases)
+        result = init_audit(args.run_dir, audit_path, args.cases)
+        if result or not args.annotations:
+            return result
+        errors = complete_audit(audit_path, args.annotations)
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}", file=sys.stderr)
+            return 1
+        print(f"Completed annotation audit from {len(args.annotations)} review file(s)")
+        return 0
     errors = validate_audit(args.run_dir, audit_path, args.cases)
     if errors:
         print(f"FAIL: {len(errors)} annotation-audit issue(s)")

@@ -83,6 +83,26 @@ class AnnotationAuditTests(unittest.TestCase):
             errors = audit.validate_audit(self.run, self.audit_path)
         self.assertTrue(any("image changed after annotation audit" in error for error in errors))
 
+    def test_completion_file_populates_frozen_audit(self) -> None:
+        with patch.object(audit, "CASES_PATH", self.cases):
+            self.assertEqual(audit.init_audit(self.run, self.audit_path), 0)
+            completion = self.root / "completion.jsonl"
+            completion.write_text(
+                json.dumps(
+                    {
+                        "case_id": "bench-001",
+                        "reviewer_id": "reviewer-a",
+                        "image_key_alignment": True,
+                        "visible_anchors_checked": ["left hand", "right edge"],
+                        "notes": "checked at original detail",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(audit.complete_audit(self.audit_path, [completion]), [])
+            self.assertEqual(audit.validate_audit(self.run, self.audit_path), [])
+
 
 if __name__ == "__main__":
     unittest.main()

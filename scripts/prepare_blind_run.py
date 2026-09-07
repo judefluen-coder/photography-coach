@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import random
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -34,7 +35,14 @@ def main() -> int:
         action="store_true",
         help="Reuse already materialized case images; fails when any are missing",
     )
+    parser.add_argument(
+        "--reuse-images-from",
+        type=Path,
+        help="Copy already reviewed <case-id>.jpg files from this directory",
+    )
     args = parser.parse_args()
+    if args.reuse_cache and args.reuse_images_from is not None:
+        parser.error("--reuse-cache and --reuse-images-from are mutually exclusive")
 
     run_id = args.run_id or datetime.now(timezone.utc).strftime("run-%Y%m%dT%H%M%SZ")
     run_dir = DEFAULT_RUN_ROOT / run_id
@@ -59,7 +67,19 @@ def main() -> int:
                 }
             )
             continue
-        if args.reuse_cache:
+        if args.reuse_images_from is not None:
+            source = args.reuse_images_from / f"{case['id']}.jpg"
+            if not source.is_file():
+                parser.error(f"missing reviewed image: {source}")
+            shutil.copy2(source, destination)
+            materialized.append(
+                {
+                    "id": case["id"],
+                    "output_path": str(destination),
+                    "output_sha256": file_sha256(destination),
+                }
+            )
+        elif args.reuse_cache:
             if not cached.exists():
                 parser.error(f"missing cached image: {cached}")
             destination = images_dir / cached.name
