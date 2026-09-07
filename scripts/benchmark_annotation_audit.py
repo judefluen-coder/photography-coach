@@ -37,9 +37,14 @@ def value_sha256(value: Any) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def init_audit(run_dir: Path, destination: Path) -> int:
+def init_audit(
+    run_dir: Path,
+    destination: Path,
+    cases_path: Path | None = None,
+) -> int:
+    cases_path = cases_path or CASES_PATH
     inputs = load_jsonl(run_dir / "blind-inputs.jsonl")
-    cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
+    cases = {case["id"]: case for case in load_jsonl(cases_path)}
     errors: list[str] = []
     rows = []
     for item in inputs:
@@ -59,7 +64,7 @@ def init_audit(run_dir: Path, destination: Path) -> int:
         rows.append(
             {
                 "case_id": case_id,
-                "benchmark_cases_sha256": file_sha256(CASES_PATH),
+                "benchmark_cases_sha256": file_sha256(cases_path),
                 "image_sha256": actual_image_hash,
                 "must_notice_sha256": value_sha256(case["must_notice"]),
                 "reviewer_id": None,
@@ -82,12 +87,17 @@ def init_audit(run_dir: Path, destination: Path) -> int:
     return 0
 
 
-def validate_audit(run_dir: Path, audit_path: Path) -> list[str]:
+def validate_audit(
+    run_dir: Path,
+    audit_path: Path,
+    cases_path: Path | None = None,
+) -> list[str]:
+    cases_path = cases_path or CASES_PATH
     errors: list[str] = []
     try:
         inputs = load_jsonl(run_dir / "blind-inputs.jsonl")
         rows = load_jsonl(audit_path)
-        cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
+        cases = {case["id"]: case for case in load_jsonl(cases_path)}
     except (OSError, json.JSONDecodeError) as exc:
         return [f"cannot read annotation audit: {exc}"]
 
@@ -99,7 +109,7 @@ def validate_audit(run_dir: Path, audit_path: Path) -> list[str]:
         errors.append("annotation audit contains duplicate case IDs")
 
     input_by_id = {item["case_id"]: item for item in inputs}
-    current_cases_hash = file_sha256(CASES_PATH)
+    current_cases_hash = file_sha256(cases_path)
     for row in rows:
         case_id = row.get("case_id")
         if case_id not in input_by_id or case_id not in cases:
@@ -143,12 +153,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_dir", type=Path)
     parser.add_argument("--audit", type=Path)
+    parser.add_argument("--cases", type=Path, default=CASES_PATH)
     parser.add_argument("--init", action="store_true")
     args = parser.parse_args()
     audit_path = args.audit or args.run_dir / "annotation-audit.jsonl"
     if args.init:
-        return init_audit(args.run_dir, audit_path)
-    errors = validate_audit(args.run_dir, audit_path)
+        return init_audit(args.run_dir, audit_path, args.cases)
+    errors = validate_audit(args.run_dir, audit_path, args.cases)
     if errors:
         print(f"FAIL: {len(errors)} annotation-audit issue(s)")
         for error in errors:

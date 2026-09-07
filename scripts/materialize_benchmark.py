@@ -21,10 +21,10 @@ DEFAULT_OUTPUT = ROOT / ".benchmark-cache"
 USER_AGENT = "PhotographyCoachBenchmark/0.1 (+https://github.com/judefluen-coder/photography-coach)"
 
 
-def load_cases() -> list[dict[str, Any]]:
+def load_cases(path: Path = CASES_PATH) -> list[dict[str, Any]]:
     return [
         json.loads(line)
-        for line in CASES_PATH.read_text(encoding="utf-8").splitlines()
+        for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
 
@@ -160,6 +160,7 @@ def materialize(case: dict[str, Any], output: Path, use_original: bool) -> dict[
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cases", type=Path, default=CASES_PATH)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--case", action="append", dest="case_ids", help="Materialize one case ID")
     parser.add_argument(
@@ -175,7 +176,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    cases = load_cases()
+    cases = load_cases(args.cases)
     if args.case_ids:
         requested = set(args.case_ids)
         cases = [case for case in cases if case["id"] in requested]

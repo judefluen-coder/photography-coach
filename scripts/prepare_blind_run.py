@@ -24,6 +24,7 @@ def file_sha256(path: Path) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cases", type=Path, default=CASES_PATH)
     parser.add_argument("--run-id", help="Stable run name; defaults to a UTC timestamp")
     parser.add_argument("--seed", type=int, default=20260904)
     parser.add_argument("--resume", action="store_true", help="Resume an interrupted download")
@@ -44,7 +45,7 @@ def main() -> int:
     images_dir.mkdir(parents=True, exist_ok=args.resume)
     responses_dir.mkdir(exist_ok=args.resume)
 
-    cases = load_cases()
+    cases = load_cases(args.cases)
     materialized = []
     for case in cases:
         cached = DEFAULT_OUTPUT / f"{case['id']}.jpg"
@@ -108,7 +109,7 @@ def main() -> int:
         "created_at": datetime.now(timezone.utc).isoformat(),
         "seed": args.seed,
         "case_count": len(cases),
-        "benchmark_cases_sha256": file_sha256(CASES_PATH),
+        "benchmark_cases_sha256": file_sha256(args.cases),
         "coaching_protocol_sha256": protocol_sha256(),
         "labels_in_blind_packet": False,
         "answers_in_blind_packet": False,
