@@ -1,7 +1,7 @@
 {
   "stage": "bootstrap",
-  "label": "corpus complete; source-disjoint 100-case holdout v2 failed; integrity prioritization revision required",
-  "user_claim": "Corpus floors are met, but the source-disjoint 100-case holdout v2 failed independent model review: 63% overall pass, 70% observation recall, and 52% degraded-variant detection. Acclaimed overcorrection (12%) and hallucination violations (3%) met their preregistered limits. Crop pressure and global roll were detected in 0/5 and 0/4 derived cases; color excess was detected in 1/4. Use records as individually verified aids and do not claim release readiness or proven learning improvement.",
+  "label": "corpus complete; holdout v2 failed; v1.4 priority and answer-key audit revision awaits fresh holdout v3",
+  "user_claim": "Corpus floors are met, but the source-disjoint 100-case holdout v2 failed independent model review: 63% overall pass, 70% observation recall, and 52% degraded-variant detection. A 25-case development replay on those known failed variants raised degradation detection to 88% but achieved only 60% case pass, 72% observation recall, and 76% priority accuracy; it is diagnostic, not release evidence. Three replay cases also exposed answer-key/object alignment risks, so v1.4 adds mandatory materialized-image annotation audit plus stronger localization and priority adjudication. Do not claim release readiness or proven learning improvement until a new source-disjoint v3 holdout passes unchanged preregistered thresholds.",
   "release_thresholds": {
     "sources": 100,
     "verified_sources": 80,

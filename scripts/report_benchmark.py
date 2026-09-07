@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from validate_response import integrity_signal_map, validate
+from benchmark_annotation_audit import validate_audit
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -56,6 +57,19 @@ def init_grades(run_dir: Path, destination: Path) -> int:
     cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
     responses = response_files(run_dir)
     inputs = {item["case_id"]: item for item in load_jsonl(run_dir / "blind-inputs.jsonl")}
+    run_path = run_dir / "run.json"
+    if run_path.exists():
+        run = json.loads(run_path.read_text(encoding="utf-8"))
+        if run.get("annotation_audit_required") is True:
+            audit_errors = validate_audit(run_dir, run_dir / "annotation-audit.jsonl")
+            if audit_errors:
+                print(
+                    f"ERROR: freeze refused; {len(audit_errors)} annotation-audit issue(s)",
+                    file=sys.stderr,
+                )
+                for error in audit_errors[:30]:
+                    print(f"- {error}", file=sys.stderr)
+                return 1
     missing = [case_id for case_id, path in responses.items() if not path.exists() or not path.read_text(encoding="utf-8").strip()]
     if missing:
         print(
@@ -195,6 +209,11 @@ def main() -> int:
         errors.append("benchmark answer key changed after the run was prepared")
     if set(responses) != set(cases):
         errors.append("blind packet case IDs do not match the current benchmark")
+    annotation_audit_passed = False
+    if run.get("annotation_audit_required") is True:
+        audit_errors = validate_audit(args.run_dir, args.run_dir / "annotation-audit.jsonl")
+        errors.extend(f"annotation audit: {error}" for error in audit_errors)
+        annotation_audit_passed = not audit_errors
     for case_id, path in responses.items():
         if not path.exists() or not path.read_text(encoding="utf-8").strip():
             errors.append(f"{case_id}: response is missing or empty")
@@ -263,6 +282,7 @@ def main() -> int:
             "labels_in_blind_packet": run["labels_in_blind_packet"],
             "answers_in_blind_packet": run["answers_in_blind_packet"],
             "response_freeze_enforced": True,
+            "annotation_audit_passed": annotation_audit_passed,
         },
         "thresholds": thresholds,
         "metrics": metrics,

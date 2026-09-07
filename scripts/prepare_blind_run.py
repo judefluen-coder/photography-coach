@@ -112,6 +112,7 @@ def main() -> int:
         "coaching_protocol_sha256": protocol_sha256(),
         "labels_in_blind_packet": False,
         "answers_in_blind_packet": False,
+        "annotation_audit_required": True,
         "response_freeze_rule": "Write all response files before opening benchmark-cases.jsonl for grading.",
     }
     (run_dir / "run.json").write_text(

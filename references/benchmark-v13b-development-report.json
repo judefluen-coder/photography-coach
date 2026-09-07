@@ -1,0 +1,45 @@
+{
+  "run_id": "v13b-development-v2-20260907",
+  "purpose": "Development replay on 25 known failed-imitation cases from holdout v2; not an independent holdout and not release certification.",
+  "independent_holdout": false,
+  "release_certification": false,
+  "coaching_protocol_sha256": "3a86741ff9b539931e0efe73c1044f71af3fe531e2baafba42f975112c6097c3",
+  "metrics": {
+    "evaluated_cases": 25,
+    "case_pass_rate": 0.6,
+    "observation_recall": 0.72,
+    "degradation_detection_rate": 0.88,
+    "priority_hit_rate": 0.76,
+    "hallucination_violation_rate": 0.0
+  },
+  "by_operation": {
+    "highlight_clip": {"detection": "4/4", "priority": "4/4", "case_pass": "3/4"},
+    "color_excess": {"detection": "3/4", "priority": "3/4", "case_pass": "3/4"},
+    "shadow_crush": {"detection": "4/4", "priority": "4/4", "case_pass": "4/4"},
+    "tilt_and_crop": {"detection": "2/4", "priority": "2/4", "case_pass": "2/4"},
+    "detail_damage": {"detection": "4/4", "priority": "3/4", "case_pass": "2/4"},
+    "crop_pressure": {"detection": "5/5", "priority": "3/5", "case_pass": "1/5"}
+  },
+  "failed_case_ids": [
+    "v2-078", "v2-093", "v2-076", "v2-087", "v2-080",
+    "v2-091", "v2-090", "v2-084", "v2-098", "v2-089"
+  ],
+  "answer_key_image_alignment_flags": [
+    {
+      "case_id": "v2-091",
+      "severity": "high",
+      "summary": "The materialized image and the named tabletop/plate/cream/strawberry observations do not describe the same visible objects."
+    },
+    {
+      "case_id": "v2-084",
+      "severity": "moderate",
+      "summary": "The visible left-edge foreground rocks do not fully match the key's description of the main rock body and arch."
+    },
+    {
+      "case_id": "v2-098",
+      "severity": "moderate",
+      "summary": "The visible swan-shaped sculptures and left-entering sign conflict with the key's hand sculptures and central-sign wording."
+    }
+  ],
+  "passed": null
+}

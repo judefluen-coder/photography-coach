@@ -14,13 +14,15 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 - No signal never proves `通过`. Crop pressure, subject-specific clipping, local colour contamination, and intentional/non-intentional roll often need semantic visual inspection that whole-image statistics cannot perform.
 - Never expose a raw metric dump unless the user asks. Translate only the cue that changes the diagnosis into visible photographic language.
 - In an audit response, transcribe the probe's family and strength exactly as `触发：暗部[强]、轴线/透视[复核]`; write `无阈值信号` only when the probe returned none. This binds the manual review to the image that was measured.
-- Use paired visible comparisons rather than assurances: `对边：左…与右…`, `暗面：…与…`, `亮面：…与…`, `色彩对照：…与…`, `参照：…与…`, and `同尺度：…与…`. These labels are audit rails, not wording required in ordinary conversation.
+- Use paired visible comparisons rather than assurances: `对边：左…与右…`, `暗面：…与…`, `亮面：…与…`, `色彩对照：…与…`, `参照：…与…`, and `同尺度：…与…`. Follow them with a four-edge/center ledger and three named key regions. These labels are audit rails, not wording required in ordinary conversation.
 - When one or more `强` cues remain `观察/问题`, the single public `首要` must address at least one of those families. A strong cue may be marked `通过` only with localized counter-evidence in the same line; generic phrases such as “仍有层次” do not falsify it.
 - Exception: a `轴线/透视[强]` cue is derived from agreeing horizontal and vertical edge populations, so it cannot be marked `通过`. Mark the visible tilt `观察` or `问题`, then decide whether it is an intentional organizing choice or a repairable roll.
+- Probe strength routes attention; it does not settle priority. Compare the two strongest candidates by information loss, relation break, affected area, reversibility, repair value, and protection cost. Loss of a key face, gesture, text edge, object identity, or material boundary can outrank a stronger whole-image color statistic.
 
 ## 1. Edge and crop pressure
 
 - Compare opposite-edge intervals, not one isolated cut. Look at repeated spacing, limbs, line endpoints, circles, faces, signage, wings, and directional space.
+- Account for all four edges and the central anchor. The useful question is not merely “is something cut?” but “which visible relation is removed at this edge while what unrelated room remains elsewhere?”
 - Ask whether one side feels enlarged, crowded, or abruptly amputated while the opposite side retains unrelated slack.
 - Distinguish a decisive fragment that expands off-frame space from a timid cut that only removes evidence.
 - Falsifier: the cut completes a visible rhythm or relation, direction has usable continuation space, and opposite edges carry comparable intentional tension.
@@ -49,18 +51,20 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 
 - Use at least two independent stability references: a true horizon, waterline, hanging vertical, repeated architecture, door frame, or other plausibly level/plumb structure.
 - Separate camera roll from sloping ground and normal perspective convergence. Never level from a single uncertain line.
+- State whether the independent references show common roll (`是/否/不确定`) and separately test where perspective lines converge. Convergence explains depth; it does not by itself prove that the frame is level.
 - Check whether the suspected roll co-occurs with squeezed corners, uneven headroom, clipped geometry, or lost trajectory space. Co-occurrence strengthens the candidate.
 - Falsifier: independent references agree with the frame, the directional tilt is repeated elsewhere, and edge pressure does not look like collateral loss.
 
 ## 6. Detail damage
 
 - Compare the key region with nearby high-frequency texture at the same apparent scale.
+- Name the critical interface whose loss changes the reading: an eye/face boundary, hand-to-tool junction, limb articulation, letter edge, product contour, or material transition. “The whole image is soft” is a symptom, not yet a localized observation.
 - Look for halos, block boundaries, waxy smearing, false microcontrast, ringing, banding, or noise reduction that selectively erases required detail.
 - Do not infer whether softness came from focus, motion, shake, denoising, resizing, or platform compression when the finished image cannot distinguish them.
 - Falsifier: texture falls off consistently with depth or motion, edges remain natural, and the key region is at least as readable as comparable nearby detail.
 
 ## Priority and wording gate
 
-If a family is evidenced and weakens the core under every plausible intent branch, place it in the candidate ledger. If correcting it has meaningful repair value and low cost to the protected strength, it must be the public leading correction or the response must explicitly explain why another issue has greater repair value.
+If a family is evidenced and weakens the core under every plausible intent branch, place it in the candidate ledger. Compare the strongest two candidates explicitly. If correcting one has greater information/relationship recovery, meaningful repair value, and acceptable cost to the protected strength, it must be the public leading correction or the response must explain the contrary evidence. Do not let an easily named color or composition preference outrank a less glamorous loss of readable evidence.
 
 Use wording such as “画面目前呈现为……”“这两个位置共同支持……”“若原文件仍有层次，可尝试……”. Avoid “你一定拉黑了”“这是某个预设造成的” or other claims about invisible provenance.

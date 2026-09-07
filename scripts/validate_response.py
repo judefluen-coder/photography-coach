@@ -79,7 +79,20 @@ PRIMARY_FAMILY_PATTERNS = {
     "色彩": r"色彩|颜色|饱和|偏色|白平衡",
     "轴线/透视": r"轴线|透视|水平|垂直|倾斜|滚转",
     "细节": r"细节|清晰|纹理|锐化|噪点|技术",
+    "注意力/形式": r"注意力|形式|观看顺序|视觉层级|线条|形状|节奏",
+    "空间/层次": r"空间|层次|远近|遮挡|图地|透视",
+    "时机/关系": r"时机|瞬间|动作|姿态|人物|物体|关系",
+    "信息/意义": r"信息|叙事|故事|意义|情绪|语境",
 }
+
+PRIORITY_FACTORS = (
+    "信息损失",
+    "关系断裂",
+    "影响范围",
+    "可逆性",
+    "修复价值",
+    "保护代价",
+)
 
 GENERIC_AUDIT_PHRASES = (
     "关键轮廓比附近次要纹理更值得保护",
@@ -203,6 +216,14 @@ def validate(
                 or ("上" in family_line and "下" in family_line)
             ):
                 errors.append("benchmark crop check must compare 左/右 or 上/下 edges")
+            if family == "轴线/透视":
+                if not re.search(r"共同滚转[：:]\s*(是|否|不确定)", family_line):
+                    errors.append("benchmark axis check must record 共同滚转：是/否/不确定")
+                if "透视检验：" not in family_line:
+                    errors.append("benchmark axis check must include 透视检验：")
+            if family == "细节":
+                if "关键接口：" not in family_line:
+                    errors.append("benchmark detail check must localize a 关键接口：")
 
     if require_integrity_probe and integrity_signals is not None:
         for family, strength in integrity_signals.items():
@@ -216,6 +237,67 @@ def validate(
                 and family_verdicts.get(family) == "通过"
             ):
                 errors.append("strong axis consensus cannot be marked 通过")
+            if (
+                family == "色彩"
+                and strength == "strong"
+                and family_verdicts.get(family) == "通过"
+            ):
+                for label in ("材质分离：", "饱和层级：", "中性锚点："):
+                    if label not in family_lines[family]:
+                        errors.append(
+                            f"strong color pass needs structured counter-evidence: {label}"
+                        )
+
+    if require_integrity_probe:
+        edge_ledger = next(
+            (line for line in map_text.splitlines() if "四边账本：" in line),
+            "",
+        )
+        if not edge_ledger:
+            errors.append("benchmark map must include 四边账本：")
+        elif not all(label in edge_ledger for label in ("左=", "右=", "上=", "下=", "中心锚点=")):
+            errors.append("四边账本 must name 左/右/上/下 and 中心锚点")
+
+        localization = next(
+            (line for line in map_text.splitlines() if "关键区域定位：" in line),
+            "",
+        )
+        if not localization:
+            errors.append("benchmark map must include 关键区域定位：")
+        elif not all(label in localization for label in ("①", "②", "③")) or localization.count("→") < 3:
+            errors.append("关键区域定位 must contain ①/②/③ with three visible relation arrows")
+
+        priority_line = next(
+            (line for line in map_text.splitlines() if "优先级裁决：" in line),
+            "",
+        )
+        if not priority_line:
+            errors.append("benchmark map must include 优先级裁决：")
+        else:
+            for label in ("候选A=", "候选B=", "依据=", "结论="):
+                if label not in priority_line:
+                    errors.append(f"priority adjudication missing field: {label}")
+            factor_count = sum(factor in priority_line for factor in PRIORITY_FACTORS)
+            if factor_count < 2:
+                errors.append("priority adjudication must compare at least two decision factors")
+            named_classes = [
+                family for family in PRIMARY_FAMILY_PATTERNS
+                if family in priority_line.split("依据=", 1)[0]
+            ]
+            if len(set(named_classes)) < 2:
+                errors.append("priority adjudication must compare two distinct named candidate classes")
+            conclusion_match = re.search(
+                r"结论=\s*(" + "|".join(map(re.escape, PRIMARY_FAMILY_PATTERNS)) + r")",
+                priority_line,
+            )
+            if not conclusion_match:
+                errors.append("priority adjudication conclusion must name one supported class")
+            else:
+                conclusion = conclusion_match.group(1)
+                primary_lines = [line for line in map_text.splitlines() if "首要" in line]
+                primary_line = primary_lines[0] if len(primary_lines) == 1 else ""
+                if primary_line and not re.search(PRIMARY_FAMILY_PATTERNS[conclusion], primary_line):
+                    errors.append("priority adjudication conclusion must match the single 首要 line")
 
     covered_families = [
         family for family, pattern in OBSERVATION_FAMILIES.items()

@@ -78,6 +78,25 @@ class GradeValidationTests(unittest.TestCase):
         self.assertEqual(result, 1)
         self.assertFalse((run_dir / "grades.jsonl").exists())
 
+    def test_new_run_requires_completed_annotation_audit(self) -> None:
+        run_dir = Path(self.temp.name) / "audited-run"
+        run_dir.mkdir()
+        (run_dir / "blind-inputs.jsonl").write_text(
+            json.dumps(
+                {"case_id": "bench-001", "response_path": str(self.response)}
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        (run_dir / "run.json").write_text(
+            json.dumps({"annotation_audit_required": True}),
+            encoding="utf-8",
+        )
+        with redirect_stderr(io.StringIO()):
+            result = init_grades(run_dir, run_dir / "grades.jsonl")
+        self.assertEqual(result, 1)
+        self.assertFalse((run_dir / "grades.jsonl").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

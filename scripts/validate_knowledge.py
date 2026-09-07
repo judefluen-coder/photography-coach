@@ -404,6 +404,8 @@ def validate_benchmark_report(
         errors.append("benchmark report does not prove that answer keys were hidden")
     if integrity.get("response_freeze_enforced") is not True:
         errors.append("benchmark report does not prove that responses were frozen")
+    if require_protocol_fingerprint and integrity.get("annotation_audit_passed") is not True:
+        errors.append("release requires a passed image-to-answer-key annotation audit")
     report_protocol_sha256 = report.get("coaching_protocol_sha256")
     if require_protocol_fingerprint and not report_protocol_sha256:
         errors.append("release requires a coaching protocol fingerprint")

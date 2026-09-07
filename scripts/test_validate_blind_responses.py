@@ -34,8 +34,12 @@ def valid_response(marker: str) -> str:
 - 暗部｜通过｜暗面：左下衣服与右下地面仍可分。
 - 高光｜通过｜亮面：中央墙面与右侧灯罩都保留纹理。
 - 色彩｜通过｜色彩对照：冷色墙面与暖色衣服各有内部变化。
-- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致。
-- 细节｜通过｜同尺度：主体眼睛与附近衣纹边缘都自然。
+- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。
+- 细节｜通过｜同尺度：主体眼睛与附近衣纹边缘都自然；关键接口：眼睛轮廓和衣纹转折均可辨。
+
+四边账本：左=人物外有间隔；右=门框外有余量；上=灯罩完整；下=鞋底未切；中心锚点=主体双眼。
+关键区域定位：①左侧人物→轮廓与墙面分离；②中央双眼→视线关系可读；③右侧门框→限定空间深度。
+优先级裁决：候选A=细节（双眼可读）；候选B=边缘/裁切（右侧余量）；依据=关系断裂较小、保护代价较低；结论=细节。
 
 - 技术清晰：关键区域可辨。首要
 - 取景边缘：右边保留间隔。次要
@@ -135,7 +139,7 @@ class BlindResponseValidationTests(unittest.TestCase):
     def test_missing_integrity_family_is_rejected(self) -> None:
         self.write_inputs(1)
         text = valid_response("中央主体").replace(
-            "- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致。\n",
+            "- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。\n",
             "",
         )
         (self.responses / "bench-001.md").write_text(text, encoding="utf-8")
@@ -170,8 +174,8 @@ class BlindResponseValidationTests(unittest.TestCase):
             "完整性量化：已运行（无阈值信号，仍继续人工六检）",
             "完整性量化：已运行（触发：轴线/透视[复核]）",
         ).replace(
-            "参照：左侧门柱与右侧窗框均和画框一致。",
-            "参照：左侧门柱与右侧窗框均和画框一致；反证：两根独立竖线平行且没有同向侧倒。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反证：两根独立竖线平行且没有同向侧倒。",
         )
         self.assertEqual(
             validate(
@@ -213,8 +217,8 @@ class BlindResponseValidationTests(unittest.TestCase):
             "完整性量化：已运行（无阈值信号，仍继续人工六检）",
             "完整性量化：已运行（触发：轴线/透视[强]）",
         ).replace(
-            "参照：左侧门柱与右侧窗框均和画框一致。",
-            "参照：左侧门柱与右侧窗框均和画框一致；反证：两根独立竖线平行。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反证：两根独立竖线平行。",
         )
         errors = validate(
             text,
@@ -235,6 +239,52 @@ class BlindResponseValidationTests(unittest.TestCase):
             require_reference=True,
         )
         self.assertTrue(any("暗面：…与…: 暗部" in error for error in errors))
+
+    def test_benchmark_requires_four_edge_ledger(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "四边账本：左=人物外有间隔；右=门框外有余量；上=灯罩完整；下=鞋底未切；中心锚点=主体双眼。\n",
+            "",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark map must include 四边账本：", errors)
+
+    def test_benchmark_requires_three_localized_relations(self) -> None:
+        text = valid_response("中央建筑").replace("③右侧门框→限定空间深度", "右侧门框限定空间")
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertTrue(any("关键区域定位 must contain" in error for error in errors))
+
+    def test_priority_adjudication_must_match_primary(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "结论=细节。",
+            "结论=边缘/裁切。",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("priority adjudication conclusion must match the single 首要 line", errors)
+
+    def test_axis_check_requires_roll_and_perspective_tests(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒",
+            "",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark axis check must record 共同滚转：是/否/不确定", errors)
+        self.assertIn("benchmark axis check must include 透视检验：", errors)
+
+    def test_strong_color_pass_requires_structured_counterevidence(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "完整性量化：已运行（无阈值信号，仍继续人工六检）",
+            "完整性量化：已运行（触发：色彩[强]）",
+        ).replace(
+            "色彩对照：冷色墙面与暖色衣服各有内部变化。",
+            "色彩对照：冷色墙面与暖色衣服各有内部变化；反证：二者仍可分。",
+        )
+        errors = validate(
+            text,
+            require_integrity_probe=True,
+            require_reference=True,
+            integrity_signals={"色彩": "strong"},
+        )
+        self.assertTrue(any("strong color pass needs structured counter-evidence" in error for error in errors))
 
     def test_repeated_score_reason_is_rejected(self) -> None:
         text = valid_response("中央建筑")
