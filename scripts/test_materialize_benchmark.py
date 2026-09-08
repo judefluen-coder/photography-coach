@@ -3,11 +3,20 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from PIL import Image
 
-from materialize_benchmark import apply_recipe, mean_absolute_difference
+from materialize_benchmark import (
+    apply_recipe,
+    load_verified_resume_items,
+    mean_absolute_difference,
+    write_manifest_atomic,
+)
 
 
 class TransformationTests(unittest.TestCase):
@@ -62,6 +71,50 @@ class TransformationTests(unittest.TestCase):
                 "sharpen_amount": 1.8,
             },
         )
+
+
+class ResumeTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.output = Path(self.temporary.name)
+        self.image_path = self.output / "v4-001.jpg"
+        Image.new("RGB", (32, 24), (20, 40, 60)).save(self.image_path)
+        self.case = {
+            "id": "v4-001",
+            "image_url": "https://example.test/original.jpg",
+            "preview_url": "https://example.test/preview.jpg",
+            "source_sha1": "a" * 40,
+            "variant_recipe": None,
+        }
+        self.item = {
+            "id": "v4-001",
+            "download_url": self.case["image_url"],
+            "source_sha1": self.case["source_sha1"],
+            "variant_recipe": None,
+            "output_path": str(self.image_path),
+            "output_sha256": hashlib.sha256(self.image_path.read_bytes()).hexdigest(),
+            "output_width": 32,
+            "output_height": 24,
+        }
+        self.manifest = self.output / "manifest.json"
+        write_manifest_atomic(self.manifest, [self.item])
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def test_verified_resume_item_is_reused(self) -> None:
+        verified = load_verified_resume_items(
+            self.manifest, [self.case], self.output, True,
+        )
+        self.assertEqual(list(verified), ["v4-001"])
+
+    def test_tampered_resume_output_fails(self) -> None:
+        self.image_path.write_bytes(b"tampered")
+        with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+            load_verified_resume_items(self.manifest, [self.case], self.output, True)
+
+    def test_atomic_manifest_is_valid_json(self) -> None:
+        self.assertEqual(json.loads(self.manifest.read_text()), [self.item])
 
 
 if __name__ == "__main__":

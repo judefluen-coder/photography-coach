@@ -158,6 +158,56 @@ def materialize(case: dict[str, Any], output: Path, use_original: bool) -> dict[
     }
 
 
+def write_manifest_atomic(path: Path, items: list[dict[str, Any]]) -> None:
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_text(
+        json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
+def load_verified_resume_items(
+    manifest_path: Path,
+    cases: list[dict[str, Any]],
+    output: Path,
+    use_original: bool,
+) -> dict[str, dict[str, Any]]:
+    if not manifest_path.exists():
+        return {}
+    existing = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(existing, list):
+        raise ValueError("resume manifest must be a JSON array")
+    case_by_id = {case["id"]: case for case in cases}
+    verified: dict[str, dict[str, Any]] = {}
+    for item in existing:
+        case_id = item.get("id")
+        case = case_by_id.get(case_id)
+        if case is None:
+            continue
+        expected_path = output / f"{case_id}.jpg"
+        expected_url = case["image_url"] if use_original else case["preview_url"]
+        identity_matches = (
+            item.get("source_sha1") == case["source_sha1"]
+            and item.get("download_url") == expected_url
+            and item.get("variant_recipe") == case["variant_recipe"]
+            and Path(item.get("output_path", "")) == expected_path
+        )
+        if not identity_matches:
+            raise ValueError(f"{case_id}: resume manifest does not match the requested case")
+        if not expected_path.exists():
+            raise ValueError(f"{case_id}: resume output is missing: {expected_path}")
+        actual_hash = hashlib.sha256(expected_path.read_bytes()).hexdigest()
+        if actual_hash != item.get("output_sha256"):
+            raise ValueError(f"{case_id}: resume output SHA-256 mismatch")
+        with Image.open(expected_path) as opened:
+            if [opened.width, opened.height] != [
+                item.get("output_width"), item.get("output_height"),
+            ]:
+                raise ValueError(f"{case_id}: resume output dimensions mismatch")
+        verified[case_id] = item
+    return verified
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=CASES_PATH)
@@ -173,6 +223,11 @@ def main() -> int:
         "--original",
         action="store_true",
         help="Download originals and verify source SHA-1; previews are the default",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Verify and reuse completed outputs recorded in an incremental manifest",
     )
     args = parser.parse_args()
 
@@ -190,16 +245,31 @@ def main() -> int:
             parser.error("--limit must be positive")
         cases = cases[: args.limit]
 
-    manifest = []
+    args.output.mkdir(parents=True, exist_ok=True)
+    manifest_path = args.output / "manifest.json"
+    completed = (
+        load_verified_resume_items(manifest_path, cases, args.output, args.original)
+        if args.resume else {}
+    )
+    manifest_by_id: dict[str, dict[str, Any]] = dict(completed)
     for case in cases:
+        if case["id"] in completed:
+            print(f"{case['id']}: resume=verified")
+            continue
         item = materialize(case, args.output, args.original)
-        manifest.append(item)
+        manifest_by_id[case["id"]] = item
+        ordered_manifest = [
+            manifest_by_id[selected["id"]]
+            for selected in cases
+            if selected["id"] in manifest_by_id
+        ]
+        write_manifest_atomic(manifest_path, ordered_manifest)
         print(
             f"{item['id']}: {item['output_width']}x{item['output_height']} "
             f"diff={item['mean_absolute_difference']:.3f}"
         )
-    manifest_path = args.output / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    manifest = [manifest_by_id[case["id"]] for case in cases]
+    write_manifest_atomic(manifest_path, manifest)
     print(f"manifest: {manifest_path}")
     return 0
 
