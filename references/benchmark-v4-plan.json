@@ -1,0 +1,46 @@
+{
+  "split": "blind_holdout_v4",
+  "protocol_target": "evaluation-standard-v1.5",
+  "preregistered_on": "2026-09-08",
+  "case_count": 100,
+  "quality_roles": {
+    "acclaimed": 25,
+    "ordinary": 50,
+    "failed_base": 25
+  },
+  "genre_role_counts": {
+    "architecture/cityscape": {"acclaimed": 4, "ordinary": 9, "failed_base": 4},
+    "landscape/nature": {"acclaimed": 4, "ordinary": 9, "failed_base": 4},
+    "people/documentary": {"acclaimed": 4, "ordinary": 9, "failed_base": 4},
+    "wildlife/action": {"acclaimed": 4, "ordinary": 8, "failed_base": 4},
+    "still-life/food/macro": {"acclaimed": 4, "ordinary": 8, "failed_base": 4},
+    "abstract/concept": {"acclaimed": 5, "ordinary": 7, "failed_base": 5}
+  },
+  "failed_operation_counts": {
+    "crop_pressure": 5,
+    "shadow_crush": 4,
+    "highlight_clip": 4,
+    "color_excess": 4,
+    "tilt_and_crop": 4,
+    "detail_damage": 4
+  },
+  "candidate_pool": {
+    "manifest_sha256": "39db6d4ccd96afa17a7f31e3c68c939651b29abe6a4c1532fd366812672ee780",
+    "candidate_count": 357,
+    "acclaimed_count": 117,
+    "ordinary_count": 240,
+    "genre_count": 6,
+    "source": "Open-licence Wikimedia Commons Featured Pictures and Quality Images metadata; every selected file still requires original-image review."
+  },
+  "source_disjoint_from": [
+    "references/benchmark-development-cases.jsonl",
+    "references/benchmark-v2-cases.jsonl",
+    "references/benchmark-v3-cases.jsonl",
+    "references/masterwork-cards.jsonl"
+  ],
+  "selection_rule": "Select exact files by visible genre fit and benchmark role, not by title or reputation alone. No source page, image URL, source SHA-1, normalized Commons filename, or teaching-masterwork identity may overlap an earlier set.",
+  "annotation_rule": "Every must_notice relation and prohibited inference must be checked against the exact materialized image. Freeze image SHA-256 and must_notice hash before any blind response is written.",
+  "review_separation": "Blind writers receive images, prompts, the current coaching protocol, and teaching knowledge only. Separate answer-aware graders score frozen response hashes. No writer receives cases, transformations, answer-key audits, prior responses, grades, or reports.",
+  "threshold_policy": "Reuse the acceptance thresholds already frozen in references/knowledge-status.json. Do not tune thresholds, scoring anchors, case quotas, or operation quotas after responses are seen.",
+  "independence_boundary": "v3 failures informed v1.5 and can be used only for development regression. Only these newly selected v4 files can provide release evidence for v1.5. Model-only review remains internal validation rather than a human expert panel."
+}
