@@ -4,6 +4,12 @@ Use this compact preflight on every finished photograph before interpreting mood
 
 For each family, record internally `absent`, `plausible`, or `evidenced`. `Evidenced` requires at least two independent observations. One vague impression is not enough.
 
+## Fact-naming gate
+
+Before the six families, underline mentally every role, relationship, state or process, emotion or meaning, time or place, material or content, age or wear, cause or purpose, speed, and outcome label you are about to use. Keep it as fact only when the pixels directly support that class. Otherwise replace it with location, contour, colour, posture, contact, spacing, or surface description and, if useful, add a clearly marked viewing hypothesis. A later unknowns section cannot neutralize an unsupported assertion made earlier.
+
+Examples: visible foliage colour does not establish season; gray sky does not establish weather; lighting does not establish time; bubbles do not establish boiling or cooking; a bottle does not establish its contents; rough stone does not establish age or wear; clothing does not establish occupation; relative size does not establish family role; gesture does not establish emotion or thought; splash and blur do not establish speed or outcome.
+
 ## Quantitative attention probe
 
 When the image is a local file, first run `python3 scripts/analyze_image_integrity.py /absolute/path/to/image --json`. Record whether it ran. Its thresholds are intentionally asymmetric: they are designed to make the reviewer look again, not to certify failure or quality.
@@ -15,6 +21,7 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 - Never expose a raw metric dump unless the user asks. Translate only the cue that changes the diagnosis into visible photographic language.
 - In an audit response, transcribe the probe's family and strength exactly as `触发：暗部[强]、轴线/透视[复核]`; write `无阈值信号` only when the probe returned none. This binds the manual review to the image that was measured.
 - Use paired visible comparisons rather than assurances: `对边：左…与右…`, `暗面：…与…`, `亮面：…与…`, `色彩对照：…与…`, `参照：…与…`, and `同尺度：…与…`. Follow them with a four-edge/center ledger and three named key regions. These labels are audit rails, not wording required in ordinary conversation.
+- Complete three relation lanes before ranking: edge/center, space/action, and light-colour/material. Each lane compares two localized things and names what their relation preserves or loses. An inventory of three objects is not relation coverage.
 - When one or more `强` cues remain `观察/问题`, the single public `首要` must address at least one of those families. A strong cue may be marked `通过` only with localized counter-evidence in the same line; generic phrases such as “仍有层次” do not falsify it.
 - Exception: a `轴线/透视[强]` cue is derived from agreeing horizontal and vertical edge populations, so it cannot be marked `通过`. Mark the visible tilt `观察` or `问题`, then decide whether it is an intentional organizing choice or a repairable roll.
 - Probe strength routes attention; it does not settle priority. Compare the two strongest candidates by information loss, relation break, affected area, reversibility, repair value, and protection cost. Loss of a key face, gesture, text edge, object identity, or material boundary can outrank a stronger whole-image color statistic.
@@ -65,6 +72,8 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 
 ## Priority and wording gate
 
-If a family is evidenced and weakens the core under every plausible intent branch, place it in the candidate ledger. Compare the strongest two candidates explicitly. If correcting one has greater information/relationship recovery, meaningful repair value, and acceptable cost to the protected strength, it must be the public leading correction or the response must explain the contrary evidence. Do not let an easily named color or composition preference outrank a less glamorous loss of readable evidence.
+If a family is evidenced and weakens the core under every plausible intent branch, place it in candidate A. Compare the strongest two candidates explicitly. A broad or key-region information loss is provisionally first: if correcting it has greater information or relationship recovery, meaningful repair value, and acceptable cost to the protected strength, it must be the public leading correction. It may be outranked only by localized counter-evidence showing that the supposedly lost relation survives and that another repair has greater value. Do not let an easily named color or composition preference outrank a less glamorous loss of readable evidence.
+
+For action frames, identify approach, contact, suspension, or aftermath from the body-hand-foot-tool interface before ranking background colour, spectacle, or implied speed. For edges, judge directional continuation and closure across opposite sides; the absence of literal edge contact is not proof that crop pressure is absent. For detail, compare same-scale regions and prioritize irreversible loss when it crosses a face, text, gesture junction, identifying contour, or material boundary.
 
 Use wording such as “画面目前呈现为……”“这两个位置共同支持……”“若原文件仍有层次，可尝试……”. Avoid “你一定拉黑了”“这是某个预设造成的” or other claims about invisible provenance.

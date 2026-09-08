@@ -94,6 +94,40 @@ PRIORITY_FACTORS = (
     "保护代价",
 )
 
+RELATION_COVERAGE_LABELS = (
+    "边缘/中心",
+    "空间/动作",
+    "光色/材质",
+)
+
+FACT_BOUNDARY_LABELS = (
+    "角色/关系",
+    "状态/过程",
+    "感受/含义",
+    "地点/时间/因果",
+)
+
+FACT_BOUNDARY_DISPOSITIONS = r"保留未知|仅描述|观看推测|不作判断|经核验语境"
+
+# These are high-risk assertion tokens, not forbidden concepts. In a blind response they
+# need an uncertainty/viewing-effect marker in the same sentence where they first occur.
+INFERENCE_RISK_PATTERN = re.compile(
+    r"工人|导游|工作人员|员工|夫妻|家人|亲子|亲属|"
+    r"沸水|沸腾|烹煮|腌制|腌渍|"
+    r"秋天|秋季|秋日|秋林|秋色|阴天|晴天|雨天|深夜|"
+    r"啤酒|外脆内软|鲜嫩|新鲜|"
+    r"高速|飞速|"
+    r"祭台|供物|祭祀|仪式性|"
+    r"亲和感|开心|悲伤|愤怒|思考|沉思|焦虑"
+)
+
+INFERENCE_QUALIFIER_PATTERN = re.compile(
+    r"似乎|仿佛|可能|或许|看起来|视觉上|让人联想到|"
+    r"读作|可读成|像是|显得|形成.{0,4}感|带来.{0,4}感|"
+    r"不确定|无法确认|不能确认|不能判断|未知|未必|也可能|"
+    r"如果|若|假如|经核验|标题|说明文字|用户补充"
+)
+
 GENERIC_AUDIT_PHRASES = (
     "关键轮廓比附近次要纹理更值得保护",
     "边缘与主体关系仍可再整理",
@@ -267,6 +301,22 @@ def validate(
         elif not all(label in localization for label in ("①", "②", "③")) or localization.count("→") < 3:
             errors.append("关键区域定位 must contain ①/②/③ with three visible relation arrows")
 
+        relation_line = next(
+            (line for line in map_text.splitlines() if "关系覆盖：" in line),
+            "",
+        )
+        if not relation_line:
+            errors.append("benchmark map must include 关系覆盖：")
+        else:
+            for label in RELATION_COVERAGE_LABELS:
+                if not re.search(
+                    rf"{re.escape(label)}=[^；;\n]*与[^；;\n]*→[^；;\n]+",
+                    relation_line,
+                ):
+                    errors.append(
+                        f"relationship coverage needs localized pair and effect: {label}=…与…→…"
+                    )
+
         priority_line = next(
             (line for line in map_text.splitlines() if "优先级裁决：" in line),
             "",
@@ -277,6 +327,19 @@ def validate(
             for label in ("候选A=", "候选B=", "依据=", "结论="):
                 if label not in priority_line:
                     errors.append(f"priority adjudication missing field: {label}")
+            loss_gate = re.search(r"损失栅栏=(触发|未触发)", priority_line)
+            if not loss_gate:
+                errors.append("priority adjudication must record 损失栅栏=触发/未触发")
+            else:
+                has_integrity_problem = any(
+                    verdict == "问题" for verdict in family_verdicts.values()
+                )
+                if has_integrity_problem and loss_gate.group(1) != "触发":
+                    errors.append("an integrity 问题 must trigger the information-loss gate")
+                if loss_gate.group(1) == "触发":
+                    candidate_a = priority_line.split("候选A=", 1)[1].split("；", 1)[0]
+                    if not any(family in candidate_a for family in INTEGRITY_FAMILIES):
+                        errors.append("triggered loss gate must place an integrity family in 候选A")
             factor_count = sum(factor in priority_line for factor in PRIORITY_FACTORS)
             if factor_count < 2:
                 errors.append("priority adjudication must compare at least two decision factors")
@@ -364,7 +427,7 @@ def validate(
     if interval_count < 8:
         errors.append("expected eight dimension intervals or N/A values")
 
-    status = "研究状态：实验版 v0.1；不是专家认证、客观审美分或学习效果证明。"
+    status = "研究状态：实验版 v1.5；不是专家认证、客观审美分或学习效果证明。"
     if status not in text:
         errors.append("missing research-status disclaimer")
 
@@ -400,6 +463,50 @@ def validate(
 
     if "锐化" in text and re.search(r"锐化.{0,12}(恢复|找回|修复).{0,8}(焦点|合焦|细节)", text):
         errors.append("sharpening is claimed to restore missed focus/detail")
+
+    if require_integrity_probe:
+        boundary_match = re.search(
+            r"^##\s+(?:11\.\s*)?未知项与事实边界\s*$([\s\S]*?)(?=^##\s+)",
+            text,
+            re.M,
+        )
+        boundary_text = boundary_match.group(1) if boundary_match else ""
+        boundary_line = next(
+            (line for line in boundary_text.splitlines() if "事实边界审计：" in line),
+            "",
+        )
+        if not boundary_line:
+            errors.append("benchmark response must include 事实边界审计：")
+        else:
+            for label in FACT_BOUNDARY_LABELS:
+                segment_match = re.search(
+                    rf"{re.escape(label)}=([^；;\n]+)",
+                    boundary_line,
+                )
+                if not segment_match or not re.search(
+                    FACT_BOUNDARY_DISPOSITIONS,
+                    segment_match.group(1),
+                ):
+                    errors.append(
+                        f"fact-boundary audit needs an explicit disposition for {label}"
+                    )
+
+        analysis_match = re.search(
+            r"\A([\s\S]*?)(?=^##\s+(?:9\.\s*)?方法图例与摄影师方向\s*$)",
+            text,
+            re.M,
+        )
+        analysis_text = analysis_match.group(1) if analysis_match else text
+        risky_assertions: list[str] = []
+        for sentence in re.split(r"(?<=[。！？!?；;])|\n", analysis_text):
+            risk = INFERENCE_RISK_PATTERN.search(sentence)
+            if risk and not INFERENCE_QUALIFIER_PATTERN.search(sentence):
+                risky_assertions.append(risk.group(0))
+        if risky_assertions:
+            errors.append(
+                "unqualified single-frame inference at first mention: "
+                + ", ".join(sorted(set(risky_assertions)))
+            )
 
     return errors
 

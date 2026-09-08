@@ -39,7 +39,8 @@ def valid_response(marker: str) -> str:
 
 四边账本：左=人物外有间隔；右=门框外有余量；上=灯罩完整；下=鞋底未切；中心锚点=主体双眼。
 关键区域定位：①左侧人物→轮廓与墙面分离；②中央双眼→视线关系可读；③右侧门框→限定空间深度。
-优先级裁决：候选A=细节（双眼可读）；候选B=边缘/裁切（右侧余量）；依据=关系断裂较小、保护代价较低；结论=细节。
+关系覆盖：边缘/中心=左侧轮廓与中央双眼→观看路径闭合；空间/动作=双眼与后方门框→前后层次可读；光色/材质=暖色衣服与冷色墙面→人物和墙面分离。
+优先级裁决：候选A=细节（双眼可读）；候选B=边缘/裁切（右侧余量）；损失栅栏=未触发（六检没有问题）；依据=关系断裂较小、保护代价较低；结论=细节。
 
 - 技术清晰：关键区域可辨。首要
 - 取景边缘：右边保留间隔。次要
@@ -80,8 +81,9 @@ def valid_response(marker: str) -> str:
 
 ## 未知项与事实边界
 人物身份、地点和器材未知。
+事实边界审计：角色/关系=保留未知（中央人物）；状态/过程=仅描述（站立姿态）；感受/含义=观看推测（视线集中）；地点/时间/因果=保留未知（室内表面）。
 
-研究状态：实验版 v0.1；不是专家认证、客观审美分或学习效果证明。
+研究状态：实验版 v1.5；不是专家认证、客观审美分或学习效果证明。
 
 ## 可选语境复核
 如愿意可补充用途，再做第二遍语境复核。
@@ -260,6 +262,46 @@ class BlindResponseValidationTests(unittest.TestCase):
         )
         errors = validate(text, require_integrity_probe=True, require_reference=True)
         self.assertIn("priority adjudication conclusion must match the single 首要 line", errors)
+
+    def test_benchmark_requires_three_relation_lanes(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "关系覆盖：边缘/中心=左侧轮廓与中央双眼→观看路径闭合；空间/动作=双眼与后方门框→前后层次可读；光色/材质=暖色衣服与冷色墙面→人物和墙面分离。\n",
+            "",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark map must include 关系覆盖：", errors)
+
+    def test_integrity_problem_triggers_loss_gate(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "- 细节｜通过｜",
+            "- 细节｜问题｜",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("an integrity 问题 must trigger the information-loss gate", errors)
+
+    def test_benchmark_requires_fact_boundary_audit(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "事实边界审计：角色/关系=保留未知（中央人物）；状态/过程=仅描述（站立姿态）；感受/含义=观看推测（视线集中）；地点/时间/因果=保留未知（室内表面）。\n",
+            "",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark response must include 事实边界审计：", errors)
+
+    def test_unqualified_single_frame_inference_is_rejected(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "我先看到中央建筑，再看到后方边缘；判断信心为中。",
+            "我先看到一名导游，秋天的阴天里他正在思考；判断信心为中。",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertTrue(any("unqualified single-frame inference" in error for error in errors))
+
+    def test_qualified_viewing_hypothesis_is_allowed(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "我先看到中央建筑，再看到后方边缘；判断信心为中。",
+            "我先看到戴帽的人，灰蓝天空视觉上让人联想到阴天，但天气未知；判断信心为中。",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertFalse(any("unqualified single-frame inference" in error for error in errors))
 
     def test_axis_check_requires_roll_and_perspective_tests(self) -> None:
         text = valid_response("中央建筑").replace(

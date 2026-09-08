@@ -1,6 +1,6 @@
-# Evaluation standard v1.2
+# Evaluation standard v1.5
 
-This standard was revised from a 10-case pilot, a preregistered 30-case public-consensus benchmark, a 30-case v0.6 holdout, two 100-case blind runs completed on September 6, 2026, a 31-case clean-context sentinel, and a source-disjoint 100-case holdout v2 completed on September 7. The first 100-case baseline passed 83/100 cases and recalled 94.33% of required observations, but detected only 40% of deliberately degraded variants. The v1.0 cross-blind rerun again passed 83/100 and recalled 93%, while degraded-variant detection fell to 32%. v1.1 then exposed the six-family check in every response; its fresh sentinel still detected only 4/25 degraded variants, overcorrected 1/6 acclaimed controls, and supplied no compliant exact-work reference in 31/31 responses. v1.2 added a deterministic pixel-level attention probe, a measured-cue resolution rule, and benchmark freeze-time reference enforcement. On untouched holdout v2 it passed 63/100, recalled 70% of required observations, and detected 52% of derived failures. It detected all shadow, highlight, and detail-damage operations, but 0/5 crop-pressure, 0/4 global-roll, and only 1/4 color-excess operations. Even when it detected shadow or detail damage, it often failed to make that repairable loss the main priority. Acclaimed overcorrection was 12% and hallucination violations 3%, both within preregistered limits. Reports are preserved in `benchmark-development-report.json`, `integrity-sentinel-report.json`, and `benchmark-report.json`. The standard remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
+This standard was revised through multiple pilots, development replays, and three source-disjoint 100-case holdouts. v1.2 passed 63/100 on holdout v2, with 70% observation recall and 52% degraded-variant detection. The v1.4 revision added materialized-image answer-key audits, stronger localization, and explicit priority adjudication. On the untouched holdout v3 completed September 8, 2026, it passed 57/100, recalled 77% of required observations, detected 84% of derived failures, and overcorrected 16% of acclaimed controls. Detection and observation floors were met, but the system failed release thresholds because hallucination violations reached 19%, 15 cases misranked the primary issue, and every quality band except the raw overcorrection guard remained below its required case-pass floor. v1.5 therefore adds a sentence-level fact-naming gate, three-lane relationship coverage, and an information-loss priority gate. v3 is now development evidence for v1.5; only a new source-disjoint holdout can certify this revision. Current and historical reports are preserved in `benchmark-development-report.json`, `integrity-sentinel-report.json`, `benchmark-v13b-development-report.json`, `benchmark-v3-report.json`, and `benchmark-report.json`. The standard remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
 
 The v0.9 taxonomy is also calibrated against two external practices: the Getty Museum's progression from description to reflection and formal analysis, including first fixation, viewer response, intent, and surprise; and World Press Photo's separation of visual quality/story from representation, authenticity, context, accountability, and ethics. These sources inform coverage and boundary design, not universal taste rules:
 
@@ -20,7 +20,17 @@ Keep these categories distinct:
 | I | Intent/use condition | Explicit “if the goal/use is…” branch |
 | P | Preference | Parallel options, not a universal rule |
 
-Do not infer author, identity, relationship, motivation, consent, staging, exact location, equipment, exposure settings, lighting gear, camera position, before/after action, or the precise cause of softness from one finished image.
+Do not infer author, identity, role, relationship, motivation, emotion, consent, staging, exact location, weather, season, time of day, equipment, exposure settings, lighting gear, camera position, before or after action, process, speed, outcome, material contents, taste or freshness, age or wear, cause, purpose, symbolism, or the precise cause of softness from one finished image.
+
+### Fact-naming audit
+
+Audit a claim where it first appears, not only in a closing disclaimer. For each role/relationship, state/process, feeling/meaning, and place/time/cause label, choose one of three treatments:
+
+1. **Visible description:** location, contour, surface, colour, posture, contact, interval, or direction that the image directly supplies.
+2. **Viewing hypothesis:** an explicitly uncertain reading such as “视觉上让人联想到……”, followed by the visible cue and at least one live alternative.
+3. **Verified context:** information supplied by a trustworthy caption or user, kept separate from the blind pixel reading.
+
+An unqualified assertion followed later by “身份未知” remains an assertion and fails the boundary. Common traps include reading foliage colour as season, gray sky as weather, lighting as time, bubbles as cooking, a bottle as its contents, roughness as age, clothes as occupation, size as kinship or age, gesture as emotion, and splash or blur as speed.
 
 ### Ambiguous objects
 
@@ -83,6 +93,8 @@ A key-region coverage failure must enter the candidate ledger when any of these 
 ### Pass B: attention, relationship, and meaning
 
 Ask in order: Where does the first fixation land? Can the eye reach the core next? Is the key relationship readable? Does the environment add needed context? Are formal choices internally consistent? What changes if the main element disappears?
+
+Before ranking, complete three different relation checks: (1) an edge or centre relation, (2) a depth, overlap, contact, or action relation, and (3) a light, colour, or material relation. Each check must name two localized things and the effect of their relation. Three isolated object labels do not count. In action frames, decide whether the visible interface shows approach, contact, suspension, or aftermath before using words about speed, force, or outcome.
 
 An abstract interpretation may justify a technical cost, but cannot erase the Pass A observation.
 
@@ -150,6 +162,12 @@ Apply two integrity constraints from the 100-case blind baseline:
 
 6. **Whole-frame defects outrank purpose forks when both branches pay the cost.** Uneven crop pressure, global shadow compression, pervasive color excess, or camera roll with collateral edge loss is not resolved by choosing “documentary” versus “expressive.” First state the common visible cost; branch only on how much to correct it.
 7. **A technical candidate needs an exit test, not a reassuring adjective.** Before rejecting the strongest integrity candidate, name the observation that disproves it: retained separation in multiple dark materials, stable independent axes, balanced opposite-edge intervals, or preserved hue/value variation in repeated surfaces. “Atmospheric,” “graphic,” “cinematic,” and “intentional” do not count as falsifiers by themselves.
+
+Apply three constraints from the v3 failure analysis:
+
+8. **Confirmed information loss is candidate A.** When a broad region or key interface loses readable highlight, shadow, detail, geometry, edge continuation, or material colour, compare it before any reversible taste adjustment. It can lose priority only when localized counter-evidence shows the core relation survives and another repair has greater information or relationship value.
+9. **Direction space is not edge contact.** A person, animal, vehicle, line, or repeated module can be crop-pressured without touching the frame. Compare continuation and closure on opposite edges, including unrelated slack elsewhere.
+10. **Fact boundaries are sentence-local.** A closing unknowns list cannot repair unsupported roles, relationships, states, emotions, time, weather, process, speed, or causality already asserted as facts.
 
 ## Decision rules
 

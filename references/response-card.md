@@ -54,7 +54,8 @@ After the six rows, include these audit rails:
 
 - `四边账本：左=…；右=…；上=…；下=…；中心锚点=…。` Name what enters, exits, or retains space at every edge, then relate it to the central anchor. A clipped utensil, limb, sign, rock, wing, or repeated module is not assessed in isolation.
 - `关键区域定位：①…→…；②…→…；③…→…。` Name three visible locations or objects and the relation each preserves or loses. Do not substitute “主体/背景/细节” without a location or object.
-- `优先级裁决：候选A=类别（局部证据）；候选B=类别（局部证据）；依据=…；结论=类别。` Compare at least two of information loss, relation break, affected area, reversibility, repair value, and protection cost. The conclusion must match the single public `首要`. When a technical loss removes faces, gestures, text, object identity, or a material boundary, compare that loss before preferring a reversible color or compositional taste change.
+- `关系覆盖：边缘/中心=…与…→…；空间/动作=…与…→…；光色/材质=…与…→…。` Use three different localized pairs. For action, name the visible contact or separation phase; do not infer speed or outcome from splash, blur, or pose alone.
+- `优先级裁决：候选A=类别（局部证据）；候选B=类别（局部证据）；损失栅栏=触发/未触发（理由）；依据=…；结论=类别。` Compare at least two of information loss, relation break, affected area, reversibility, repair value, and protection cost. The conclusion must match the single public `首要`. Any `问题` in the six-family check triggers the loss gate: an integrity family must be candidate A and an integrity family must lead unless localized counter-evidence shows that the affected relation remains readable. When a technical loss removes faces, gestures, text, object identity, or a material boundary, compare that loss before preferring a reversible color or compositional taste change.
 
 Below that, select six to nine relevant observation families for the adaptive map. For each, write evidence before interpretation and assign a priority mark. Keep one `首要`, two to five `次要`, at least one `要保护`, and use `无明显问题` honestly. The map must mention relevant surroundings and object/person spacing, not only the presumed subject. A row may combine neighboring families only when one visible relation truly links them. If an integrity family is `问题` and weakens all plausible intent branches, put it at `首要` or explicitly explain why a better-supported issue outranks it. If the probe returned any `强` cue that remains `观察/问题`, the `首要` row must address at least one such family; an unrelated compositional preference cannot silently outrank visible information loss. The probe strength is not itself the priority: a review-level loss of a face, gesture, text, or defining contour may outrank a strong but still organized color field.
 
@@ -110,9 +111,13 @@ List all eight stable dimensions with integer intervals such as `3–4/5`: `技�
 
 ## 11. 未知项与事实边界
 
-List material unknowns and distinguish visible fact, viewing-effect inference, intent condition, and preference. Include this status line:
+List material unknowns and distinguish visible fact, viewing-effect inference, intent condition, and preference. In audit/benchmark mode add one compact line:
 
-`研究状态：实验版 v0.1；不是专家认证、客观审美分或学习效果证明。`
+`事实边界审计：角色/关系=保留未知（可见描述）；状态/过程=仅描述（可见状态）；感受/含义=观看推测（可见依据）；地点/时间/因果=保留未知（可见描述）。`
+
+Audit claims where they first appear. Unsupported role, family relation, emotion, intention, process, speed, outcome, weather, season, time, place, material content, taste or freshness, wear or age, cause, purpose, and symbolism must already be visibly described or marked as inference in the earlier prose; this line cannot retroactively legalize an assertion. In ordinary conversation, keep the same discipline but collapse the rail into one natural sentence instead of exposing the template. Include this status line:
+
+`研究状态：实验版 v1.5；不是专家认证、客观审美分或学习效果证明。`
 
 ## 12. 可选语境复核
 
