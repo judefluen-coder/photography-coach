@@ -6,22 +6,30 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import urllib.parse
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_PLAN = ROOT / "references" / "benchmark-v3-plan.json"
+DEFAULT_PLAN = ROOT / "references" / "benchmark-v4-plan.json"
 CASES = ROOT / "references" / "benchmark-cases.jsonl"
 DEVELOPMENT = ROOT / "references" / "benchmark-development-cases.jsonl"
 V2_ARCHIVE = ROOT / "references" / "benchmark-v2-cases.jsonl"
 MASTERWORKS = ROOT / "references" / "masterwork-cards.jsonl"
 REQUIRED = {
     "candidate_id", "source_sha1", "source_page", "image_url", "preview_url",
-    "title", "creator", "license", "quality_role", "genre",
+    "title", "creator", "license", "assessment", "quality_role", "genre",
     "visible_observations", "must_not_infer", "selection_rationale",
 }
+
+
+def normalized_commons_title(url: str) -> str:
+    path = urllib.parse.urlparse(url).path
+    if "/wiki/" not in path:
+        return ""
+    return urllib.parse.unquote(path.split("/wiki/", 1)[1]).replace("_", " ").casefold()
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -46,6 +54,7 @@ def validate_selection(
     seen_ids: set[str] = set()
     seen_sha1s: set[str] = set()
     seen_pages: set[str] = set()
+    seen_images: set[str] = set()
     for index, row in enumerate(rows, 1):
         label = row.get("candidate_id", f"row-{index}")
         missing = REQUIRED - row.keys()
@@ -70,8 +79,23 @@ def validate_selection(
             errors.append(f"{label}: duplicate source_page")
         else:
             seen_pages.add(page)
+        image_url = row.get("image_url")
+        if not isinstance(image_url, str) or not image_url.startswith(("https://", "http://")):
+            errors.append(f"{label}: invalid image_url")
+        elif image_url in seen_images:
+            errors.append(f"{label}: duplicate image_url")
+        else:
+            seen_images.add(image_url)
         if row.get("quality_role") not in allowed_roles:
             errors.append(f"{label}: invalid quality_role")
+        expected_assessment = (
+            "acclaimed" if row.get("quality_role") == "acclaimed" else "ordinary"
+        )
+        if row.get("assessment") != expected_assessment:
+            errors.append(
+                f"{label}: assessment {row.get('assessment')} does not support "
+                f"quality_role {row.get('quality_role')}"
+            )
         if row.get("genre") not in allowed_genres:
             errors.append(f"{label}: invalid genre")
         observations = row.get("visible_observations")
@@ -86,14 +110,21 @@ def validate_selection(
 
     prior_sha1s: set[str] = set()
     prior_pages: set[str] = set()
-    for path in (CASES, DEVELOPMENT, V2_ARCHIVE):
+    prior_paths = {
+        CASES,
+        DEVELOPMENT,
+        V2_ARCHIVE,
+        *ROOT.glob("references/benchmark-v*-cases.jsonl"),
+    }
+    for path in sorted(prior_paths):
         if not path.exists():
             continue
         for row in load_jsonl(path):
             prior_sha1s.add(row.get("source_sha1", ""))
             prior_pages.add(row.get("source_page", ""))
-    masterwork_pages = {
-        row.get("direct_url", "") for row in load_jsonl(MASTERWORKS)
+    masterwork_pages = {row.get("direct_url", "") for row in load_jsonl(MASTERWORKS)}
+    masterwork_titles = {
+        normalized_commons_title(page) for page in masterwork_pages if page
     }
     for row in rows:
         label = row.get("candidate_id", "<unknown>")
@@ -103,6 +134,9 @@ def validate_selection(
             errors.append(f"{label}: source_page overlaps an earlier benchmark")
         if row.get("source_page") in masterwork_pages:
             errors.append(f"{label}: source_page overlaps a teaching masterwork")
+        normalized_title = normalized_commons_title(row.get("source_page", ""))
+        if normalized_title and normalized_title in masterwork_titles:
+            errors.append(f"{label}: normalized Commons file overlaps a teaching masterwork")
 
     if len(rows) != plan["case_count"]:
         errors.append(f"selection count {len(rows)} != planned {plan['case_count']}")
@@ -139,7 +173,8 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print(f"PASS: {len(rows)} source-disjoint candidates match the preregistered v3 plan")
+    split = json.loads(args.plan.read_text(encoding="utf-8")).get("split", "benchmark")
+    print(f"PASS: {len(rows)} source-disjoint candidates match the preregistered {split} plan")
     return 0
 
 

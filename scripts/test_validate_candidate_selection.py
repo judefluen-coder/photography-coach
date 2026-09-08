@@ -38,6 +38,7 @@ class CandidateSelectionTests(unittest.TestCase):
             "title": "Fresh",
             "creator": "Example",
             "license": "CC BY-SA 4.0",
+            "assessment": "ordinary",
             "quality_role": "failed_base",
             "genre": "wildlife/action",
             "visible_observations": ["runner clears rail", "crowd remains behind"],
@@ -80,6 +81,45 @@ class CandidateSelectionTests(unittest.TestCase):
         self.row["proposed_operation"] = "tilt_and_crop"
         errors = self.validate()
         self.assertTrue(any("failed-operation counts do not match plan" in error for error in errors))
+
+    def test_assessment_must_support_quality_role(self) -> None:
+        self.row["assessment"] = "acclaimed"
+        self.assertTrue(any("does not support quality_role" in error for error in self.validate()))
+
+    def test_normalized_masterwork_file_overlap_fails(self) -> None:
+        self.masterworks.write_text(
+            json.dumps(
+                {"direct_url": "https://commons.wikimedia.org/wiki/File%3AFresh.jpg"}
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        self.assertTrue(
+            any("normalized Commons file overlaps" in error for error in self.validate())
+        )
+
+    def test_duplicate_image_url_fails(self) -> None:
+        plan = json.loads(self.plan.read_text())
+        plan["case_count"] = 2
+        plan["quality_roles"] = {"failed_base": 2}
+        plan["genre_role_counts"] = {"wildlife/action": {"failed_base": 2}}
+        plan["failed_operation_counts"] = {"crop_pressure": 2}
+        self.plan.write_text(json.dumps(plan))
+        other = {**self.row, "candidate_id": "O-spo-002", "source_sha1": "b" * 40,
+                 "source_page": "https://commons.wikimedia.org/wiki/File:Other.jpg"}
+        self.selection.write_text(
+            json.dumps(self.row) + "\n" + json.dumps(other) + "\n",
+            encoding="utf-8",
+        )
+        with (
+            patch.object(validator, "CASES", self.cases),
+            patch.object(validator, "DEVELOPMENT", self.development),
+            patch.object(validator, "V2_ARCHIVE", self.v2_archive),
+            patch.object(validator, "MASTERWORKS", self.masterworks),
+            patch.object(validator, "ROOT", self.root),
+        ):
+            errors, _ = validator.validate_selection([self.selection], self.plan)
+        self.assertTrue(any("duplicate image_url" in error for error in errors))
 
 
 if __name__ == "__main__":
