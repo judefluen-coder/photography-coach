@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -120,6 +121,69 @@ class CandidateSelectionTests(unittest.TestCase):
         ):
             errors, _ = validator.validate_selection([self.selection], self.plan)
         self.assertTrue(any("duplicate image_url" in error for error in errors))
+
+    def with_frozen_manifest(self) -> tuple[Path, dict]:
+        manifest = self.root / "candidate-manifest.jsonl"
+        frozen = {
+            key: self.row[key]
+            for key in (
+                "candidate_id", "source_sha1", "source_page", "image_url", "preview_url",
+                "title", "creator", "license", "assessment",
+            )
+        }
+        frozen["review_genre"] = "sports"
+        manifest.write_text(json.dumps(frozen) + "\n", encoding="utf-8")
+        plan = json.loads(self.plan.read_text())
+        plan["candidate_pool"] = {
+            "manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
+            "candidate_count": 1,
+        }
+        self.plan.write_text(json.dumps(plan), encoding="utf-8")
+        return manifest, frozen
+
+    def test_frozen_manifest_membership_passes(self) -> None:
+        manifest, _ = self.with_frozen_manifest()
+        self.selection.write_text(json.dumps(self.row) + "\n", encoding="utf-8")
+        with (
+            patch.object(validator, "CASES", self.cases),
+            patch.object(validator, "DEVELOPMENT", self.development),
+            patch.object(validator, "V2_ARCHIVE", self.v2_archive),
+            patch.object(validator, "MASTERWORKS", self.masterworks),
+        ):
+            errors, _ = validator.validate_selection(
+                [self.selection], self.plan, manifest,
+            )
+        self.assertEqual(errors, [])
+
+    def test_frozen_manifest_hash_mismatch_fails(self) -> None:
+        manifest, _ = self.with_frozen_manifest()
+        manifest.write_text(manifest.read_text() + "\n", encoding="utf-8")
+        self.selection.write_text(json.dumps(self.row) + "\n", encoding="utf-8")
+        with (
+            patch.object(validator, "CASES", self.cases),
+            patch.object(validator, "DEVELOPMENT", self.development),
+            patch.object(validator, "V2_ARCHIVE", self.v2_archive),
+            patch.object(validator, "MASTERWORKS", self.masterworks),
+        ):
+            errors, _ = validator.validate_selection(
+                [self.selection], self.plan, manifest,
+            )
+        self.assertTrue(any("candidate manifest sha256" in error for error in errors))
+
+    def test_selection_cannot_mutate_frozen_identity(self) -> None:
+        manifest, _ = self.with_frozen_manifest()
+        self.row["creator"] = "Changed after preregistration"
+        self.selection.write_text(json.dumps(self.row) + "\n", encoding="utf-8")
+        with (
+            patch.object(validator, "CASES", self.cases),
+            patch.object(validator, "DEVELOPMENT", self.development),
+            patch.object(validator, "V2_ARCHIVE", self.v2_archive),
+            patch.object(validator, "MASTERWORKS", self.masterworks),
+        ):
+            errors, _ = validator.validate_selection(
+                [self.selection], self.plan, manifest,
+            )
+        self.assertTrue(any("creator differs from the frozen" in error for error in errors))
 
 
 if __name__ == "__main__":

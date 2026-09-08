@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import urllib.parse
@@ -14,6 +15,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PLAN = ROOT / "references" / "benchmark-v4-plan.json"
+DEFAULT_CANDIDATE_MANIFEST = ROOT / ".benchmark-runs" / "v4-review" / "candidate-manifest.jsonl"
 CASES = ROOT / "references" / "benchmark-cases.jsonl"
 DEVELOPMENT = ROOT / "references" / "benchmark-development-cases.jsonl"
 V2_ARCHIVE = ROOT / "references" / "benchmark-v2-cases.jsonl"
@@ -22,6 +24,18 @@ REQUIRED = {
     "candidate_id", "source_sha1", "source_page", "image_url", "preview_url",
     "title", "creator", "license", "assessment", "quality_role", "genre",
     "visible_observations", "must_not_infer", "selection_rationale",
+}
+MANIFEST_IDENTITY_FIELDS = (
+    "source_sha1", "source_page", "image_url", "preview_url", "title", "creator",
+    "license", "assessment",
+)
+MANIFEST_GENRES = {
+    "architecture": "architecture/cityscape",
+    "landscapes": "landscape/nature",
+    "people": "people/documentary",
+    "sports": "wildlife/action",
+    "food": "still-life/food/macro",
+    "sculptures": "abstract/concept",
 }
 
 
@@ -43,6 +57,7 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 def validate_selection(
     selection_paths: list[Path],
     plan_path: Path = DEFAULT_PLAN,
+    candidate_manifest_path: Path | None = None,
 ) -> tuple[list[str], list[dict[str, Any]]]:
     errors: list[str] = []
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
@@ -50,6 +65,34 @@ def validate_selection(
     allowed_roles = set(plan["quality_roles"])
     allowed_genres = set(plan["genre_role_counts"])
     allowed_operations = set(plan["failed_operation_counts"])
+
+    manifest_by_id: dict[str, dict[str, Any]] = {}
+    candidate_pool = plan.get("candidate_pool")
+    if candidate_pool:
+        if candidate_manifest_path is None:
+            errors.append("candidate manifest is required by the preregistered plan")
+        else:
+            manifest_bytes = candidate_manifest_path.read_bytes()
+            actual_hash = hashlib.sha256(manifest_bytes).hexdigest()
+            expected_hash = candidate_pool.get("manifest_sha256")
+            if actual_hash != expected_hash:
+                errors.append(
+                    f"candidate manifest sha256 {actual_hash} != preregistered {expected_hash}"
+                )
+            manifest_rows = load_jsonl(candidate_manifest_path)
+            if len(manifest_rows) != candidate_pool.get("candidate_count"):
+                errors.append(
+                    f"candidate manifest count {len(manifest_rows)} != preregistered "
+                    f"{candidate_pool.get('candidate_count')}"
+                )
+            for manifest_row in manifest_rows:
+                manifest_id = manifest_row.get("candidate_id")
+                if not isinstance(manifest_id, str):
+                    errors.append("candidate manifest contains a row without candidate_id")
+                elif manifest_id in manifest_by_id:
+                    errors.append(f"candidate manifest has duplicate candidate_id {manifest_id}")
+                else:
+                    manifest_by_id[manifest_id] = manifest_row
 
     seen_ids: set[str] = set()
     seen_sha1s: set[str] = set()
@@ -107,6 +150,22 @@ def validate_selection(
         if row.get("quality_role") == "failed_base":
             if row.get("proposed_operation") not in allowed_operations:
                 errors.append(f"{label}: failed_base needs a supported proposed_operation")
+        if candidate_pool and manifest_by_id:
+            frozen = manifest_by_id.get(candidate_id)
+            if frozen is None:
+                errors.append(f"{label}: candidate_id is not in the frozen candidate manifest")
+            else:
+                for field in MANIFEST_IDENTITY_FIELDS:
+                    if row.get(field) != frozen.get(field):
+                        errors.append(f"{label}: {field} differs from the frozen candidate manifest")
+                expected_genre = MANIFEST_GENRES.get(frozen.get("review_genre"))
+                if expected_genre is None:
+                    errors.append(f"{label}: frozen candidate has invalid review_genre")
+                elif row.get("genre") != expected_genre:
+                    errors.append(
+                        f"{label}: genre {row.get('genre')} differs from frozen pool lane "
+                        f"{expected_genre}"
+                    )
 
     prior_sha1s: set[str] = set()
     prior_pages: set[str] = set()
@@ -162,9 +221,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("selections", nargs="+", type=Path)
     parser.add_argument("--plan", type=Path, default=DEFAULT_PLAN)
+    parser.add_argument(
+        "--candidate-manifest", type=Path, default=DEFAULT_CANDIDATE_MANIFEST,
+    )
     args = parser.parse_args()
     try:
-        errors, rows = validate_selection(args.selections, args.plan)
+        errors, rows = validate_selection(
+            args.selections, args.plan, args.candidate_manifest,
+        )
     except (OSError, json.JSONDecodeError) as exc:
         print(f"ERROR: cannot validate selection: {exc}", file=sys.stderr)
         return 2

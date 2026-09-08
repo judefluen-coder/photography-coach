@@ -10,7 +10,11 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from validate_candidate_selection import DEFAULT_PLAN, validate_selection
+from validate_candidate_selection import (
+    DEFAULT_CANDIDATE_MANIFEST,
+    DEFAULT_PLAN,
+    validate_selection,
+)
 
 
 BLIND_PROMPT = (
@@ -156,10 +160,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("selections", nargs="+", type=Path)
     parser.add_argument("--plan", type=Path, default=DEFAULT_PLAN)
+    parser.add_argument(
+        "--candidate-manifest", type=Path, default=DEFAULT_CANDIDATE_MANIFEST,
+    )
     parser.add_argument("--seed", type=int, default=20260907)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    errors, rows = validate_selection(args.selections, args.plan)
+    errors, rows = validate_selection(
+        args.selections, args.plan, args.candidate_manifest,
+    )
     if errors:
         for error in errors:
             print(f"ERROR: {error}")
