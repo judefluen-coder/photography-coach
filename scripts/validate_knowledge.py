@@ -7,6 +7,7 @@ import json
 import sys
 import argparse
 import hashlib
+import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -257,8 +258,8 @@ def validate() -> tuple[list[str], dict[str, list[dict[str, Any]]]]:
             errors.append(
                 f"benchmark {record_id}: provenance_status must be official-page-verified"
             )
-        if record.get("split") != "blind_holdout_v2":
-            errors.append(f"benchmark {record_id}: split must be blind_holdout_v2")
+        if not re.fullmatch(r"blind_holdout_v[2-9][0-9]*", str(record.get("split", ""))):
+            errors.append(f"benchmark {record_id}: split must be a versioned blind_holdout_vN")
         if record.get("difficulty") not in {"low", "medium", "high"}:
             errors.append(f"benchmark {record_id}: invalid difficulty")
         for field in ("source_page", "image_url", "preview_url"):

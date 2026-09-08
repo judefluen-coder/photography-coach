@@ -1,0 +1,520 @@
+{
+  "run_id": "holdout-v3-20260908",
+  "benchmark_cases_sha256": "9472129b10a39166a9712e311071d5d1259caafb01be4119e2e5740b8c970c50",
+  "coaching_protocol_sha256": "0b5fb004a6edb5a4957ec1866defe08605ba225ee8dfd6a2f86d50b30bf7fa03",
+  "passed": false,
+  "metrics": {
+    "evaluated_cases": 100,
+    "overall_pass_rate": 0.57,
+    "observation_recall": 0.77,
+    "failed_variant_detection_rate": 0.84,
+    "acclaimed_overcorrection_rate": 0.16,
+    "hallucination_violation_rate": 0.19,
+    "band_pass_rates": {
+      "acclaimed": 0.64,
+      "failed_imitation": 0.6,
+      "ordinary": 0.52
+    },
+    "genre_pass_rates": {
+      "abstract/concept": 0.5882,
+      "architecture/cityscape": 0.4706,
+      "landscape/nature": 0.7059,
+      "people/documentary": 0.6471,
+      "still-life/food/macro": 0.375,
+      "wildlife/action": 0.625
+    }
+  },
+  "failure_reason_counts": {
+    "observation_recall": 19,
+    "hallucination": 19,
+    "priority": 15,
+    "degradation_miss": 4,
+    "overcorrection": 4,
+    "action_quality": 3
+  },
+  "operation_results": {
+    "color_excess": {
+      "total": 4,
+      "detected": 4,
+      "case_passed": 3
+    },
+    "crop_pressure": {
+      "total": 5,
+      "detected": 4,
+      "case_passed": 3
+    },
+    "detail_damage": {
+      "total": 4,
+      "detected": 3,
+      "case_passed": 1
+    },
+    "highlight_clip": {
+      "total": 4,
+      "detected": 4,
+      "case_passed": 3
+    },
+    "shadow_crush": {
+      "total": 4,
+      "detected": 4,
+      "case_passed": 3
+    },
+    "tilt_and_crop": {
+      "total": 4,
+      "detected": 2,
+      "case_passed": 2
+    }
+  },
+  "failed_cases": [
+    {
+      "case_id": "v3-094",
+      "quality_band": "failed_imitation",
+      "genre": "landscape/nature",
+      "operation": "tilt_and_crop",
+      "failed_checks": [
+        "observation_recall",
+        "priority",
+        "hallucination",
+        "degradation_miss"
+      ],
+      "grader_notes": "命中双河弯、浅色桥、附近屋舍与下缘密林等保留关系；但把长山脊/聚落/桥面的共同倾斜判为不确定，并断言两端自然续出、无压边，故操作观察0、裁切观察1、首要与 degradation 均不计。深度模式本身完整，仍给 pattern=2。多次断言“秋林/秋色”，越过禁止推断季节的边界。"
+    },
+    {
+      "case_id": "v3-061",
+      "quality_band": "acclaimed",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "hallucination"
+      ],
+      "grader_notes": "边界均不计：must_notice[0]只泛称成束绿茎和重复尖端，未定位左上高低扇面；[1]只罗列气泡、蒸汽和金属锅，未定位前半部密泡、右沿上升蒸汽及锅壁亮白/深块关系；[2]仅说前后锅分层，未识别暗圆炉面与前锅椭圆口在清晰度、亮度、尺寸上的重复差。气泡/蒸汽和尖端细节仍为保护项，故优先项命中；pattern仅广义命中，参考和八维均模板化，分别记1。违规：多次把单帧气泡与蒸汽断言为“沸水/沸泡”和“烹煮状态”，实质断言了答案键禁止推断的水温/加热状态。"
+    },
+    {
+      "case_id": "v3-001",
+      "quality_band": "failed_imitation",
+      "genre": "wildlife/action",
+      "operation": "crop_pressure",
+      "failed_checks": [
+        "observation_recall",
+        "priority",
+        "degradation_miss"
+      ],
+      "grader_notes": "边界不计：答案定位了右侧人物、板头、左侧浪峰和下方泡沫，但反向断言板头未贴右边、前方空间充足，并把边缘/裁切判为通过，未识别 crop_pressure 的右侧轨迹压缩与对边余量失衡；也未命中连接绳及双脚离板空隙这一局部反证。动作相位方案符合另一 expected pattern，故 pattern_fit=2。"
+    },
+    {
+      "case_id": "v3-038",
+      "quality_band": "ordinary",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "V形两半、外壳—孔隙/空腔材质关系、底部倒影与蓝灰浅绿虚化背景均命中并被保护。违规：正文把“外脆内软”写成可见关系，并以“湿润”描述孔隙，正是从断面推断口感；末尾改称观看联想不能撤销前文事实式断言。"
+    },
+    {
+      "case_id": "v3-047",
+      "quality_band": "ordinary",
+      "genre": "wildlife/action",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "红橙全盔脸部、双手—把位、后方扇形水墙与下缘器械、多个深度冻结水滴均命中；动作相位和接口明确保护。违规：首段将画面事实式归类为“高速水上运动”，参考段又称“人器高速动作”，而答案键禁止由水花/姿态断言速度；末尾“速度未知”不能撤销先前断言。"
+    },
+    {
+      "case_id": "v3-097",
+      "quality_band": "ordinary",
+      "genre": "landscape/nature",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "横展灰水、低建筑/防波堤、左下斜入石岸、右侧平滑空水与远右孤立小船均定位并保护弧岸纵深；但开头断言“阴天港湾”，正文又以“符合天气”解释远景，未仅保留为未知，触发禁止由灰调断言实时天气。运营状态与设施/船只具体用途未推断。"
+    },
+    {
+      "case_id": "v3-073",
+      "quality_band": "failed_imitation",
+      "genre": "architecture/cityscape",
+      "operation": "crop_pressure",
+      "failed_checks": [
+        "priority"
+      ],
+      "grader_notes": "海城弧线、右缘和下缘楼体齐切及港池连续均有定位，足以命中 crop_pressure 家族；但把近水平海天线和稳定楼体误判为共同滚转并列首要，故观察2与首要不计，相关模式仅给1。未越界推断城市人口或财富。"
+    },
+    {
+      "case_id": "v3-095",
+      "quality_band": "ordinary",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "杯沿颗粒、两瓣柑橘、倒插小瓶，瓶/吸管/杯脚方向线、强日光反射及底部菜单与上方虚化车辆均定位；杯瓶果瓣关系和材质明确保护。但把小瓶及瓶内液体断言为“啤酒/啤酒瓶”，由外观/标签推定内容，触及禁止从标签推断酒精内容的边界，故严格判 hallucination。"
+    },
+    {
+      "case_id": "v3-009",
+      "quality_band": "ordinary",
+      "genre": "abstract/concept",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "命中中央深灰包裹体与框架、左侧完整金顶对照和右侧街屋；边界不计 MN2：提到广场砖纹与少量行人，但未定位浅深几何带及小人物的尺度关系。核心“完整装饰—遮蔽体”对照被置于开场和成立点。禁推断违例：答案多次把中央未知体断言为“施工体/施工结构/施工状态”并据此提出修缮/工程分支，超出不得推断真实对象、遮蔽原因和工程阶段的边界。"
+    },
+    {
+      "case_id": "v3-012",
+      "quality_band": "ordinary",
+      "genre": "abstract/concept",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "命中三件角状雕塑前后/大小关系和小件从两大体之间探头，也命中红色彩绘栏杆遮腿及右侧彩绘板、门窗高密环境。边界不计 MN2：虽说毛纹角形清楚，未定位角、耳与窗格/彩板边缘的多次相交。禁推断违例：答案把较小体称为“小兽/幼小个体”，并断言“群体和幼小个体关系”“亲密关系”可读，正落入不得由大小站位推断亲子或群体关系的禁止项。"
+    },
+    {
+      "case_id": "v3-004",
+      "quality_band": "ordinary",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "priority"
+      ],
+      "grader_notes": "命中左前较浅孔洞与右前较深斑点对照，以及白底柔影托出叠放。边界不计 MN0：虽定位左右各三枚与中央白色间隔，却反向断言右前圆形贴边被切，和答案键“轮廓均未贴边”冲突；该误读还被提升为首要，故 priority_hit=false。重复机制大体正确但行动被错误边缘诊断带偏，pattern_fit=1。"
+    },
+    {
+      "case_id": "v3-071",
+      "quality_band": "failed_imitation",
+      "genre": "people/documentary",
+      "operation": "tilt_and_crop",
+      "failed_checks": [
+        "priority",
+        "degradation_miss"
+      ],
+      "grader_notes": "命中四人手—墙关系与右端洋红色锚；对倾斜却判断“人物仍直、共同滚转否、较像透视”，与海天线和墙顶共同右下倾斜的答案键相反，故观察1、首要和 degradation 均不计。人物关系、地点保持未知。"
+    },
+    {
+      "case_id": "v3-048",
+      "quality_band": "ordinary",
+      "genre": "wildlife/action",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "priority"
+      ],
+      "grader_notes": "命中四人前后重叠但由护具明暗/颜色分开且脸部可辨的关系。must_notice[0]边界不计：响应只说前倾与刀冰接口，未识别多枚冰刀共同悬于冰坡横边上方的腾空相位，反而近似描述为接触；must_notice[2]不计：提到红黄广告和冰面但未定位底部横边及虚化牛形图案/建筑次层。首要改为背景色彩，未命中最高价值动作相位。"
+    },
+    {
+      "case_id": "v3-093",
+      "quality_band": "ordinary",
+      "genre": "wildlife/action",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "priority"
+      ],
+      "grader_notes": "准确定位斜脊线与其上的三名小人物，命中观察1；右下人物被误读为“行走者”，漏掉脚下窄板状物，观察0和动作首要不计。虽提人物周围密纹/脚印，却未定位右侧更密、左下较连续的对边关系，观察2按边界不计。模式仅有一般动作相位/边缘保护，给1；未推断速度、技能、成败、关系或地点。"
+    },
+    {
+      "case_id": "v3-005",
+      "quality_band": "ordinary",
+      "genre": "people/documentary",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中前排欢呼脸、蓝粉服装重复和左右边缘截入；边界不计 MN0：虽定位奖杯、手臂和脸的汇聚，但未指出奖杯遮住后排人脸；不计 MN2：未定位虚化观众中的举手/拍摄姿态。奖杯—手臂—表情关系被明确列为要保护，故 priority_hit=true。"
+    },
+    {
+      "case_id": "v3-067",
+      "quality_band": "ordinary",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "priority",
+        "action_quality"
+      ],
+      "grader_notes": "命中暖色石材、紫色花束和深木的色彩分离关系。must_notice[0]边界不计：虽识别左三壁挂器具与右三台盆，但未定位中央宽石柱对两组重复的强行分隔；must_notice[1]不计：仅见三面镜及右侧镜墙切入，未识别镜中灯具/门/水槽重复和最右额外镜列倒影。首要改为灯具高光，泛称重复为保护不足以命中核心中央分隔，故 priority_hit=false；pattern仅广义相关。主动作仍是无具体方向/目标的“调整机位或曝光”，action_quality=0；参考和八维说明模板化，分别记1。"
+    },
+    {
+      "case_id": "v3-092",
+      "quality_band": "failed_imitation",
+      "genre": "landscape/nature",
+      "operation": "shadow_crush",
+      "failed_checks": [
+        "priority"
+      ],
+      "grader_notes": "shadow_crush 家族及右侧密林树干/灌木合并、木棚板缝微弱均有定位，亮田、田纹、蓝灰山和厚云保留关系也可见；但把荧绿列为首要，暗部仅次要，故 priority=false，暗部模式机制虽对但行动链不完整，仅给1。作物、耕作、所有权、人员活动与光比成因未断言。"
+    },
+    {
+      "case_id": "v3-058",
+      "quality_band": "acclaimed",
+      "genre": "people/documentary",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中右侧梯上人物、手—刷具—窗框动作接口并把该关键关系列为首要。must_notice[1]边界不计：只泛称三窗与梯，未定位人物、梯和悬桶对中/右窗竖向重复的打断；must_notice[2]不计：仅说梯与影子斜线“呼应”，未识别实体梯右下倾与长暗影左下延伸的交叉。参考虽为精确作品页，但对应、差异和实验均属泛化层级措辞，故 reference_hygiene=1；八维齐全却多项理由为模板化“基本可读/大体分开/可读或静态”，故 score_integrity=1。"
+    },
+    {
+      "case_id": "v3-040",
+      "quality_band": "ordinary",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中上方失焦粉蓝白衣块与前景清楚黄锅的层次。must_notice[0]边界不计：响应反复断言“三只主要锅体”，未识别四锅完整序列；must_notice[1]不计：称“两把银勺”，未命中三勺同向、圆垫与花布叠加的完整关系。锅体重复仍被明确列为要保护，故首要/保护项命中。"
+    },
+    {
+      "case_id": "v3-021",
+      "quality_band": "acclaimed",
+      "genre": "people/documentary",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "命中左下背对镜头人物—中央两名戴头盔者—远城的三层关系，也定位玻璃框线/反射与右侧尖塔。边界不计 MN2：未指出两名外侧人物都低头看手边平台及相近手位。核心三层关系明确列为要保护。禁推断违例：答案把戴头盔者断言为“工人/维护者”，并多次把关系叙述成“维护城市的人”，属于不得从单帧断言具体任务。"
+    },
+    {
+      "case_id": "v3-030",
+      "quality_band": "ordinary",
+      "genre": "wildlife/action",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "命中右侧骑车者、手脚车体与黄色锚点，也准确命中右侧前进空间窄而左侧环境空区大的方向性边缘。边界不计 MN2：仅笼统提背景行人与树，未定位中央树下三人、右后一名背向者及背景细节关系。禁推断违例：答案把笑容和姿态进一步断言为“轻松骑行/轻松愉快”，而答案键明确不得推断人物情绪。"
+    },
+    {
+      "case_id": "v3-020",
+      "quality_band": "failed_imitation",
+      "genre": "architecture/cityscape",
+      "operation": "highlight_clip",
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中中央上下多块近白玻璃丢失颜色/纹理且非针点高光，首要明确为 highlight_clip。边界不计 MN1：答案把两侧木框描述为深色且有木纹，未定位上方木框被推亮后玻璃/木材亮度区分减弱；不计 MN2：虽说铅条仍清楚，未定位中心纹章、花瓣、麦穗、尖拱及暗绿玻璃反证。失败族及其在多窗格的可见影响已充分局部化。"
+    },
+    {
+      "case_id": "v3-066",
+      "quality_band": "ordinary",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "action_quality"
+      ],
+      "grader_notes": "命中彩色建筑密铺山坡、绿坡间隔，也命中四边持续自然切入、全画面信息均匀高负荷；后者被列为首要。must_notice[1]边界不计：虽说缺单一停顿点和坡线来自地形，但未定位坡面、挡墙、道路多向斜线及台阶层次关系。pattern仅广义命中。主动作“调整机位或曝光，只改变首要关系”没有明确怎么调或以何可见关系验收，故 action_quality=0；参考和八维理由泛化，分别记1。未推断居民身份、贫富、产权或安全。"
+    },
+    {
+      "case_id": "v3-008",
+      "quality_band": "ordinary",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中中央门洞、成对柱与半圆拱共享正面中轴。边界不计 MN1：答案提到彩色门楣和光比，却未定位斜向阴影将圆形图案分成受光/落影两半；不计 MN2：虽提铁门和地面阴影，未定位球饰、十字顶饰及其共同建立的前后层次。轴线保护机制正确但主要行动转向曝光，pattern_fit=1。"
+    },
+    {
+      "case_id": "v3-055",
+      "quality_band": "ordinary",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "priority"
+      ],
+      "grader_notes": "命中蓝粉金白横带层叠与中央竖向托座中轴。must_notice[1]边界不计：仅识别左右柱头等量切入，未识别底部大画框也被截及几何单元无法闭合，反而把边缘判断为通过/保护；must_notice[2]不计：未指出各平面亮度接近、正面均匀受光和短浅投影使立体弱于色带，反称浮饰靠侧影凸出。首要改为色彩微调，未命中最高价值的边缘闭合关系。"
+    },
+    {
+      "case_id": "v3-063",
+      "quality_band": "failed_imitation",
+      "genre": "still-life/food/macro",
+      "operation": "detail_damage",
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中主体表面碎纹/外缘全面柔糊、材质身份受损及整体圆轮廓仍保留的局部反证；细节为首要，足以定位 detail_damage 家族对主体表面与外缘的影响。must_notice[0]边界不计：虽见居中棕色圆形与黑底，但未定位沿左、右、下缘的断续白碎屑亮轮廓；must_notice[2]不计：未识别黑布左上暗至右中稍亮的宽尺度渐变与织纹丢失。把退化归因式处理为重新对焦，未触及低清放大/压缩机制，故 pattern_fit=1；参考和八维说明模板化，分别记1。"
+    },
+    {
+      "case_id": "v3-022",
+      "quality_band": "acclaimed",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "priority",
+        "overcorrection"
+      ],
+      "grader_notes": "边界均不计：答案识别面包、格布、盘和木桌，但未定位右侧深色圆盘堆与左下三枚散落的空间关系；未定位格布由左下折向右上及粗细褶皱的尺度关系；也未识别上方较大安静木板区与下部密集区的疏密平衡。它反而把暖色层级提升为结构瓶颈，要求移动格布并大幅压红橙，可能损伤答案键中格布—面包的综合色与纹理强项，故 overcorrection=true。"
+    },
+    {
+      "case_id": "v3-059",
+      "quality_band": "acclaimed",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "overcorrection"
+      ],
+      "grader_notes": "命中左侧盘绕轨道与两座不同高塔，也以右下旋转亮盘相对清楚轨道/塔架定位选择性运动关系；三种几何列为保护项。must_notice[2]边界不计：只泛称水面反光和岸/水/设施分层，未定位黄青粉白反射、深蓝天空与亮岸线三层。建议与建筑轴线/透视模式仅宽泛相关，故 pattern_fit=1。参考差异和迁移实验泛化，八维理由多为模板句，分别记1。过度纠正：把答案键强调的深蓝夜空和多色人工光场误判成结构性色偏，要求以白建筑中性化，会削弱高质量样本的蓝夜—彩灯层级。"
+    },
+    {
+      "case_id": "v3-077",
+      "quality_band": "ordinary",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "命中横向建筑带、大片空地/蓝天及暖灯覆盖与暗门窗节奏，并明确保护长天际线；未定位中央偏右细高棕榈，观察2不计。将场景反复断言为“夜景”“深夜天空”，未把拍摄时刻保留为未知，触发禁止推断。"
+    },
+    {
+      "case_id": "v3-096",
+      "quality_band": "ordinary",
+      "genre": "abstract/concept",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "全身像、手—下巴、另一手—书形物/柱体、椭圆壁龛、长袍竖褶、清楚刻字与灰白低饱和阴影分离均定位并保护；但多次把托腮手势断言为“思考姿态”，由手势推断思想含义，触及明确禁止项。真实身份、职业与作者意图未另作断言。"
+    },
+    {
+      "case_id": "v3-076",
+      "quality_band": "ordinary",
+      "genre": "abstract/concept",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "三分之四头像、胡须/眼窝粗糙纹理及右后硬影分离均定位并保护；但多次把可见粗石面断言为“磨损”，且称“年代痕迹可见”，越过答案键禁止的完成/损坏与年代推断，故 hallucination=true。"
+    },
+    {
+      "case_id": "v3-034",
+      "quality_band": "ordinary",
+      "genre": "people/documentary",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "左侧阶梯坐姿队列与右前站立举手者、石阶斜线和右侧草地/平台/远山、上半部大蓝天与人物连接关系均被定位；手势—朝向和空间纵深明确列为保护项。禁推断违例：答案反复把站立者和其他人断言为“讲解者/听众”，把场面定性为“讲解现场/集体学习”，正落入不得断言站立者是导游或坐者同属团体的禁止项。"
+    },
+    {
+      "case_id": "v3-023",
+      "quality_band": "acclaimed",
+      "genre": "abstract/concept",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "priority"
+      ],
+      "grader_notes": "仅命中暖色木件从深绿树林/竖树干背景中分离。边界不计 MN0：答案只说向左上弯曲，未识别由木墩上升形成大环再向右上张开的喇叭状开口；不计 MN1：虽提连续木纹，却未定位细斜枝穿环与清楚负空间。核心大环/负形未被首要或保护项真正命中；背景净化为有代价可选实验，overcorrection=false。"
+    },
+    {
+      "case_id": "v3-064",
+      "quality_band": "ordinary",
+      "genre": "people/documentary",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "命中中央完整全身人物、蓝色下装/长靴与向右视线，命中左右不同衣色人物和上半密集看台，也命中双手—红布与中央蓝衣的颜色关系；这些人物时机、全身边缘和手持布状态均明确保护。pattern动作与代价较泛，参考和八维均模板化，分别记1。违规：首段把两侧人物事实式称为“工作人员”，属于由服装/场地断言人物身份或赛事角色。"
+    },
+    {
+      "case_id": "v3-079",
+      "quality_band": "ordinary",
+      "genre": "architecture/cityscape",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "密集楼体、左上纯蓝天空、斜升山崖和下缘截楼均准确定位并保护空—密对角；但八维理由断言“山体限制”建设密度，已把可见邻接关系写成城市规划成因，按严格边界判越界。人口、房价和阶层未推断。"
+    },
+    {
+      "case_id": "v3-051",
+      "quality_band": "acclaimed",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "overcorrection"
+      ],
+      "grader_notes": "命中下半部多层方块堆叠与上方斜架块的重复变化。must_notice[1]不计：虽定位侧逆光、中央亮块和前方暗块，却把答案键中仍保留纹理的前块断言为大面积合并/纹理消失；must_notice[2]不计：只提大黑负空间，未定位前景散落糖晶。几何重复与逆光虽列为保护项，故优先项命中；但把受控暗面误判为结构失败并要求正面白卡补光，会削弱该高质量样本的黑场侧逆光强项，构成过度纠正。"
+    },
+    {
+      "case_id": "v3-056",
+      "quality_band": "acclaimed",
+      "genre": "landscape/nature",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall"
+      ],
+      "grader_notes": "命中左中红色长舟、向左拉开的白色水痕与岛前位置，并将船—尾流方向关系明确保护。must_notice[0]边界不计：笼统称“两组绿岛及倒影”，未定位左中大树岛、右中低矮树丛岛和淡远岸三者关系；must_notice[2]不计：未识别前景灰蓝/粉灰/灰绿渐变及右下孤立灌木—倒影的大小对照。建议转向动作方向空间，与答案键的地平/价值叠层模式仅广义相关，故 pattern_fit=1。"
+    },
+    {
+      "case_id": "v3-028",
+      "quality_band": "ordinary",
+      "genre": "still-life/food/macro",
+      "operation": null,
+      "failed_checks": [
+        "hallucination"
+      ],
+      "grader_notes": "黄盘左右两类粉色肉片、下缘红色圆片与上方绿色长条扇形、深色木桌和俯视遮挡层次均被具体定位；四组分区被列为要保护。禁推断违例：答案把上方绿色长形物直接断言为“腌渍蔬菜/绿色腌渍外观食物”，而答案键明确不得仅凭外观判断腌制方式。"
+    },
+    {
+      "case_id": "v3-065",
+      "quality_band": "ordinary",
+      "genre": "landscape/nature",
+      "operation": null,
+      "failed_checks": [
+        "observation_recall",
+        "action_quality"
+      ],
+      "grader_notes": "命中右下亮草坡贴边并与谷底村落争夺注意，将其列为首要。must_notice[0]边界不计：虽罗列村落、田地、道路、两侧山体和蓝灰山，但未定位左右近山向中远淡山收夹的深度关系；must_notice[1]不计：只提云层，未识别宽阔低云横贯山腰并遮挡右中山脊/谷地。pattern仅广义命中。主动作“调整机位或曝光，只改变首要关系”没有具体移动、曝光目标或可见判据，属于泛泛建议，故 action_quality=0；参考和八维说明亦泛化，分别记1。"
+    },
+    {
+      "case_id": "v3-015",
+      "quality_band": "failed_imitation",
+      "genre": "abstract/concept",
+      "operation": "detail_damage",
+      "failed_checks": [
+        "observation_recall",
+        "priority",
+        "hallucination",
+        "degradation_miss"
+      ],
+      "grader_notes": "仅命中多翼坐姿大形、中央脸、下方大形与灰石/暖橙综合色块仍可辨的局部反证。答案反向声称翼羽、冠饰、胸饰与底座雕刻均清楚，完整性量化“无阈值信号”，未识别跨主体和背景的 detail_damage 及硬软不一致，因此 MN0/MN1、priority 和 degradation 均未命中。其简化背景并保护主体材料差异的方案仍完整符合 reduction 类 expected pattern。禁推断违例：把环境直接称为“祭台”、右上物称“供物”并宣称“仪式性”，落入不得推断宗教含义/仪式状态。"
+    },
+    {
+      "case_id": "v3-033",
+      "quality_band": "failed_imitation",
+      "genre": "wildlife/action",
+      "operation": "detail_damage",
+      "failed_checks": [
+        "priority",
+        "hallucination"
+      ],
+      "grader_notes": "命中居中头肩人物、灰发眼口与红黑白衣块仍可定位，也明确说发丝、衣料和胸前图案偏软，足以局部化 detail_damage 的可见影响。边界不计 MN2：虽提彩色散景，未比较其大尺度自然虚化与脸部微细节损伤的不同。答案把暗部而非细节损伤列首要，故 priority_hit=false；锐化只作局部补救且未完整解释多尺度材料保护，pattern_fit=1。禁推断违例：由笑容断言“亲近/亲和感明确”，落入不得推断情绪。"
+    },
+    {
+      "case_id": "v3-017",
+      "quality_band": "failed_imitation",
+      "genre": "still-life/food/macro",
+      "operation": "color_excess",
+      "failed_checks": [
+        "priority"
+      ],
+      "grader_notes": "命中红椒/绿果/绿叶的高饱和面积压过白盘背景，以及两枚椭圆果、弯曲红形和左伸叶片的横向组合。边界不计 MN2：虽定位叶脉、果皮和椒皮纹理仍可分，却反向判断白盘—背景接口局部消失，未命中盘沿尚可在下方追踪的反证。答案识别并局部化 color_excess，但首要错误转向高光，故 degradation_detected=true、priority_hit=false。"
+    },
+    {
+      "case_id": "v3-046",
+      "quality_band": "acclaimed",
+      "genre": "abstract/concept",
+      "operation": null,
+      "failed_checks": [
+        "overcorrection"
+      ],
+      "grader_notes": "木质人形与双臂方向/刀痕、黄衣灰裤和木质四肢材料交界、密枝交叠与黄色分离均命中。过度纠正：把答案键中的林地密枝与手臂方向交叠升格为结构失败，要求移机位至连续叶面并清除脚部草交叉，会削弱该高质量样本的林地嵌入关系；虽写明代价，仍作为必须重拍的结构重建。"
+    }
+  ]
+}
