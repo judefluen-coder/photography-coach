@@ -90,7 +90,7 @@ RECIPES = {
     ],
     "detail_damage": [
         {"downsample_factor": .28, "gaussian_blur_radius": .7, "jpeg_quality": 52, "sharpen_amount": 1.2},
-        {"downsample_factor": .24, "gaussian_blur_radius": .9, "jpeg_quality": 45, "sharpen_amount": 1.4},
+        {"downsample_factor": .20, "gaussian_blur_radius": 1.0, "jpeg_quality": 40, "sharpen_amount": 1.5},
         {"downsample_factor": .21, "gaussian_blur_radius": 1.0, "jpeg_quality": 38, "sharpen_amount": 1.6},
         {"downsample_factor": .18, "gaussian_blur_radius": 1.1, "jpeg_quality": 32, "sharpen_amount": 1.8},
     ],
