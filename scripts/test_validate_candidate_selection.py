@@ -21,6 +21,7 @@ class CandidateSelectionTests(unittest.TestCase):
         self.plan.write_text(
             json.dumps(
                 {
+                    "split": "blind_holdout_v4",
                     "case_count": 1,
                     "quality_roles": {"failed_base": 1},
                     "genre_role_counts": {"wildlife/action": {"failed_base": 1}},
@@ -77,6 +78,20 @@ class CandidateSelectionTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.assertTrue(any("overlaps an earlier benchmark" in error for error in self.validate()))
+
+    def test_promoted_target_split_is_not_treated_as_earlier(self) -> None:
+        self.cases.write_text(
+            json.dumps(
+                {
+                    "split": "blind_holdout_v4",
+                    "source_sha1": "a" * 40,
+                    "source_page": "https://commons.wikimedia.org/wiki/File:Fresh.jpg",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(self.validate(), [])
 
     def test_wrong_operation_fails(self) -> None:
         self.row["proposed_operation"] = "tilt_and_crop"

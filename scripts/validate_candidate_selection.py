@@ -179,6 +179,11 @@ def validate_selection(
         if not path.exists():
             continue
         for row in load_jsonl(path):
+            # Once a validated selection is promoted to the active answer key, it is
+            # no longer an "earlier" benchmark. Keep the validator replayable after
+            # freeze while still rejecting every archived/development split.
+            if row.get("split") == plan.get("split"):
+                continue
             prior_sha1s.add(row.get("source_sha1", ""))
             prior_pages.add(row.get("source_page", ""))
     masterwork_pages = {row.get("direct_url", "") for row in load_jsonl(MASTERWORKS)}
