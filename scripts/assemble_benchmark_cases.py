@@ -15,8 +15,8 @@ from validate_candidate_selection import DEFAULT_PLAN, validate_selection
 
 BLIND_PROMPT = (
     "仅根据图像完成摄影教练盲评；不要使用文件名、作者、来源、平台评级或答案标签。"
-    "运行完整性量化与六检，先做全画面扫描，再给唯一优先级、八维区间、可执行方案、"
-    "事实边界，以及一张经核验的精确作品参考。"
+    "运行完整性量化与六检，先做全画面扫描和三条关系覆盖，再用损失栅栏裁决唯一优先级，"
+    "给八维区间、可执行方案、首次提及即生效的事实边界，以及一张经核验的精确作品参考。"
 )
 GENRE_PATTERNS = {
     "architecture/cityscape": [
@@ -93,8 +93,17 @@ RECIPES = {
 }
 
 
-def assemble(rows: list[dict[str, Any]], seed: int) -> list[dict[str, Any]]:
+def assemble(
+    rows: list[dict[str, Any]],
+    seed: int,
+    *,
+    split: str = "blind_holdout_v4",
+    reviewed_on: str = "2026-09-08",
+) -> list[dict[str, Any]]:
     rng = random.Random(seed)
+    case_prefix = split.removeprefix("blind_holdout_")
+    if not case_prefix or case_prefix == split:
+        raise ValueError(f"split must start with blind_holdout_: {split}")
     rows = [dict(row) for row in rows]
     rng.shuffle(rows)
     recipe_offsets: dict[str, int] = defaultdict(int)
@@ -116,7 +125,7 @@ def assemble(rows: list[dict[str, Any]], seed: int) -> list[dict[str, Any]]:
             expected_patterns.insert(0, OPERATION_PATTERNS[operation])
         cases.append(
             {
-                "id": f"v3-{ordinal:03d}",
+                "id": f"{case_prefix}-{ordinal:03d}",
                 "quality_band": "failed_imitation" if role == "failed_base" else role,
                 "genre": row["genre"],
                 "title": row["title"],
@@ -127,8 +136,8 @@ def assemble(rows: list[dict[str, Any]], seed: int) -> list[dict[str, Any]]:
                 "source_sha1": row["source_sha1"],
                 "license": row["license"],
                 "provenance_status": "official-page-verified",
-                "reviewed_on": "2026-09-07",
-                "split": "blind_holdout_v3",
+                "reviewed_on": reviewed_on,
+                "split": split,
                 "blind_prompt": BLIND_PROMPT,
                 "expected_pattern_ids": expected_patterns,
                 "must_notice": row["visible_observations"],
@@ -155,7 +164,13 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
-    cases = assemble(rows, args.seed)
+    plan = json.loads(args.plan.read_text(encoding="utf-8"))
+    cases = assemble(
+        rows,
+        args.seed,
+        split=plan["split"],
+        reviewed_on=plan.get("preregistered_on", "2026-09-08"),
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         "".join(json.dumps(case, ensure_ascii=False) + "\n" for case in cases),

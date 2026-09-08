@@ -29,6 +29,8 @@ class AssembleBenchmarkCasesTests(unittest.TestCase):
 
     def test_failed_base_becomes_draft_variant(self) -> None:
         case = assemble([self.row("failed_base", "tilt_and_crop")], 7)[0]
+        self.assertEqual(case["id"], "v4-001")
+        self.assertEqual(case["split"], "blind_holdout_v4")
         self.assertEqual(case["quality_band"], "failed_imitation")
         self.assertEqual(case["variant_recipe"]["operation"], "tilt_and_crop")
         self.assertEqual(case["annotation_status"], "draft_requires_materialized_review")
@@ -36,6 +38,16 @@ class AssembleBenchmarkCasesTests(unittest.TestCase):
     def test_seed_is_deterministic(self) -> None:
         rows = [self.row("acclaimed"), self.row("failed_base", "crop_pressure")]
         self.assertEqual(assemble(rows, 9), assemble(rows, 9))
+
+    def test_split_controls_case_prefix(self) -> None:
+        case = assemble(
+            [self.row("acclaimed")],
+            1,
+            split="blind_holdout_v9",
+            reviewed_on="2030-01-02",
+        )[0]
+        self.assertEqual(case["id"], "v9-001")
+        self.assertEqual(case["reviewed_on"], "2030-01-02")
 
 
 if __name__ == "__main__":
