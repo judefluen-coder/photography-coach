@@ -47,8 +47,9 @@ class CandidateSelectionTests(unittest.TestCase):
         }
         self.cases = self.root / "cases.jsonl"
         self.development = self.root / "development.jsonl"
+        self.v2_archive = self.root / "v2.jsonl"
         self.masterworks = self.root / "masterworks.jsonl"
-        for path in (self.cases, self.development, self.masterworks):
+        for path in (self.cases, self.development, self.v2_archive, self.masterworks):
             path.write_text("", encoding="utf-8")
 
     def tearDown(self) -> None:
@@ -59,6 +60,7 @@ class CandidateSelectionTests(unittest.TestCase):
         with (
             patch.object(validator, "CASES", self.cases),
             patch.object(validator, "DEVELOPMENT", self.development),
+            patch.object(validator, "V2_ARCHIVE", self.v2_archive),
             patch.object(validator, "MASTERWORKS", self.masterworks),
         ):
             errors, _ = validator.validate_selection([self.selection], self.plan)

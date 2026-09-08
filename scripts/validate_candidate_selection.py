@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PLAN = ROOT / "references" / "benchmark-v3-plan.json"
 CASES = ROOT / "references" / "benchmark-cases.jsonl"
 DEVELOPMENT = ROOT / "references" / "benchmark-development-cases.jsonl"
+V2_ARCHIVE = ROOT / "references" / "benchmark-v2-cases.jsonl"
 MASTERWORKS = ROOT / "references" / "masterwork-cards.jsonl"
 REQUIRED = {
     "candidate_id", "source_sha1", "source_page", "image_url", "preview_url",
@@ -85,7 +86,9 @@ def validate_selection(
 
     prior_sha1s: set[str] = set()
     prior_pages: set[str] = set()
-    for path in (CASES, DEVELOPMENT):
+    for path in (CASES, DEVELOPMENT, V2_ARCHIVE):
+        if not path.exists():
+            continue
         for row in load_jsonl(path):
             prior_sha1s.add(row.get("source_sha1", ""))
             prior_pages.add(row.get("source_page", ""))

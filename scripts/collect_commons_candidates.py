@@ -19,6 +19,7 @@ from audit_benchmark_sources import query
 ROOT = Path(__file__).resolve().parent.parent
 CASES_PATH = ROOT / "references" / "benchmark-cases.jsonl"
 DEVELOPMENT_CASES_PATH = ROOT / "references" / "benchmark-development-cases.jsonl"
+V2_ARCHIVE_PATH = ROOT / "references" / "benchmark-v2-cases.jsonl"
 MASTERWORKS_PATH = ROOT / "references" / "masterwork-cards.jsonl"
 ASSESSMENT_CATEGORIES = {
     "acclaimed": "Category:Featured pictures on Wikimedia Commons",
@@ -54,7 +55,7 @@ def commons_page(title: str) -> str:
 def exclusions() -> tuple[set[str], set[str]]:
     pages: set[str] = set()
     sha1s: set[str] = set()
-    for case_path in (CASES_PATH, DEVELOPMENT_CASES_PATH):
+    for case_path in (CASES_PATH, DEVELOPMENT_CASES_PATH, V2_ARCHIVE_PATH):
         if not case_path.exists():
             continue
         for case in load_jsonl(case_path):
