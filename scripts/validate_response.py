@@ -112,21 +112,26 @@ FACT_BOUNDARY_DISPOSITIONS = r"保留未知|仅描述|观看推测|不作判断|
 # These are high-risk assertion tokens, not forbidden concepts. In a blind response they
 # need an uncertainty/viewing-effect marker in the same sentence where they first occur.
 INFERENCE_RISK_PATTERN = re.compile(
-    r"工人|导游|工作人员|员工|夫妻|家人|亲子|亲属|"
+    r"工人|导游|工作人员|员工|讲解者|听众|讲解现场|维护者|"
+    r"夫妻|家人|亲子|亲属|亲密关系|群体关系|幼小|小兽|"
     r"沸水|沸腾|烹煮|腌制|腌渍|"
     r"秋天|秋季|秋日|秋林|秋色|阴天|晴天|雨天|深夜|"
-    r"啤酒|外脆内软|鲜嫩|新鲜|"
-    r"高速|飞速|"
+    r"啤酒|外脆内软|湿润|鲜嫩|新鲜|"
+    r"高速(?!连拍|快门)|飞速|"
+    r"施工体|施工结构|施工状态|修缮|工程阶段|"
+    r"磨损|年代痕迹|古老|陈旧|山体.{0,6}限制|限制.{0,6}建设|"
     r"祭台|供物|祭祀|仪式性|"
-    r"亲和感|开心|悲伤|愤怒|思考|沉思|焦虑"
+    r"亲和感|亲近|轻松愉快|轻松骑行|开心|悲伤|愤怒|思考|沉思|焦虑"
 )
 
 INFERENCE_QUALIFIER_PATTERN = re.compile(
     r"似乎|仿佛|可能|或许|看起来|视觉上|让人联想到|"
-    r"读作|可读成|像是|显得|形成.{0,4}感|带来.{0,4}感|"
+    r"读作|可读成|像是|显得|"
     r"不确定|无法确认|不能确认|不能判断|未知|未必|也可能|"
     r"如果|若|假如|经核验|标题|说明文字|用户补充"
 )
+
+VIEWING_EFFECT_VERBS = r"形成|带来|传达|强化|营造|呈现"
 
 GENERIC_AUDIT_PHRASES = (
     "关键轮廓比附近次要纹理更值得保护",
@@ -491,16 +496,22 @@ def validate(
                         f"fact-boundary audit needs an explicit disposition for {label}"
                     )
 
-        analysis_match = re.search(
-            r"\A([\s\S]*?)(?=^##\s+(?:9\.\s*)?方法图例与摄影师方向\s*$)",
+        analysis_text = re.sub(
+            r"^##\s+(?:9\.\s*)?方法图例与摄影师方向\s*$[\s\S]*?(?=^##\s+)",
+            "",
             text,
-            re.M,
+            flags=re.M,
         )
-        analysis_text = analysis_match.group(1) if analysis_match else text
         risky_assertions: list[str] = []
         for sentence in re.split(r"(?<=[。！？!?；;])|\n", analysis_text):
             risk = INFERENCE_RISK_PATTERN.search(sentence)
-            if risk and not INFERENCE_QUALIFIER_PATTERN.search(sentence):
+            if not risk:
+                continue
+            effect_marker = re.search(
+                rf"(?:{VIEWING_EFFECT_VERBS})(?:了|出)?[^。！？!?；;]{{0,8}}{re.escape(risk.group(0))}",
+                sentence,
+            )
+            if not INFERENCE_QUALIFIER_PATTERN.search(sentence) and not effect_marker:
                 risky_assertions.append(risk.group(0))
         if risky_assertions:
             errors.append(

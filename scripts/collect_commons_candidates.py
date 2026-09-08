@@ -55,18 +55,36 @@ def commons_page(title: str) -> str:
 def exclusions() -> tuple[set[str], set[str]]:
     pages: set[str] = set()
     sha1s: set[str] = set()
-    for case_path in (CASES_PATH, DEVELOPMENT_CASES_PATH, V2_ARCHIVE_PATH):
+    case_paths = {
+        CASES_PATH,
+        DEVELOPMENT_CASES_PATH,
+        V2_ARCHIVE_PATH,
+        *ROOT.glob("references/benchmark-v*-cases.jsonl"),
+    }
+    for case_path in sorted(case_paths):
         if not case_path.exists():
             continue
         for case in load_jsonl(case_path):
             pages.add(case["source_page"])
             sha1s.add(case["source_sha1"])
-    for card in load_jsonl(MASTERWORKS_PATH):
-        for field in ("source_page", "source_url", "work_url", "image_page"):
+    pages.update(masterwork_pages(load_jsonl(MASTERWORKS_PATH)))
+    return pages, sha1s
+
+
+def masterwork_pages(cards: list[dict[str, Any]]) -> set[str]:
+    pages: set[str] = set()
+    for card in cards:
+        for field in (
+            "direct_url",
+            "source_page",
+            "source_url",
+            "work_url",
+            "image_page",
+        ):
             value = card.get(field)
             if isinstance(value, str) and "commons.wikimedia.org/wiki/" in value:
                 pages.add(value)
-    return pages, sha1s
+    return pages
 
 
 def stable_key(title: str, seed: str) -> str:

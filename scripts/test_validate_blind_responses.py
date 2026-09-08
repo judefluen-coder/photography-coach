@@ -303,6 +303,28 @@ class BlindResponseValidationTests(unittest.TestCase):
         errors = validate(text, require_integrity_probe=True, require_reference=True)
         self.assertFalse(any("unqualified single-frame inference" in error for error in errors))
 
+    def test_viewing_effect_and_camera_operation_are_not_fact_violations(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "我先看到中央建筑，再看到后方边缘；判断信心为中。",
+            "红蓝重复强化了仪式性；下一次可高速连拍，但真实速度未知；判断信心为中。",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertFalse(any("unqualified single-frame inference" in error for error in errors))
+
+    def test_triggered_loss_gate_requires_integrity_candidate_a(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "- 细节｜通过｜",
+            "- 细节｜问题｜",
+        ).replace(
+            "候选A=细节（双眼可读）",
+            "候选A=注意力/形式（双眼可读）",
+        ).replace(
+            "损失栅栏=未触发（六检没有问题）",
+            "损失栅栏=触发（关键接口失读）",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("triggered loss gate must place an integrity family in 候选A", errors)
+
     def test_axis_check_requires_roll_and_perspective_tests(self) -> None:
         text = valid_response("中央建筑").replace(
             "；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒",

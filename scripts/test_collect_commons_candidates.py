@@ -9,6 +9,7 @@ from collect_commons_candidates import (
     acceptable_info,
     collect_titles,
     commons_page,
+    masterwork_pages,
     plain_text,
     stable_key,
 )
@@ -53,6 +54,13 @@ class CommonsCandidateTests(unittest.TestCase):
         self.assertEqual(
             collect_titles("ordinary", "AB", 2, query_fn=fake_query),
             ["File:A.jpg", "File:Shared.jpg"],
+        )
+
+    def test_masterwork_direct_url_is_excluded(self) -> None:
+        url = "https://commons.wikimedia.org/wiki/File:Teaching_example.jpg"
+        self.assertEqual(
+            masterwork_pages([{"direct_url": url}]),
+            {url},
         )
 
 
