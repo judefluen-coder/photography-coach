@@ -1,0 +1,12 @@
+{
+  "run_id": "holdout-v4-v16-final-20260908",
+  "created_at": "2026-09-08T07:17:56.033386+00:00",
+  "seed": 20260908,
+  "case_count": 100,
+  "benchmark_cases_sha256": "816b72e80d86aa57c2ee992bcab462bd0a0e6c8f6b064137a409979848552650",
+  "coaching_protocol_sha256": "9faccfcc9ac8871db835c76ee4b0c3f4773b2ee4fdeb4253010c7b7392ddb5dd",
+  "labels_in_blind_packet": false,
+  "answers_in_blind_packet": false,
+  "annotation_audit_required": true,
+  "response_freeze_rule": "Write all response files before opening benchmark-cases.jsonl for grading."
+}

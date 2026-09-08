@@ -1,0 +1,91 @@
+{
+  "run_id": "holdout-v4-v16-final-20260908",
+  "generated_at": "2026-09-08T09:16:55.016319+00:00",
+  "benchmark_cases_sha256": "816b72e80d86aa57c2ee992bcab462bd0a0e6c8f6b064137a409979848552650",
+  "blind_integrity": {
+    "labels_in_blind_packet": false,
+    "answers_in_blind_packet": false,
+    "response_freeze_enforced": true,
+    "annotation_audit_passed": true
+  },
+  "thresholds": {
+    "minimum_overall_pass_rate": 0.8,
+    "minimum_band_pass_rate": 0.72,
+    "minimum_genre_pass_rate": 0.7,
+    "minimum_observation_recall": 0.75,
+    "minimum_failed_variant_detection_rate": 0.84,
+    "maximum_acclaimed_overcorrection_rate": 0.16,
+    "maximum_hallucination_violation_rate": 0.05
+  },
+  "metrics": {
+    "evaluated_cases": 100,
+    "overall_pass_rate": 0.64,
+    "observation_recall": 0.9233,
+    "failed_variant_detection_rate": 0.16,
+    "acclaimed_overcorrection_rate": 0.0,
+    "hallucination_violation_rate": 0.01,
+    "band_pass_rates": {
+      "acclaimed": 0.88,
+      "failed_imitation": 0.16,
+      "ordinary": 0.76
+    },
+    "genre_pass_rates": {
+      "abstract/concept": 0.6471,
+      "architecture/cityscape": 0.5294,
+      "landscape/nature": 0.7647,
+      "people/documentary": 0.6471,
+      "still-life/food/macro": 0.625,
+      "wildlife/action": 0.625
+    }
+  },
+  "checks": {
+    "all_cases_evaluated": true,
+    "overall_pass_rate": false,
+    "every_band_pass_rate": false,
+    "every_genre_pass_rate": false,
+    "observation_recall": true,
+    "failed_variant_detection_rate": false,
+    "acclaimed_overcorrection_rate": true,
+    "hallucination_violation_rate": true
+  },
+  "passed": false,
+  "failed_case_ids": [
+    "v4-001",
+    "v4-005",
+    "v4-011",
+    "v4-013",
+    "v4-015",
+    "v4-016",
+    "v4-019",
+    "v4-020",
+    "v4-022",
+    "v4-027",
+    "v4-028",
+    "v4-031",
+    "v4-032",
+    "v4-033",
+    "v4-038",
+    "v4-045",
+    "v4-052",
+    "v4-053",
+    "v4-057",
+    "v4-059",
+    "v4-063",
+    "v4-064",
+    "v4-066",
+    "v4-070",
+    "v4-071",
+    "v4-072",
+    "v4-073",
+    "v4-077",
+    "v4-080",
+    "v4-081",
+    "v4-086",
+    "v4-088",
+    "v4-090",
+    "v4-091",
+    "v4-094",
+    "v4-100"
+  ],
+  "coaching_protocol_sha256": "9faccfcc9ac8871db835c76ee4b0c3f4773b2ee4fdeb4253010c7b7392ddb5dd"
+}

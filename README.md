@@ -50,9 +50,9 @@ The tracked corpus currently contains:
 - 55 admitted critique patterns;
 - 100 active source-disjoint benchmark cases across six genres and three quality roles.
 
-The source, genre, language, region, historical/contemporary, and methodological coverage floors are met. The last independent holdout, v3, did **not** pass the release gate. A development-only v1.5 replay reduced unsupported factual assertions but regressed scene observation and degraded-image detection. The current v1.6 protocol therefore uses a scene-topology snapshot before quantitative cues, operation-specific crop/tilt/detail tests, and a two-relation protection gate.
+The source, genre, language, region, historical/contemporary, and methodological coverage floors are met. The source-disjoint 100-image v4 holdout was selected, materialized, visually audited, answered blind, frozen by hash, and cross-graded without changing the preregistered thresholds. It did **not** pass the release gate: overall pass was 64%, observation recall 92.33%, failed-variant detection 16%, acclaimed overcorrection 0%, and hallucination violations 1%. Band pass rates were 88% for acclaimed photographs, 76% for ordinary photographs, and 16% for failed imitations.
 
-The new 100-image v4 holdout has been selected, materialized, visually audited, and frozen. Its blind responses and answer-aware grading are still pending. Until v4 passes unchanged thresholds, the project remains an experimental prototype rather than a validated release.
+The result is useful but sharply bounded. v1.6 usually notices the expected scene relations and protects strong photographs, yet it is not reliable at recognizing and localizing visible processing or integrity damage. It detected only 4 of 25 controlled failures: one crop-pressure, one highlight-clipping, one tilt/crop, and one detail-damage case; it missed all four shadow-compression and all four colour-excess cases. The project therefore remains an experimental research prototype rather than a validated release. The failure is preserved in [`references/benchmark-report.json`](references/benchmark-report.json); it is not repaired by retuning this holdout.
 
 ## Verification
 
@@ -69,7 +69,7 @@ The release gate is intentionally stricter:
 python3 scripts/validate_knowledge.py --release
 ```
 
-It must fail while the current source-disjoint holdout has no complete passing report. A green structural check is not a substitute for blind evaluation.
+It currently fails because the completed v4 report misses the preregistered performance thresholds. A green structural check is not a substitute for blind evaluation, and a complete failed report is not presented as a passing release.
 
 ## Repository policy
 
