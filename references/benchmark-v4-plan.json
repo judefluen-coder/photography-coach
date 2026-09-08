@@ -1,6 +1,6 @@
 {
   "split": "blind_holdout_v4",
-  "protocol_target": "evaluation-standard-v1.5",
+  "protocol_target": "evaluation-standard-v1.6",
   "preregistered_on": "2026-09-08",
   "case_count": 100,
   "quality_roles": {
@@ -42,5 +42,6 @@
   "annotation_rule": "Every must_notice relation and prohibited inference must be checked against the exact materialized image. Freeze image SHA-256 and must_notice hash before any blind response is written.",
   "review_separation": "Blind writers receive images, prompts, the current coaching protocol, and teaching knowledge only. Separate answer-aware graders score frozen response hashes. No writer receives cases, transformations, answer-key audits, prior responses, grades, or reports.",
   "threshold_policy": "Reuse the acceptance thresholds already frozen in references/knowledge-status.json. Do not tune thresholds, scoring anchors, case quotas, or operation quotas after responses are seen.",
-  "independence_boundary": "v3 failures informed v1.5 and can be used only for development regression. Only these newly selected v4 files can provide release evidence for v1.5. Model-only review remains internal validation rather than a human expert panel."
+  "protocol_revision_record": "The target changed from v1.5 to v1.6 after the development-only replay on already-seen v3 images, before any v4 blind response existed. Candidate pool, selected files, answer-key quotas, transformation quotas, grading anchors, and acceptance thresholds were not changed. v1.6 adds topology-first observation, operation-specific crop/tilt/detail tests, probe-as-nomination priority logic, and a two-relation protection gate.",
+  "independence_boundary": "v3 failures and the v1.5 replay informed v1.6 and can be used only for development regression. Only these newly selected v4 files can provide release evidence for v1.6. Model-only review remains internal validation rather than a human expert panel."
 }

@@ -191,10 +191,34 @@ def validate(
 
     if "完整性六检" not in map_text:
         errors.append("whole-frame map must expose 完整性六检")
+    topology_line = next(
+        (line for line in map_text.splitlines() if "场景拓扑快照：" in line),
+        "",
+    )
+    if require_integrity_probe:
+        if not topology_line:
+            errors.append("benchmark map must include 场景拓扑快照：")
+        else:
+            for label in (
+                "重复/状态=",
+                "路径/轴线=",
+                "例外/中断=",
+                "边缘唯一项=",
+                "尺度锚点=",
+            ):
+                if label not in topology_line:
+                    errors.append(f"scene-topology snapshot missing field: {label}")
+            if "路径/轴线=" in topology_line and "→" not in topology_line.split(
+                "路径/轴线=", 1
+            )[1].split("；", 1)[0]:
+                errors.append("scene-topology path must name a start-to-end arrow")
     probe_line = next(
         (line for line in map_text.splitlines() if "完整性量化" in line),
         "",
     )
+    if require_integrity_probe and topology_line and probe_line:
+        if map_text.find(topology_line) > map_text.find(probe_line):
+            errors.append("scene-topology snapshot must precede the integrity probe result")
     probe_match = re.search(r"完整性量化[：:]\s*(已运行|不可用)", probe_line)
     if not probe_match:
         errors.append("whole-frame map must record 完整性量化 as 已运行 or 不可用")
@@ -255,14 +279,30 @@ def validate(
                 or ("上" in family_line and "下" in family_line)
             ):
                 errors.append("benchmark crop check must compare 左/右 or 上/下 edges")
+            if family == "边缘/裁切":
+                for label in ("闭合测试：", "受压侧", "对侧余量"):
+                    if label not in family_line:
+                        errors.append(f"benchmark crop check missing operation test: {label}")
             if family == "轴线/透视":
                 if not re.search(r"共同滚转[：:]\s*(是|否|不确定)", family_line):
                     errors.append("benchmark axis check must record 共同滚转：是/否/不确定")
                 if "透视检验：" not in family_line:
                     errors.append("benchmark axis check must include 透视检验：")
+                if "反向旋转测试：" not in family_line:
+                    errors.append("benchmark axis check must include 反向旋转测试：")
+                for label in ("横向", "竖向", "边缘代价"):
+                    if label not in family_line:
+                        errors.append(f"benchmark axis counter-rotation test missing: {label}")
             if family == "细节":
                 if "关键接口：" not in family_line:
                     errors.append("benchmark detail check must localize a 关键接口：")
+                if "伪影三联：" not in family_line:
+                    errors.append("benchmark detail check must include 伪影三联：")
+                for label in ("蜡化=", "光晕/假微反差=", "块化/振铃="):
+                    if label not in family_line:
+                        errors.append(f"benchmark detail artifact triad missing: {label}")
+                if "双景深纹理：" not in family_line:
+                    errors.append("benchmark detail check must include 双景深纹理：")
 
     if require_integrity_probe and integrity_signals is not None:
         for family, strength in integrity_signals.items():
@@ -270,12 +310,6 @@ def validate(
                 errors.append(
                     f"raised integrity family marked 通过 needs localized 反证: {family}"
                 )
-            if (
-                family == "轴线/透视"
-                and strength == "strong"
-                and family_verdicts.get(family) == "通过"
-            ):
-                errors.append("strong axis consensus cannot be marked 通过")
             if (
                 family == "色彩"
                 and strength == "strong"
@@ -322,6 +356,33 @@ def validate(
                         f"relationship coverage needs localized pair and effect: {label}=…与…→…"
                     )
 
+        protection_line = next(
+            (line for line in map_text.splitlines() if "保护门：" in line),
+            "",
+        )
+        protection_loss_state = ""
+        if not protection_line:
+            errors.append("benchmark map must include 保护门：")
+        else:
+            for label in ("成立关系①=", "成立关系②=", "具体信息损失=", "修正代价="):
+                if label not in protection_line:
+                    errors.append(f"protection gate missing field: {label}")
+            for relation_label in ("成立关系①", "成立关系②"):
+                if not re.search(
+                    rf"{re.escape(relation_label)}=[^；;\n]*与[^；;\n]*→[^；;\n]+",
+                    protection_line,
+                ):
+                    errors.append(
+                        f"protection gate needs localized pair and effect: {relation_label}=…与…→…"
+                    )
+            loss_match = re.search(r"具体信息损失=(已证实|未证实)（[^）]+）", protection_line)
+            if not loss_match:
+                errors.append("protection gate must record 具体信息损失=已证实/未证实（局部依据）")
+            else:
+                protection_loss_state = loss_match.group(1)
+            if "STRUCTURAL_BOTTLENECK" in found_decisions and protection_loss_state != "已证实":
+                errors.append("STRUCTURAL_BOTTLENECK requires a localized confirmed information loss")
+
         priority_line = next(
             (line for line in map_text.splitlines() if "优先级裁决：" in line),
             "",
@@ -341,7 +402,13 @@ def validate(
                 )
                 if has_integrity_problem and loss_gate.group(1) != "触发":
                     errors.append("an integrity 问题 must trigger the information-loss gate")
-                if loss_gate.group(1) == "触发":
+                if has_integrity_problem and protection_loss_state != "已证实":
+                    errors.append("an integrity 问题 requires confirmed loss in the protection gate")
+                if protection_loss_state == "已证实" and loss_gate.group(1) != "触发":
+                    errors.append("confirmed information loss must trigger the information-loss gate")
+                if protection_loss_state == "未证实" and loss_gate.group(1) != "未触发":
+                    errors.append("unconfirmed information loss cannot trigger the information-loss gate")
+                if loss_gate.group(1) == "触发" and has_integrity_problem:
                     candidate_a = priority_line.split("候选A=", 1)[1].split("；", 1)[0]
                     if not any(family in candidate_a for family in INTEGRITY_FAMILIES):
                         errors.append("triggered loss gate must place an integrity family in 候选A")
@@ -386,24 +453,6 @@ def validate(
     if "要保护" not in map_text:
         errors.append("whole-frame map must mark at least one protected strength: 要保护")
 
-    if require_integrity_probe and integrity_signals is not None:
-        unresolved_strong = [
-            family
-            for family, strength in integrity_signals.items()
-            if strength == "strong" and family_verdicts.get(family) != "通过"
-        ]
-        if unresolved_strong:
-            primary_lines = [line for line in map_text.splitlines() if "首要" in line]
-            primary_line = primary_lines[0] if len(primary_lines) == 1 else ""
-            if not any(
-                re.search(PRIMARY_FAMILY_PATTERNS[family], primary_line)
-                for family in unresolved_strong
-            ):
-                errors.append(
-                    "an unresolved strong integrity signal must drive the single 首要: "
-                    + ", ".join(unresolved_strong)
-                )
-
     if not re.search(r"裁切.{0,30}(上|下|左|右|边缘|比例|画面)", text, re.S):
         errors.append("crop plan must use a visible boundary or proportion")
 
@@ -432,7 +481,7 @@ def validate(
     if interval_count < 8:
         errors.append("expected eight dimension intervals or N/A values")
 
-    status = "研究状态：实验版 v1.5；不是专家认证、客观审美分或学习效果证明。"
+    status = "研究状态：实验版 v1.6；不是专家认证、客观审美分或学习效果证明。"
     if status not in text:
         errors.append("missing research-status disclaimer")
 

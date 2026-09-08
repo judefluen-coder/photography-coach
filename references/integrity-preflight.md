@@ -10,9 +10,21 @@ Before the six families, underline mentally every role, relationship, state or p
 
 Examples: visible foliage colour does not establish season; gray sky does not establish weather; lighting does not establish time; bubbles do not establish boiling or cooking; a bottle does not establish its contents; rough stone does not establish age or wear; clothing does not establish occupation; relative size does not establish family role; gesture does not establish emotion or thought; splash and blur do not establish speed or outcome.
 
+## Scene-topology snapshot
+
+Complete this visual snapshot before reading quantitative results:
+
+- `重复/状态`: count the important repeated units and distinguish visibly different states or orientations.
+- `路径/轴线`: trace one named start through the frame to a named endpoint.
+- `例外/中断`: find the unit, gap, overlap, or direction change that breaks the pattern; write `未见` if none is visible.
+- `边缘唯一项`: scan all four edges for unique objects, clipped modules, and line endpoints.
+- `尺度锚点`: name a small or distant element that makes relative scale legible, or state that none is reliable.
+
+Do not let later probe strength change this ledger without reopening the image. In ordinary chat this remains a silent seeing routine; benchmark/audit responses expose one compact `场景拓扑快照` line.
+
 ## Quantitative attention probe
 
-When the image is a local file, first run `python3 scripts/analyze_image_integrity.py /absolute/path/to/image --json`. Record whether it ran. Its thresholds are intentionally asymmetric: they are designed to make the reviewer look again, not to certify failure or quality.
+When the image is a local file, run `python3 scripts/analyze_image_integrity.py /absolute/path/to/image --json` after the topology snapshot. Record whether it ran. Its thresholds are intentionally asymmetric: they are designed to make the reviewer look again, not to certify failure, quality, or priority.
 
 - A raised signal must be resolved at full useful resolution. Do not answer it with mood words or a generic claim that detail remains.
 - A family may be marked `问题` or `观察` when one measured cue and one localized visible sign agree; two localized visible signs remain sufficient without a measured cue.
@@ -22,15 +34,15 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 - In an audit response, transcribe the probe's family and strength exactly as `触发：暗部[强]、轴线/透视[复核]`; write `无阈值信号` only when the probe returned none. This binds the manual review to the image that was measured.
 - Use paired visible comparisons rather than assurances: `对边：左…与右…`, `暗面：…与…`, `亮面：…与…`, `色彩对照：…与…`, `参照：…与…`, and `同尺度：…与…`. Follow them with a four-edge/center ledger and three named key regions. These labels are audit rails, not wording required in ordinary conversation.
 - Complete three relation lanes before ranking: edge/center, space/action, and light-colour/material. Each lane compares two localized things and names what their relation preserves or loses. An inventory of three objects is not relation coverage.
-- When one or more `强` cues remain `观察/问题`, the single public `首要` must address at least one of those families. A strong cue may be marked `通过` only with localized counter-evidence in the same line; generic phrases such as “仍有层次” do not falsify it.
-- Exception: a `轴线/透视[强]` cue is derived from agreeing horizontal and vertical edge populations, so it cannot be marked `通过`. Mark the visible tilt `观察` or `问题`, then decide whether it is an intentional organizing choice or a repairable roll.
-- Probe strength routes attention; it does not settle priority. Compare the two strongest candidates by information loss, relation break, affected area, reversibility, repair value, and protection cost. Loss of a key face, gesture, text edge, object identity, or material boundary can outrank a stronger whole-image color statistic.
+- A strong cue may be marked `通过` only with localized counter-evidence in the same line; generic phrases such as “仍有层次” do not falsify it. A strong cue that remains `观察` may still be a watch item rather than the public priority when no specific information or relationship loss is visible.
+- Probe strength routes attention; it never settles priority. Compare the two strongest candidates by information loss, relation break, affected area, reversibility, repair value, and protection cost. Loss of a key face, gesture, text edge, object identity, or material boundary can outrank a stronger whole-image color statistic, while an organized strong cue can lose to a better-supported relational issue.
 
 ## 1. Edge and crop pressure
 
 - Compare opposite-edge intervals, not one isolated cut. Look at repeated spacing, limbs, line endpoints, circles, faces, signage, wings, and directional space.
 - Account for all four edges and the central anchor. The useful question is not merely “is something cut?” but “which visible relation is removed at this edge while what unrelated room remains elsewhere?”
 - Ask whether one side feels enlarged, crowded, or abruptly amputated while the opposite side retains unrelated slack.
+- Run an edge-closure test: compare the remaining room on the threatened side with the visible scale of the body, action, trajectory, circle, line, or repeated module, then compare it with unrelated room at the opposite edge. No literal edge contact is required.
 - Distinguish a decisive fragment that expands off-frame space from a timid cut that only removes evidence.
 - Falsifier: the cut completes a visible rhythm or relation, direction has usable continuation space, and opposite edges carry comparable intentional tension.
 
@@ -59,20 +71,21 @@ When the image is a local file, first run `python3 scripts/analyze_image_integri
 - Use at least two independent stability references: a true horizon, waterline, hanging vertical, repeated architecture, door frame, or other plausibly level/plumb structure.
 - Separate camera roll from sloping ground and normal perspective convergence. Never level from a single uncertain line.
 - State whether the independent references show common roll (`是/否/不确定`) and separately test where perspective lines converge. Convergence explains depth; it does not by itself prove that the frame is level.
+- Run a signed counter-rotation test: identify one reliable horizontal and one reliable vertical, predict the same corrective rotation direction for both, and check whether the correction also reduces rather than worsens collateral edge pressure. Hills, roads, trees, curved facades, or a lone converging edge are not reliable by themselves.
 - Check whether the suspected roll co-occurs with squeezed corners, uneven headroom, clipped geometry, or lost trajectory space. Co-occurrence strengthens the candidate.
-- Falsifier: independent references agree with the frame, the directional tilt is repeated elsewhere, and edge pressure does not look like collateral loss.
+- Falsifier: the reliable horizontal and vertical do not improve together under one counter-rotation, or the proposed correction worsens edge pressure; the visible orientation is then unsupported as common repairable roll.
 
 ## 6. Detail damage
 
-- Compare the key region with nearby high-frequency texture at the same apparent scale.
+- Compare high-frequency textures at similar apparent scale across two depth planes. Do not use intentionally defocused bokeh versus a face as the sole comparison.
 - Name the critical interface whose loss changes the reading: an eye/face boundary, hand-to-tool junction, limb articulation, letter edge, product contour, or material transition. “The whole image is soft” is a symptom, not yet a localized observation.
-- Look for halos, block boundaries, waxy smearing, false microcontrast, ringing, banding, or noise reduction that selectively erases required detail.
+- Record an artifact triad: waxy smearing; halo or false microcontrast; and blocking or ringing. A single absent artifact does not prove intact detail, but the triad prevents generic “soft” judgments.
 - Do not infer whether softness came from focus, motion, shake, denoising, resizing, or platform compression when the finished image cannot distinguish them.
 - Falsifier: texture falls off consistently with depth or motion, edges remain natural, and the key region is at least as readable as comparable nearby detail.
 
 ## Priority and wording gate
 
-If a family is evidenced and weakens the core under every plausible intent branch, place it in candidate A. Compare the strongest two candidates explicitly. A broad or key-region information loss is provisionally first: if correcting it has greater information or relationship recovery, meaningful repair value, and acceptable cost to the protected strength, it must be the public leading correction. It may be outranked only by localized counter-evidence showing that the supposedly lost relation survives and that another repair has greater value. Do not let an easily named color or composition preference outrank a less glamorous loss of readable evidence.
+Before ranking, run a protection gate: name two different relationships that already work, record whether a specific information loss is `已证实` or `未证实`, and state the cost of the proposed correction to those relationships. If a family is evidenced and weakens the core under every plausible intent branch, place it in candidate A. Compare the strongest two candidates explicitly. A broad or key-region information loss is provisionally first: if correcting it has greater information or relationship recovery, meaningful repair value, and acceptable cost to the protected strengths, it must be the public leading correction. It may be outranked only by localized counter-evidence showing that the supposedly lost relation survives and that another repair has greater value. A strong probe cue without specific loss does not lead. Do not let an easily named color or composition preference outrank a less glamorous loss of readable evidence, and do not destroy an existing spatial, temporal, or color relation merely to neutralize a style cue.
 
 For action frames, identify approach, contact, suspension, or aftermath from the body-hand-foot-tool interface before ranking background colour, spectacle, or implied speed. For edges, judge directional continuation and closure across opposite sides; the absence of literal edge contact is not proof that crop pressure is absent. For detail, compare same-scale regions and prioritize irreversible loss when it crosses a face, text, gesture junction, identifying contour, or material boundary.
 

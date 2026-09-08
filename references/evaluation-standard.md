@@ -1,6 +1,6 @@
-# Evaluation standard v1.5
+# Evaluation standard v1.6
 
-This standard was revised through multiple pilots, development replays, and three source-disjoint 100-case holdouts. v1.2 passed 63/100 on holdout v2, with 70% observation recall and 52% degraded-variant detection. The v1.4 revision added materialized-image answer-key audits, stronger localization, and explicit priority adjudication. On the untouched holdout v3 completed September 8, 2026, it passed 57/100, recalled 77% of required observations, detected 84% of derived failures, and overcorrected 16% of acclaimed controls. Detection and observation floors were met, but the system failed release thresholds because hallucination violations reached 19%, 15 cases misranked the primary issue, and every quality band except the raw overcorrection guard remained below its required case-pass floor. v1.5 therefore adds a sentence-level fact-naming gate, three-lane relationship coverage, and an information-loss priority gate. v3 is now development evidence for v1.5; only a new source-disjoint holdout can certify this revision. Current and historical reports are preserved in `benchmark-development-report.json`, `integrity-sentinel-report.json`, `benchmark-v13b-development-report.json`, `benchmark-v3-report.json`, and `benchmark-report.json`. The standard remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
+This standard was revised through multiple pilots, development replays, and three source-disjoint 100-case holdouts. v1.2 passed 63/100 on holdout v2, with 70% observation recall and 52% degraded-variant detection. The v1.4 revision added materialized-image answer-key audits, stronger localization, and explicit priority adjudication. On the untouched holdout v3 completed September 8, 2026, it passed 57/100, recalled 77% of required observations, detected 84% of derived failures, and overcorrected 16% of acclaimed controls. v1.5 added sentence-local fact naming, three-lane relationship coverage, and an information-loss gate. A 100-case development replay on the already-seen v3 images reduced hallucination violations from 19% to 1% and raised raw case pass from 57% to 63%, but observation recall fell to 68.3%, degraded-variant detection to 64%, and detail/tilt/crop recognition remained weak. v1.6 therefore puts a scene-topology snapshot before quantitative cues, makes probe strength a nomination rather than a priority rule, adds operation-specific tilt/crop/detail tests, and requires a two-relation protection gate before structural correction. These are development-informed changes; only a new source-disjoint holdout v4 can certify them. Current and historical reports are preserved in `benchmark-development-report.json`, `integrity-sentinel-report.json`, `benchmark-v13b-development-report.json`, `benchmark-v3-report.json`, and `benchmark-report.json`. The standard remains a research prototype: it must not be described as objective truth, expert certification, proven learning improvement, or release-ready.
 
 The v0.9 taxonomy is also calibrated against two external practices: the Getty Museum's progression from description to reflection and formal analysis, including first fixation, viewer response, intent, and surprise; and World Press Photo's separation of visual quality/story from representation, authenticity, context, accountability, and ethics. These sources inform coverage and boundary design, not universal taste rules:
 
@@ -54,7 +54,19 @@ An unqualified assertion followed later by “身份未知” remains an asserti
 
 Keep at most two genre candidates when uncertain and say which judgment changes with the routing.
 
-## Mandatory two-pass scan
+## Mandatory topology-first scan
+
+### Pass 0: scene topology before defect search
+
+Before viewing probe results or ranking any correction, build a compact map of what is actually arranged in the frame:
+
+1. Count the important repeated units and separate their visibly different states or orientations.
+2. Trace one dominant path or axis from a named start to a named endpoint; do not replace the path with a list of objects.
+3. Find one exception, interruption, or missing link in the repetition/path, including the honest result `none visible`.
+4. Scan all four edges for unique objects, line endpoints, clipped modules, and directional continuation.
+5. Name one small or distant scale anchor when present; otherwise state that no reliable scale anchor is visible.
+
+This pass is descriptive. It precedes the quantitative attention probe so a statistical cue cannot rewrite the number, state, path, edge, or scale relations already visible in the photograph.
 
 ### Pass A: low-level and key-region scan
 
@@ -74,9 +86,9 @@ For every image, silently answer these concrete miss checks before moving to mea
 4. Is the tightness or empty area doing visible work, and are horizon or architectural axes internally deliberate?
 5. Do the brightest, darkest, or most saturated areas support the first two fixations rather than create a third unrelated target?
 
-When a local file is accessible, first run `scripts/analyze_image_integrity.py` as specified in `integrity-preflight.md`. Its output is an attention router, not a quality score: it can expose pixel-distribution or edge-structure cues that the visual model otherwise rationalizes away, but it cannot determine subject importance, intention, or whether a crop is meaningful. Then run the six-family integrity challenge. Test each family as a falsifiable hypothesis and classify it internally as `absent`, `plausible`, or `evidenced`. A style explanation is not a result: it is a counter-condition that must be tested against the visible state. Diagnose what the image shows, not an unobservable editing history.
+After Pass 0, when a local file is accessible, run `scripts/analyze_image_integrity.py` as specified in `integrity-preflight.md`. Its output is an attention router, not a quality score or priority vote: it can expose pixel-distribution or edge-structure cues that the visual model otherwise rationalizes away, but it cannot determine subject importance, intention, whether a crop is meaningful, or whether a visibly tilted structure should be corrected. Then run the six-family integrity challenge. Test each family as a falsifiable hypothesis and classify it internally as `absent`, `plausible`, or `evidenced`. A style explanation is not a result: it is a counter-condition that must be tested against the visible state. Diagnose what the image shows, not an unobservable editing history.
 
-In the public response, record whether the quantitative probe ran, then expose the completed scan as a compact `完整性六检` table before the adaptive whole-frame map. Give one line each for edge/crop, shadows, highlights, color, axis/perspective, and detail. Use only `通过`, `观察`, or `问题`; every line needs a short visible basis. `观察` or `问题` needs two localized signs, or one measured cue plus one localized sign. A raised cue can still be falsified, but a `通过` verdict must name that visible falsifier. This table is evidence that the scan ran, not six mandatory faults. It does not replace the prioritized whole-frame map.
+In an audit response, record the scene-topology snapshot before whether the quantitative probe ran, then expose the completed scan as a compact `完整性六检` table before the adaptive whole-frame map. Give one line each for edge/crop, shadows, highlights, color, axis/perspective, and detail. Use only `通过`, `观察`, or `问题`; every line needs a short visible basis. `观察` or `问题` needs two localized signs, or one measured cue plus one localized sign. A raised cue can still be falsified, but a `通过` verdict must name that visible falsifier. This table is evidence that the scan ran, not six mandatory faults. It does not replace the prioritized whole-frame map. In ordinary conversation, fold the topology into concrete prose instead of exposing another template.
 
 An integrity candidate becomes `evidenced` only with at least two independent observations, for example two opposite edges, two unrelated dark regions, repeated nominal neutrals, or one stability reference plus collateral edge pressure. If the same evidenced issue weakens the core under both plausible intent branches, it must enter the candidate ledger and cannot be demoted merely because the subject, moment, or graphic idea still works.
 
@@ -94,7 +106,7 @@ A key-region coverage failure must enter the candidate ledger when any of these 
 
 Ask in order: Where does the first fixation land? Can the eye reach the core next? Is the key relationship readable? Does the environment add needed context? Are formal choices internally consistent? What changes if the main element disappears?
 
-Before ranking, complete three different relation checks: (1) an edge or centre relation, (2) a depth, overlap, contact, or action relation, and (3) a light, colour, or material relation. Each check must name two localized things and the effect of their relation. Three isolated object labels do not count. In action frames, decide whether the visible interface shows approach, contact, suspension, or aftermath before using words about speed, force, or outcome.
+Before ranking, complete three different relation checks: (1) an edge or centre relation, (2) a depth, overlap, contact, or action relation, and (3) a light, colour, or material relation. Each check must name two localized things and the effect of their relation. Three isolated object labels do not count. Reconcile these checks with Pass 0: repeated-unit counts, path endpoints, exceptions, edge objects, and scale anchors may not silently change. In action frames, decide whether the visible interface shows approach, contact, suspension, or aftermath before using words about speed, force, or outcome.
 
 An abstract interpretation may justify a technical cost, but cannot erase the Pass A observation.
 
@@ -169,11 +181,19 @@ Apply three constraints from the v3 failure analysis:
 9. **Direction space is not edge contact.** A person, animal, vehicle, line, or repeated module can be crop-pressured without touching the frame. Compare continuation and closure on opposite edges, including unrelated slack elsewhere.
 10. **Fact boundaries are sentence-local.** A closing unknowns list cannot repair unsupported roles, relationships, states, emotions, time, weather, process, speed, or causality already asserted as facts.
 
+Apply five constraints from the v1.5 development replay:
+
+11. **Topology precedes cue strength.** Count repeated units and states, trace one start-to-end path, name an exception, scan edge endpoints, and find a scale anchor before reading the probe. If the later diagnosis contradicts that snapshot, revisit the pixels rather than rationalizing the contradiction.
+12. **Probe cues nominate; visible loss ranks.** `强` and `复核` determine where to inspect, never what must be `首要`. A family leads only after localized evidence shows lost information or a broken relationship with useful repair value.
+13. **Tilt needs a signed counter-rotation test.** Call roll repairable only when one reliable horizontal and one reliable vertical improve together under the same counter-rotation and the edge-pressure result also improves. A hill, road, tree, curved facade, or one converging line is insufficient. A strong axis statistic may be marked `通过` when localized references falsify common roll.
+14. **Crop and detail need operation-specific tests.** For crop pressure, compare threatened-side room to body/action/module scale and unrelated opposite-side slack; no literal cut is required. For detail damage, test waxy smearing, halo or false microcontrast, and blocking or ringing, then compare high-frequency textures of similar apparent scale across two depth planes. Bokeh versus a face is not sufficient by itself.
+15. **Protect before correcting.** Before `STRUCTURAL_BOTTLENECK`, name two currently successful relations, one concrete information loss, and the proposed correction's cost to both relations. Without a localized loss, keep the issue as observation, purpose branch, or optional experiment.
+
 ## Decision rules
 
 ### STRUCTURAL_BOTTLENECK
 
-Use only when the issue has at least two positional observations, blocks the core reading, promises more repair value than loss to the current strength, is not merely a broken convention, and clearly leads the ledger. State why it outranks the runner-up.
+Use only when the issue has at least two positional observations, names a concrete information or relationship loss, blocks the core reading, promises more repair value than loss to two named current strengths, is not merely a broken convention, and clearly leads the ledger. State why it outranks the runner-up.
 
 ### CONDITIONAL_BRANCH
 

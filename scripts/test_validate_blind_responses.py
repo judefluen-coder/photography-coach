@@ -28,18 +28,20 @@ def valid_response(marker: str) -> str:
 主体左侧轮廓与右侧亮面分开，距离关系可读。
 
 ## 全画面看片地图
+场景拓扑快照：重复/状态=左右各一组竖向结构且中央一人；路径/轴线=起点左侧人物→终点右侧门框；例外/中断=中央双眼打断竖向重复；边缘唯一项=上沿灯罩、下沿鞋底；尺度锚点=中央人物。
 完整性六检：
 - 完整性量化：已运行（无阈值信号，仍继续人工六检）。
-- 边缘/裁切｜通过｜对边：左侧人物与右侧门框均留有间隔。
+- 边缘/裁切｜通过｜对边：左侧人物与右侧门框均留有间隔；闭合测试：受压侧人物外仍有半身宽；对侧余量与门框模块相当。
 - 暗部｜通过｜暗面：左下衣服与右下地面仍可分。
 - 高光｜通过｜亮面：中央墙面与右侧灯罩都保留纹理。
 - 色彩｜通过｜色彩对照：冷色墙面与暖色衣服各有内部变化。
-- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。
-- 细节｜通过｜同尺度：主体眼睛与附近衣纹边缘都自然；关键接口：眼睛轮廓和衣纹转折均可辨。
+- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反向旋转测试：横向门楣与竖向门柱不需要同向修正；边缘代价会增加右侧压力。
+- 细节｜通过｜同尺度：主体眼睛与附近衣纹边缘都自然；关键接口：眼睛轮廓和衣纹转折均可辨；伪影三联：蜡化=未见、光晕/假微反差=未见、块化/振铃=未见；双景深纹理：近处衣纹与后方门框边缘均自然。
 
 四边账本：左=人物外有间隔；右=门框外有余量；上=灯罩完整；下=鞋底未切；中心锚点=主体双眼。
 关键区域定位：①左侧人物→轮廓与墙面分离；②中央双眼→视线关系可读；③右侧门框→限定空间深度。
 关系覆盖：边缘/中心=左侧轮廓与中央双眼→观看路径闭合；空间/动作=双眼与后方门框→前后层次可读；光色/材质=暖色衣服与冷色墙面→人物和墙面分离。
+保护门：成立关系①=左侧轮廓与中央双眼→观看路径闭合；成立关系②=暖色衣服与冷色墙面→人物和墙面分离；具体信息损失=未证实（双眼与门框边缘仍可辨）；修正代价=继续锐化会让衣纹变硬。
 优先级裁决：候选A=细节（双眼可读）；候选B=边缘/裁切（右侧余量）；损失栅栏=未触发（六检没有问题）；依据=关系断裂较小、保护代价较低；结论=细节。
 
 - 技术清晰：关键区域可辨。首要
@@ -83,7 +85,7 @@ def valid_response(marker: str) -> str:
 人物身份、地点和器材未知。
 事实边界审计：角色/关系=保留未知（中央人物）；状态/过程=仅描述（站立姿态）；感受/含义=观看推测（视线集中）；地点/时间/因果=保留未知（室内表面）。
 
-研究状态：实验版 v1.5；不是专家认证、客观审美分或学习效果证明。
+研究状态：实验版 v1.6；不是专家认证、客观审美分或学习效果证明。
 
 ## 可选语境复核
 如愿意可补充用途，再做第二遍语境复核。
@@ -141,7 +143,7 @@ class BlindResponseValidationTests(unittest.TestCase):
     def test_missing_integrity_family_is_rejected(self) -> None:
         self.write_inputs(1)
         text = valid_response("中央主体").replace(
-            "- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。\n",
+            "- 轴线/透视｜通过｜参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反向旋转测试：横向门楣与竖向门柱不需要同向修正；边缘代价会增加右侧压力。\n",
             "",
         )
         (self.responses / "bench-001.md").write_text(text, encoding="utf-8")
@@ -176,8 +178,8 @@ class BlindResponseValidationTests(unittest.TestCase):
             "完整性量化：已运行（无阈值信号，仍继续人工六检）",
             "完整性量化：已运行（触发：轴线/透视[复核]）",
         ).replace(
-            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。",
-            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反证：两根独立竖线平行且没有同向侧倒。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反向旋转测试：横向门楣与竖向门柱不需要同向修正；边缘代价会增加右侧压力。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反向旋转测试：横向门楣与竖向门柱不需要同向修正；边缘代价会增加右侧压力；反证：两根独立竖线平行且没有同向侧倒。",
         )
         self.assertEqual(
             validate(
@@ -198,7 +200,7 @@ class BlindResponseValidationTests(unittest.TestCase):
         )
         self.assertTrue(any("actual trigger: 轴线/透视[复核]" in error for error in errors))
 
-    def test_unresolved_strong_signal_must_drive_primary(self) -> None:
+    def test_unresolved_strong_signal_does_not_force_primary(self) -> None:
         text = valid_response("中央建筑").replace(
             "完整性量化：已运行（无阈值信号，仍继续人工六检）",
             "完整性量化：已运行（触发：色彩[强]）",
@@ -212,15 +214,15 @@ class BlindResponseValidationTests(unittest.TestCase):
             require_reference=True,
             integrity_signals={"色彩": "strong"},
         )
-        self.assertTrue(any("must drive the single 首要" in error for error in errors))
+        self.assertFalse(any("must drive the single 首要" in error for error in errors))
 
-    def test_strong_axis_consensus_cannot_be_marked_pass(self) -> None:
+    def test_strong_axis_consensus_can_pass_with_localized_falsifier(self) -> None:
         text = valid_response("中央建筑").replace(
             "完整性量化：已运行（无阈值信号，仍继续人工六检）",
             "完整性量化：已运行（触发：轴线/透视[强]）",
         ).replace(
-            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒。",
-            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反证：两根独立竖线平行。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反向旋转测试：横向门楣与竖向门柱不需要同向修正；边缘代价会增加右侧压力。",
+            "参照：左侧门柱与右侧窗框均和画框一致；共同滚转：否；透视检验：两者没有向同一消失点异常侧倒；反向旋转测试：横向门楣与竖向门柱不需要同向修正；边缘代价会增加右侧压力；反证：两根独立竖线平行。",
         )
         errors = validate(
             text,
@@ -228,7 +230,7 @@ class BlindResponseValidationTests(unittest.TestCase):
             require_reference=True,
             integrity_signals={"轴线/透视": "strong"},
         )
-        self.assertIn("strong axis consensus cannot be marked 通过", errors)
+        self.assertNotIn("strong axis consensus cannot be marked 通过", errors)
 
     def test_benchmark_family_requires_paired_visible_evidence(self) -> None:
         text = valid_response("中央建筑").replace(
@@ -249,6 +251,57 @@ class BlindResponseValidationTests(unittest.TestCase):
         )
         errors = validate(text, require_integrity_probe=True, require_reference=True)
         self.assertIn("benchmark map must include 四边账本：", errors)
+
+    def test_benchmark_requires_topology_before_probe(self) -> None:
+        topology = (
+            "场景拓扑快照：重复/状态=左右各一组竖向结构且中央一人；"
+            "路径/轴线=起点左侧人物→终点右侧门框；例外/中断=中央双眼打断竖向重复；"
+            "边缘唯一项=上沿灯罩、下沿鞋底；尺度锚点=中央人物。\n"
+        )
+        text = valid_response("中央建筑").replace(topology, "")
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark map must include 场景拓扑快照：", errors)
+
+        text = valid_response("中央建筑").replace(topology, "").replace(
+            "- 完整性量化：已运行（无阈值信号，仍继续人工六检）。\n",
+            "- 完整性量化：已运行（无阈值信号，仍继续人工六检）。\n" + topology,
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("scene-topology snapshot must precede the integrity probe result", errors)
+
+    def test_benchmark_requires_operation_specific_integrity_tests(self) -> None:
+        text = valid_response("中央建筑").replace("闭合测试：", "")
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark crop check missing operation test: 闭合测试：", errors)
+
+        text = valid_response("中央建筑").replace("反向旋转测试：", "")
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark axis check must include 反向旋转测试：", errors)
+
+        text = valid_response("中央建筑").replace("伪影三联：", "")
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark detail check must include 伪影三联：", errors)
+
+    def test_benchmark_requires_protection_gate(self) -> None:
+        line = (
+            "保护门：成立关系①=左侧轮廓与中央双眼→观看路径闭合；"
+            "成立关系②=暖色衣服与冷色墙面→人物和墙面分离；"
+            "具体信息损失=未证实（双眼与门框边缘仍可辨）；修正代价=继续锐化会让衣纹变硬。\n"
+        )
+        text = valid_response("中央建筑").replace(line, "")
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn("benchmark map must include 保护门：", errors)
+
+    def test_structural_bottleneck_requires_confirmed_loss(self) -> None:
+        text = valid_response("中央建筑").replace(
+            "NO_STRUCTURAL_BOTTLENECK",
+            "STRUCTURAL_BOTTLENECK",
+        )
+        errors = validate(text, require_integrity_probe=True, require_reference=True)
+        self.assertIn(
+            "STRUCTURAL_BOTTLENECK requires a localized confirmed information loss",
+            errors,
+        )
 
     def test_benchmark_requires_three_localized_relations(self) -> None:
         text = valid_response("中央建筑").replace("③右侧门框→限定空间深度", "右侧门框限定空间")
