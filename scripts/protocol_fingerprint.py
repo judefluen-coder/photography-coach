@@ -13,6 +13,7 @@ PROTOCOL_RELATIVE_PATHS = (
     Path("references/evaluation-standard.md"),
     Path("references/integrity-preflight.md"),
     Path("references/response-card.md"),
+    Path("references/blind-evaluator-prompt.md"),
     Path("references/benchmark-method.md"),
     Path("references/reference-policy.md"),
     Path("references/knowledge-method.md"),
@@ -23,6 +24,7 @@ PROTOCOL_RELATIVE_PATHS = (
     Path("scripts/search_knowledge.py"),
     Path("scripts/analyze_image_integrity.py"),
     Path("scripts/validate_response.py"),
+    Path("scripts/validate_blind_responses.py"),
     Path("scripts/benchmark_annotation_audit.py"),
 )
 
