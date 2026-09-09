@@ -85,6 +85,7 @@ class AssembleBenchmarkCasesTests(unittest.TestCase):
         return {
             "split": "blind_holdout_v5",
             "preregistered_on": "2026-09-09",
+            "assembly_seed": 20260909,
             "case_count": 180,
             "blind_prompt": "v5 preregistered blind prompt",
             "failed_operation_counts": {

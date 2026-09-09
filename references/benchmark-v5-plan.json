@@ -2,6 +2,8 @@
   "split": "blind_holdout_v5",
   "protocol_target": "evaluation-standard-v1.6",
   "preregistered_on": "2026-09-09",
+  "assembly_seed": 20260909,
+  "blind_run_seed": 20260909,
   "blind_prompt": "仅根据图像完成摄影教练盲评；不要使用文件名、作者、来源、平台评级或答案标签。先做场景拓扑快照，再运行完整性量化、六检和三条关系覆盖；用两条成立关系保护门与损失栅栏裁决唯一优先级，给八维区间、可执行方案、首次提及即生效的事实边界，以及一张经核验且与首要诊断机制匹配的精确作品参考。",
   "case_count": 180,
   "release_scored_case_count": 180,

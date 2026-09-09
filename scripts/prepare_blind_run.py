@@ -8,8 +8,10 @@ import hashlib
 import json
 import random
 import shutil
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
+from threading import Lock
 
 from materialize_benchmark import (
     CASES_PATH,
@@ -43,6 +45,7 @@ def load_verified_reuse_items(
     cases: list[dict[str, object]],
     images_dir: Path,
     *,
+    use_original: bool,
     require_all: bool = True,
 ) -> dict[str, dict[str, object]]:
     """Load reusable outputs only when manifest identity and bytes still match."""
@@ -70,6 +73,9 @@ def load_verified_reuse_items(
                 raise ValueError(f"{case_id}: reuse manifest is missing {field}")
             if item[field] != case[field]:
                 raise ValueError(f"{case_id}: reuse manifest {field} mismatch")
+        expected_url = case["image_url"] if use_original else case["preview_url"]
+        if item.get("download_url") != expected_url:
+            raise ValueError(f"{case_id}: reuse manifest download_url mismatch")
         if "output_sha256" not in item:
             raise ValueError(f"{case_id}: reuse manifest is missing output_sha256")
 
@@ -120,6 +126,12 @@ def main() -> int:
     parser.add_argument("--cases", type=Path, default=CASES_PATH)
     parser.add_argument("--run-id", help="Stable run name; defaults to a UTC timestamp")
     parser.add_argument("--seed", type=int, default=20260904)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=4,
+        help="Concurrent source materializations; completed items remain manifest-backed",
+    )
     parser.add_argument("--resume", action="store_true", help="Resume an interrupted download")
     parser.add_argument("--original", action="store_true", help="Use full originals and verify SHA-1")
     parser.add_argument(
@@ -133,6 +145,8 @@ def main() -> int:
         help="Copy reviewed images from a directory containing a verified manifest.json",
     )
     args = parser.parse_args()
+    if not 1 <= args.workers <= 8:
+        parser.error("--workers must be between 1 and 8")
     if args.reuse_cache and args.reuse_images_from is not None:
         parser.error("--reuse-cache and --reuse-images-from are mutually exclusive")
 
@@ -149,7 +163,10 @@ def main() -> int:
     if args.reuse_images_from is not None or args.reuse_cache:
         try:
             reuse_items = load_verified_reuse_items(
-                reuse_dir / "manifest.json", cases, reuse_dir
+                reuse_dir / "manifest.json",
+                cases,
+                reuse_dir,
+                use_original=args.original,
             )
         except (OSError, ValueError, json.JSONDecodeError) as error:
             parser.error(str(error))
@@ -159,7 +176,11 @@ def main() -> int:
     if args.resume:
         try:
             resume_items = load_verified_reuse_items(
-                run_manifest_path, cases, images_dir, require_all=False
+                run_manifest_path,
+                cases,
+                images_dir,
+                use_original=args.original,
+                require_all=False,
             )
         except (OSError, ValueError, json.JSONDecodeError) as error:
             parser.error(str(error))
@@ -177,28 +198,76 @@ def main() -> int:
     images_dir.mkdir(parents=True, exist_ok=args.resume)
     responses_dir.mkdir(exist_ok=args.resume)
 
-    materialized = []
+    materialized_by_id: dict[str, dict[str, object]] = {}
+    pending_cases: list[dict[str, object]] = []
+
+    def ordered_materializations() -> list[dict[str, object]]:
+        return [
+            materialized_by_id[case["id"]]
+            for case in cases
+            if case["id"] in materialized_by_id
+        ]
+
     for case in cases:
         destination = images_dir / f"{case['id']}.jpg"
         if case["id"] in resume_items:
-            materialized.append(
-                reused_materialization_record(case, resume_items[case["id"]], destination)
+            materialized_by_id[case["id"]] = reused_materialization_record(
+                case, resume_items[case["id"]], destination
             )
             continue
         if args.reuse_images_from is not None:
             source = reuse_dir / f"{case['id']}.jpg"
             shutil.copy2(source, destination)
             item = reused_materialization_record(case, reuse_items[case["id"]], destination)
-            materialized.append(item)
+            materialized_by_id[case["id"]] = item
+            write_manifest_atomic(run_manifest_path, ordered_materializations())
         elif args.reuse_cache:
             source = reuse_dir / f"{case['id']}.jpg"
             destination.hardlink_to(source)
             item = reused_materialization_record(case, reuse_items[case["id"]], destination)
-            materialized.append(item)
+            materialized_by_id[case["id"]] = item
+            write_manifest_atomic(run_manifest_path, ordered_materializations())
         else:
+            pending_cases.append(case)
+
+    if pending_cases:
+        failures: list[tuple[str, Exception]] = []
+        manifest_lock = Lock()
+
+        def materialize_and_record(case: dict[str, object]) -> dict[str, object]:
             item = materialize(case, images_dir, args.original)
-            materialized.append(item)
-        write_manifest_atomic(run_manifest_path, materialized)
+            with manifest_lock:
+                materialized_by_id[case["id"]] = item
+                write_manifest_atomic(run_manifest_path, ordered_materializations())
+            return item
+
+        executor = ThreadPoolExecutor(max_workers=args.workers)
+        futures = {}
+        interrupted = False
+        try:
+            for case in pending_cases:
+                future = executor.submit(materialize_and_record, case)
+                futures[future] = case["id"]
+            for future in as_completed(futures):
+                case_id = futures[future]
+                try:
+                    future.result()
+                except Exception as exc:
+                    failures.append((case_id, exc))
+        except KeyboardInterrupt:
+            interrupted = True
+            for future in futures:
+                future.cancel()
+            raise
+        finally:
+            executor.shutdown(wait=True, cancel_futures=interrupted)
+        if failures:
+            summary = "; ".join(f"{case_id}: {exc}" for case_id, exc in failures)
+            raise RuntimeError(f"materialization failed after preserving successes: {summary}")
+    else:
+        write_manifest_atomic(run_manifest_path, ordered_materializations())
+
+    materialized = ordered_materializations()
 
     rng = random.Random(args.seed)
     rng.shuffle(materialized)

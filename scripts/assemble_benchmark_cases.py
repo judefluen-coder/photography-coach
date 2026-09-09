@@ -322,7 +322,11 @@ def main() -> int:
     parser.add_argument(
         "--candidate-manifest", type=Path, default=DEFAULT_CANDIDATE_MANIFEST,
     )
-    parser.add_argument("--seed", type=int, default=20260907)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        help="Assembly seed; must match plan.assembly_seed when explicitly supplied",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     errors, rows = validate_selection(
@@ -333,8 +337,18 @@ def main() -> int:
             print(f"ERROR: {error}")
         return 1
     plan = json.loads(args.plan.read_text(encoding="utf-8"))
+    planned_seed = plan.get("assembly_seed")
+    if not isinstance(planned_seed, int) or isinstance(planned_seed, bool) or planned_seed < 0:
+        print("ERROR: invalid assembly plan: assembly_seed must be a non-negative integer")
+        return 1
+    if args.seed is not None and args.seed != planned_seed:
+        print(
+            f"ERROR: --seed {args.seed} differs from preregistered "
+            f"assembly_seed {planned_seed}"
+        )
+        return 1
     try:
-        cases = assemble(rows, args.seed, plan=plan)
+        cases = assemble(rows, planned_seed, plan=plan)
     except ValueError as exc:
         print(f"ERROR: invalid assembly plan: {exc}")
         return 1

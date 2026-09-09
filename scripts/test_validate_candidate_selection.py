@@ -38,6 +38,8 @@ class CandidateSelectionTests(unittest.TestCase):
         }
         self.plan_payload = {
             "split": "blind_holdout_v5",
+            "assembly_seed": 7,
+            "blind_run_seed": 11,
             "blind_prompt": "Critique only the supplied image.",
             "case_count": 1,
             "quality_roles": {"failed_base": 1},
@@ -266,6 +268,8 @@ class V5PlanTests(unittest.TestCase):
         validator.validate_plan(self.plan, errors)
         self.assertEqual(errors, [])
         self.assertEqual(self.plan["case_count"], 180)
+        self.assertEqual(self.plan["assembly_seed"], 20260909)
+        self.assertEqual(self.plan["blind_run_seed"], 20260909)
         self.assertEqual(
             self.plan["quality_roles"],
             {"acclaimed": 60, "ordinary": 60, "failed_base": 60},

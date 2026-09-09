@@ -8,6 +8,7 @@ import hashlib
 import io
 import json
 import math
+import re
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,31 @@ def download(url: str) -> bytes:
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=90) as response:
         return response.read()
+
+
+def decode_rgb(
+    payload: bytes,
+    *,
+    allow_missing_jpeg_eoi: bool = False,
+) -> tuple[Image.Image, str | None]:
+    """Decode strictly, optionally repairing only a verified JPEG's missing EOI."""
+    try:
+        with Image.open(io.BytesIO(payload)) as opened:
+            return opened.convert("RGB"), None
+    except OSError as exc:
+        match = re.search(r"image file is truncated \((\d+) bytes not processed\)", str(exc))
+        if (
+            not allow_missing_jpeg_eoi
+            or match is None
+            or int(match.group(1)) > 4
+            or not payload.startswith(b"\xff\xd8")
+            or payload.endswith(b"\xff\xd9")
+        ):
+            raise
+    with Image.open(io.BytesIO(payload + b"\xff\xd9")) as opened:
+        if opened.format != "JPEG":
+            raise OSError("missing-EOI recovery is restricted to JPEG sources")
+        return opened.convert("RGB"), "jpeg_eoi_appended"
 
 
 def apply_recipe(image: Image.Image, recipe: dict[str, Any]) -> Image.Image:
@@ -121,8 +147,10 @@ def materialize(case: dict[str, Any], output: Path, use_original: bool) -> dict[
                 f"{case['id']}: source SHA-1 mismatch ({actual_sha1} != {case['source_sha1']})"
             )
 
-    with Image.open(io.BytesIO(payload)) as opened:
-        source = opened.convert("RGB")
+    source, decode_recovery = decode_rgb(
+        payload,
+        allow_missing_jpeg_eoi=use_original,
+    )
     result = source
     difference = 0.0
     if case["variant_recipe"] is not None:
@@ -153,6 +181,7 @@ def materialize(case: dict[str, Any], output: Path, use_original: bool) -> dict[
         "output_width": result.width,
         "output_height": result.height,
         "mean_absolute_difference": round(difference, 3),
+        "source_decode_recovery": decode_recovery,
         "variant_recipe": case["variant_recipe"],
         "license": case["license"],
     }

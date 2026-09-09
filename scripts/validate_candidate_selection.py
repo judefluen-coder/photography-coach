@@ -59,6 +59,10 @@ def validate_plan(plan: dict[str, Any], errors: list[str]) -> None:
         errors.append("plan split must be a versioned blind_holdout_vN")
     if not isinstance(plan.get("blind_prompt"), str) or not plan["blind_prompt"].strip():
         errors.append("plan requires a non-empty blind_prompt")
+    for seed_field in ("assembly_seed", "blind_run_seed"):
+        seed = plan.get(seed_field)
+        if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+            errors.append(f"plan {seed_field} must be a non-negative integer")
 
     case_count = plan.get("case_count")
     quality_roles = plan.get("quality_roles", {})

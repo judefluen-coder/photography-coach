@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import tempfile
 import unittest
@@ -13,6 +14,7 @@ from PIL import Image
 
 from materialize_benchmark import (
     apply_recipe,
+    decode_rgb,
     load_verified_resume_items,
     mean_absolute_difference,
     write_manifest_atomic,
@@ -71,6 +73,31 @@ class TransformationTests(unittest.TestCase):
                 "sharpen_amount": 1.8,
             },
         )
+
+    def test_decode_rgb_recovers_source_missing_jpeg_eoi(self) -> None:
+        buffer = io.BytesIO()
+        Image.new("RGB", (32, 24), (20, 40, 60)).save(buffer, format="JPEG")
+
+        decoded, recovery = decode_rgb(
+            buffer.getvalue()[:-2], allow_missing_jpeg_eoi=True
+        )
+
+        self.assertEqual(decoded.size, (32, 24))
+        self.assertEqual(recovery, "jpeg_eoi_appended")
+
+    def test_decode_rgb_does_not_repair_unverified_preview(self) -> None:
+        buffer = io.BytesIO()
+        Image.new("RGB", (32, 24), (20, 40, 60)).save(buffer, format="JPEG")
+
+        with self.assertRaises(OSError):
+            decode_rgb(buffer.getvalue()[:-2])
+
+    def test_decode_rgb_rejects_deeply_truncated_jpeg(self) -> None:
+        buffer = io.BytesIO()
+        Image.new("RGB", (128, 96), (20, 40, 60)).save(buffer, format="JPEG")
+
+        with self.assertRaises(OSError):
+            decode_rgb(buffer.getvalue()[:-200], allow_missing_jpeg_eoi=True)
 
 
 class ResumeTests(unittest.TestCase):
