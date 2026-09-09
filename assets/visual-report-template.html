@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Photography Coach 单张照片点评">
+  <title>Photography Coach</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101210;
+      --surface: #171a18;
+      --surface-strong: #1d211e;
+      --text: #f0f1ed;
+      --muted: #9da39d;
+      --faint: #737a74;
+      --line: #2d332f;
+      --accent: #e49a66;
+      --accent-text: #1d120c;
+      --radius: 12px;
+      --sans: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.72;
+      text-rendering: optimizeLegibility;
+    }
+    button, a { font: inherit; }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    [hidden] { display: none !important; }
+    .topbar {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 clamp(20px, 4vw, 56px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { font-size: 19px; font-weight: 720; letter-spacing: 0.04em; }
+    .topbar span { color: var(--muted); font-size: 13px; }
+    .workspace {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 36px clamp(20px, 4vw, 56px) 48px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(330px, 0.64fr);
+      gap: clamp(28px, 4vw, 60px);
+      align-items: center;
+      min-height: calc(100dvh - 152px);
+    }
+    .photo-shell { min-width: 0; }
+    .photo-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1.62;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #090a09;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.25);
+    }
+    .photo-stage img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: opacity 160ms ease;
+    }
+    .photo-stage .treatment { opacity: 0; }
+    .photo-stage[data-mode="treatment"] .source { opacity: 0; }
+    .photo-stage[data-mode="treatment"] .treatment { opacity: 1; }
+    .photo-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 14px;
+    }
+    .tabs {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .tabs button {
+      min-height: 40px;
+      padding: 7px 15px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .tabs button[aria-pressed="true"] { background: #303630; color: var(--text); }
+    .tabs button:active, .button-primary:active, .button-quiet:active { transform: translateY(1px); }
+    .button-primary, .button-quiet {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 15px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 720;
+      text-decoration: none;
+    }
+    .button-primary { background: var(--accent); color: var(--accent-text); }
+    .button-quiet { border: 1px solid var(--line); background: transparent; color: var(--text); }
+    .hero-copy { padding: 12px 0; }
+    .kicker { margin: 0 0 16px; color: var(--accent); font-size: 13px; font-weight: 700; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 22px;
+      font-size: clamp(34px, 3.3vw, 52px);
+      line-height: 1.18;
+      letter-spacing: -0.035em;
+      font-weight: 720;
+    }
+    .lead { margin-bottom: 30px; color: #c9ccc7; font-size: 18px; line-height: 1.75; }
+    .priority { padding: 20px 0 0; border-top: 1px solid var(--line); }
+    .priority-label { display: block; margin-bottom: 6px; color: var(--accent); font-size: 12px; font-weight: 700; }
+    .priority strong { display: block; margin-bottom: 8px; font-size: 20px; line-height: 1.5; }
+    .priority p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .report { max-width: 1120px; margin: 26px auto 0; padding: 0 clamp(20px, 4vw, 56px) 100px; }
+    section { padding: 66px 0; border-top: 1px solid var(--line); }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+      gap: 40px;
+      margin-bottom: 34px;
+    }
+    h2 { margin-bottom: 0; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.28; letter-spacing: -0.02em; }
+    .section-head p { margin-bottom: 0; color: var(--muted); }
+    .read-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(270px, 0.82fr);
+      gap: 20px;
+    }
+    .main-read, .keep-read { padding: 26px; border-radius: var(--radius); background: var(--surface); }
+    .main-read { background: var(--surface-strong); }
+    .read-grid small { display: block; margin-bottom: 14px; color: var(--accent); font-size: 12px; font-weight: 700; }
+    .read-grid h3 { margin-bottom: 12px; font-size: 22px; line-height: 1.45; }
+    .read-grid p { margin-bottom: 0; color: var(--muted); }
+    .map { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 42px; margin-top: 42px; }
+    .map-item { padding-left: 16px; border-left: 2px solid var(--line); }
+    .map-item.primary { border-color: var(--accent); }
+    .map-item .map-label { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 5px; }
+    .map-item strong { font-size: 15px; }
+    .map-item small { color: var(--faint); font-size: 11px; }
+    .map-item.primary small { color: var(--accent); }
+    .map-item p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .score {
+      display: grid;
+      grid-template-columns: minmax(130px, 0.58fr) minmax(0, 1.42fr);
+      gap: 18px;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .score-title { display: flex; flex-direction: column; gap: 3px; font-size: 14px; font-weight: 650; }
+    .score-value { color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    .score p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.62; }
+    .shoot { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 40px; align-items: start; }
+    .instruction { padding: 30px; border-radius: var(--radius); background: var(--accent); color: var(--accent-text); }
+    .instruction small { font-weight: 760; }
+    .instruction h3 { margin: 10px 0 12px; font-size: 28px; line-height: 1.35; }
+    .instruction p { margin-bottom: 0; }
+    .shoot-notes { padding-top: 4px; }
+    .shoot-notes h3 { margin-bottom: 8px; font-size: 17px; }
+    .shoot-notes p { margin-bottom: 24px; color: var(--muted); }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .compare.single { grid-template-columns: 1fr; max-width: 720px; }
+    .compare figure { margin: 0; }
+    .compare img { width: 100%; aspect-ratio: 1.62; object-fit: contain; border-radius: var(--radius); background: #090a09; }
+    .compare figcaption { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .compare figcaption strong { color: var(--text); }
+    .edit-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+    .edit-notes h3 { margin-bottom: 8px; font-size: 17px; }
+    .edit-notes p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .edit-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .reference { display: grid; grid-template-columns: 0.6fr 1.4fr; gap: 42px; align-items: start; }
+    .reference-title {
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .reference-title small { color: var(--faint); }
+    .reference-title strong { font-size: 23px; line-height: 1.35; }
+    .reference-copy h3 { margin-bottom: 14px; font-size: 21px; line-height: 1.5; }
+    .reference-copy p { color: var(--muted); font-size: 14px; }
+    .practice { max-width: 780px; font-size: 18px; line-height: 1.8; }
+    .practice strong { color: var(--accent); }
+    details { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+    summary { cursor: pointer; font-size: 14px; font-weight: 650; }
+    details p { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
+    footer { padding: 26px clamp(20px, 4vw, 56px) 40px; border-top: 1px solid var(--line); color: var(--faint); font-size: 12px; text-align: center; }
+    @media (max-width: 1000px) {
+      .hero { grid-template-columns: 1fr; min-height: 0; }
+      .hero-copy { max-width: 760px; }
+      .section-head, .shoot, .reference { grid-template-columns: 1fr; gap: 20px; }
+      .reference-title { min-height: 180px; }
+    }
+    @media (max-width: 700px) {
+      .topbar { min-height: 60px; padding: 0 16px; }
+      .workspace { padding: 18px 14px 36px; }
+      .hero { gap: 30px; }
+      .photo-stage { aspect-ratio: 1.25; }
+      .photo-stage img { object-position: center; }
+      .photo-toolbar { align-items: stretch; flex-direction: column; }
+      .tabs { width: 100%; }
+      .button-primary { width: 100%; }
+      h1 { font-size: 34px; }
+      .lead { font-size: 16px; }
+      .report { margin-top: 0; padding: 0 16px 72px; }
+      section { padding: 50px 0; }
+      .read-grid, .map, .scores, .compare, .edit-notes { grid-template-columns: 1fr; }
+      .score { grid-template-columns: 128px 1fr; }
+      .compare { gap: 28px; }
+      .edit-actions { flex-direction: column; }
+      .button-quiet, .edit-actions .button-primary { width: 100%; justify-content: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="brand">见一张</div><span>单张照片点评</span></header>
+  <main>
+    <div class="workspace">
+      <div class="hero">
+        <div class="photo-shell">
+          <div class="photo-stage" id="photoStage">
+            <img class="source" id="heroSource" alt="用户提交的原始照片">
+            <img class="treatment" id="heroTreatment" alt="裁切并调整影调色彩后的照片">
+          </div>
+          <div class="photo-toolbar">
+            <div class="tabs treatment-only" aria-label="照片版本">
+              <button type="button" data-mode="source">看原图</button>
+              <button type="button" data-mode="treatment">看调整后</button>
+            </div>
+            <a class="button-primary treatment-only" id="heroDownload" download>下载调整后的照片</a>
+          </div>
+        </div>
+        <div class="hero-copy">
+          <p class="kicker">先说结论</p>
+          <h1 id="title"></h1>
+          <p class="lead" id="summary"></p>
+          <div class="priority">
+            <span class="priority-label">先改这一件事</span>
+            <strong id="priorityTitle"></strong>
+            <p id="priorityBody"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report">
+      <section aria-labelledby="readTitle">
+        <div class="section-head">
+          <h2 id="readTitle">这张照片，哪里已经成立</h2>
+          <p id="strengthBody"></p>
+        </div>
+        <div class="read-grid">
+          <div class="main-read"><small>真正卡住画面的地方</small><h3 id="readPriorityTitle"></h3><p id="readPriorityBody"></p></div>
+          <div class="keep-read"><small>调整时要保住</small><h3 id="strengthTitle"></h3><p id="strengthBodyRepeat"></p></div>
+        </div>
+        <div class="map" id="observationMap"></div>
+      </section>
+
+      <section aria-labelledby="scoreTitle">
+        <div class="section-head"><h2 id="scoreTitle">八维评分</h2><p>没有总分。区间只用来长期比较同类照片，不代表客观审美排名。</p></div>
+        <div class="scores" id="scores"></div>
+      </section>
+
+      <section aria-labelledby="shootTitle">
+        <div class="section-head"><h2 id="shootTitle">下次遇到这种场景</h2><p>先改位置、时机或人与背景的关系，不默认把问题推给器材。</p></div>
+        <div class="shoot">
+          <div class="instruction"><small>站在现场时，只记这句话</small><h3 id="reshootAction"></h3><p id="reshootEffect"></p></div>
+          <div class="shoot-notes"><h3>会失去什么</h3><p id="reshootCost"></p><h3>什么时候能做</h3><p id="reshootAvailability"></p></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="editTitle">
+        <div class="section-head"><h2 id="editTitle"></h2><p id="editSummary"></p></div>
+        <div class="compare" id="compare">
+          <figure><img id="compareSource" alt="调整前的原始照片"><figcaption><strong>原图</strong><span>保留文件</span></figcaption></figure>
+          <figure class="treatment-only"><img id="compareTreatment" alt="裁切并调整影调色彩后的照片"><figcaption><strong>调整后</strong><span>可下载</span></figcaption></figure>
+        </div>
+        <div class="edit-notes">
+          <div><h3>我具体动了什么</h3><p id="editRecipe"></p></div>
+          <div><h3>这一步修不了什么</h3><p id="editLimit"></p></div>
+        </div>
+        <div class="edit-actions">
+          <a class="button-primary treatment-only" id="downloadTreatment" download>下载调整后</a>
+          <a class="button-quiet" id="downloadSource" download>下载原图</a>
+        </div>
+      </section>
+
+      <section aria-labelledby="referenceTitle">
+        <div class="section-head"><h2 id="referenceTitle">只看一张相关的照片</h2><p id="referenceMatch"></p></div>
+        <div class="reference">
+          <div class="reference-title"><small id="referenceMeta"></small><strong id="referenceWork"></strong></div>
+          <div class="reference-copy"><h3 id="lookingTask"></h3><p id="referenceDifference"></p><a class="button-quiet" id="referenceLink" target="_blank" rel="noreferrer">打开参考照片</a></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="practiceTitle">
+        <div class="section-head"><h2 id="practiceTitle">30 分钟练习</h2><p>只练一个变量，并给照片一个看得见的通过条件。</p></div>
+        <p class="practice"><strong id="exerciseTitle"></strong> <span id="exerciseInstructions"></span></p>
+        <details><summary>事实边界</summary><p id="boundaryNote"></p></details>
+      </section>
+    </div>
+  </main>
+  <footer id="researchStatus"></footer>
+
+  <script id="reportData" type="application/json">__REPORT_JSON__</script>
+  <script>
+    const data = JSON.parse(document.querySelector('#reportData').textContent);
+    const text = (selector, value) => { document.querySelector(selector).textContent = value || ''; };
+    const source = data.source_asset;
+    const treatment = data.treatment_asset || '';
+    const hasTreatment = Boolean(treatment);
+
+    document.title = `${data.title} | Photography Coach`;
+    text('#title', data.title);
+    text('#summary', data.summary);
+    text('#priorityTitle', data.priority.title);
+    text('#priorityBody', data.priority.body);
+    text('#readPriorityTitle', data.priority.title);
+    text('#readPriorityBody', data.priority.body);
+    text('#strengthTitle', data.strength.title);
+    text('#strengthBody', data.strength.body);
+    text('#strengthBodyRepeat', data.strength.body);
+    text('#reshootAction', data.reshoot.action);
+    text('#reshootEffect', data.reshoot.effect);
+    text('#reshootCost', data.reshoot.cost);
+    text('#reshootAvailability', data.reshoot.availability);
+    text('#editTitle', hasTreatment ? '我已经直接帮你调了一版' : '这张可以怎样调整');
+    text('#editSummary', data.edit.summary);
+    text('#editRecipe', `${data.edit.crop} ${data.edit.tone_color}`);
+    text('#editLimit', data.edit.limit);
+    text('#referenceMeta', `${data.reference.photographer}, ${data.reference.year}`);
+    text('#referenceWork', data.reference.title);
+    text('#lookingTask', data.reference.looking_task);
+    text('#referenceMatch', data.reference.match);
+    text('#referenceDifference', data.reference.difference);
+    text('#exerciseTitle', data.exercise.title);
+    text('#exerciseInstructions', data.exercise.instructions);
+    text('#boundaryNote', data.boundary_note);
+    text('#researchStatus', data.research_status);
+
+    document.querySelector('#heroSource').src = source;
+    document.querySelector('#compareSource').src = source;
+    document.querySelector('#downloadSource').href = source;
+    document.querySelector('#downloadSource').download = `photography-coach-source.${data.source_extension}`;
+    document.querySelector('#referenceLink').href = data.reference.url;
+
+    if (hasTreatment) {
+      document.querySelector('#heroTreatment').src = treatment;
+      document.querySelector('#compareTreatment').src = treatment;
+      document.querySelector('#heroDownload').href = treatment;
+      document.querySelector('#downloadTreatment').href = treatment;
+      document.querySelector('#heroDownload').download = `photography-coach-treatment.${data.treatment_extension}`;
+      document.querySelector('#downloadTreatment').download = `photography-coach-treatment.${data.treatment_extension}`;
+    } else {
+      document.querySelectorAll('.treatment-only').forEach((element) => element.hidden = true);
+      document.querySelector('#compare').classList.add('single');
+    }
+
+    const map = document.querySelector('#observationMap');
+    data.observations.forEach((observation) => {
+      const item = document.createElement('div');
+      item.className = `map-item${observation.priority === '首要' ? ' primary' : ''}`;
+      const label = document.createElement('div');
+      label.className = 'map-label';
+      const strong = document.createElement('strong');
+      strong.textContent = observation.label;
+      const small = document.createElement('small');
+      small.textContent = observation.priority;
+      const body = document.createElement('p');
+      body.textContent = observation.text;
+      label.append(strong, small);
+      item.append(label, body);
+      map.append(item);
+    });
+
+    const scores = document.querySelector('#scores');
+    data.scores.forEach((score) => {
+      const item = document.createElement('div');
+      item.className = 'score';
+      const title = document.createElement('div');
+      title.className = 'score-title';
+      title.textContent = score.dimension;
+      const value = document.createElement('span');
+      value.className = 'score-value';
+      value.textContent = score.interval;
+      const reason = document.createElement('p');
+      reason.textContent = score.reason;
+      title.append(value);
+      item.append(title, reason);
+      scores.append(item);
+    });
+
+    const stage = document.querySelector('#photoStage');
+    const buttons = document.querySelectorAll('.tabs button');
+    const setMode = (mode) => {
+      stage.dataset.mode = mode;
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+    };
+    buttons.forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    setMode(hasTreatment ? 'treatment' : 'source');
+  </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+{
+  "split": "blind_holdout_v5",
+  "protocol_target": "evaluation-standard-v1.6",
+  "preregistered_on": "2026-09-09",
+  "blind_prompt": "仅根据图像完成摄影教练盲评；不要使用文件名、作者、来源、平台评级或答案标签。先做场景拓扑快照，再运行完整性量化、六检和三条关系覆盖；用两条成立关系保护门与损失栅栏裁决唯一优先级，给八维区间、可执行方案、首次提及即生效的事实边界，以及一张经核验且与首要诊断机制匹配的精确作品参考。",
+  "case_count": 180,
+  "release_scored_case_count": 180,
+  "quality_roles": {
+    "acclaimed": 60,
+    "ordinary": 60,
+    "failed_base": 60
+  },
+  "assessment_by_quality_role": {
+    "acclaimed": "acclaimed",
+    "ordinary": "ordinary",
+    "failed_base": "ordinary"
+  },
+  "genre_role_counts": {
+    "architecture/cityscape": {"acclaimed": 10, "ordinary": 10, "failed_base": 10},
+    "landscape/nature": {"acclaimed": 10, "ordinary": 10, "failed_base": 10},
+    "people/documentary": {"acclaimed": 10, "ordinary": 10, "failed_base": 10},
+    "wildlife/action": {"acclaimed": 10, "ordinary": 10, "failed_base": 10},
+    "still-life/food/macro": {"acclaimed": 10, "ordinary": 10, "failed_base": 10},
+    "abstract/concept": {"acclaimed": 10, "ordinary": 10, "failed_base": 10}
+  },
+  "candidate_review_genre_map": {
+    "architecture": "architecture/cityscape",
+    "landscapes": "landscape/nature",
+    "people": "people/documentary",
+    "sports": "wildlife/action",
+    "food": "still-life/food/macro",
+    "sculptures": "abstract/concept"
+  },
+  "failed_operation_counts": {
+    "crop_pressure": 10,
+    "shadow_crush": 10,
+    "highlight_clip": 10,
+    "color_excess": 10,
+    "tilt_and_crop": 10,
+    "detail_damage": 10
+  },
+  "failure_recipe_profiles": {
+    "crop_pressure": [
+      {"left_pct": 0.10, "right_pct": 0.02, "top_pct": 0.04, "bottom_pct": 0.03},
+      {"left_pct": 0.02, "right_pct": 0.11, "top_pct": 0.03, "bottom_pct": 0.04},
+      {"left_pct": 0.04, "right_pct": 0.03, "top_pct": 0.10, "bottom_pct": 0.02},
+      {"left_pct": 0.03, "right_pct": 0.05, "top_pct": 0.02, "bottom_pct": 0.10},
+      {"left_pct": 0.07, "right_pct": 0.06, "top_pct": 0.04, "bottom_pct": 0.03},
+      {"left_pct": 0.12, "right_pct": 0.01, "top_pct": 0.02, "bottom_pct": 0.05},
+      {"left_pct": 0.01, "right_pct": 0.12, "top_pct": 0.05, "bottom_pct": 0.02},
+      {"left_pct": 0.05, "right_pct": 0.02, "top_pct": 0.12, "bottom_pct": 0.01},
+      {"left_pct": 0.02, "right_pct": 0.04, "top_pct": 0.01, "bottom_pct": 0.12},
+      {"left_pct": 0.08, "right_pct": 0.07, "top_pct": 0.03, "bottom_pct": 0.05}
+    ],
+    "shadow_crush": [
+      {"black_point": 0.16, "gamma": 1.30},
+      {"black_point": 0.18, "gamma": 1.36},
+      {"black_point": 0.20, "gamma": 1.42},
+      {"black_point": 0.21, "gamma": 1.48},
+      {"black_point": 0.22, "gamma": 1.54},
+      {"black_point": 0.23, "gamma": 1.60},
+      {"black_point": 0.24, "gamma": 1.66},
+      {"black_point": 0.25, "gamma": 1.72},
+      {"black_point": 0.27, "gamma": 1.78},
+      {"black_point": 0.29, "gamma": 1.84}
+    ],
+    "highlight_clip": [
+      {"exposure_stops": 0.65, "clip_point": 0.99},
+      {"exposure_stops": 0.75, "clip_point": 0.98},
+      {"exposure_stops": 0.85, "clip_point": 0.97},
+      {"exposure_stops": 0.95, "clip_point": 0.96},
+      {"exposure_stops": 1.05, "clip_point": 0.95},
+      {"exposure_stops": 1.15, "clip_point": 0.94},
+      {"exposure_stops": 1.25, "clip_point": 0.93},
+      {"exposure_stops": 1.35, "clip_point": 0.92},
+      {"exposure_stops": 1.45, "clip_point": 0.91},
+      {"exposure_stops": 1.55, "clip_point": 0.90}
+    ],
+    "color_excess": [
+      {"saturation": 1.45, "red_gain": 1.06, "green_gain": 1.00, "blue_gain": 0.96},
+      {"saturation": 1.52, "red_gain": 1.08, "green_gain": 1.01, "blue_gain": 0.94},
+      {"saturation": 1.59, "red_gain": 1.10, "green_gain": 1.00, "blue_gain": 0.93},
+      {"saturation": 1.66, "red_gain": 1.05, "green_gain": 1.04, "blue_gain": 0.92},
+      {"saturation": 1.73, "red_gain": 1.12, "green_gain": 0.99, "blue_gain": 0.91},
+      {"saturation": 1.80, "red_gain": 0.96, "green_gain": 1.02, "blue_gain": 1.10},
+      {"saturation": 1.87, "red_gain": 0.94, "green_gain": 1.03, "blue_gain": 1.12},
+      {"saturation": 1.94, "red_gain": 1.14, "green_gain": 1.02, "blue_gain": 0.90},
+      {"saturation": 2.01, "red_gain": 1.08, "green_gain": 0.95, "blue_gain": 1.09},
+      {"saturation": 2.08, "red_gain": 1.16, "green_gain": 1.00, "blue_gain": 0.88}
+    ],
+    "tilt_and_crop": [
+      {"angle_degrees": 3.2, "resample": "bicubic"},
+      {"angle_degrees": -3.6, "resample": "bicubic"},
+      {"angle_degrees": 4.0, "resample": "bicubic"},
+      {"angle_degrees": -4.4, "resample": "bicubic"},
+      {"angle_degrees": 4.8, "resample": "bicubic"},
+      {"angle_degrees": -5.2, "resample": "bicubic"},
+      {"angle_degrees": 5.6, "resample": "bicubic"},
+      {"angle_degrees": -6.0, "resample": "bicubic"},
+      {"angle_degrees": 6.4, "resample": "bicubic"},
+      {"angle_degrees": -6.8, "resample": "bicubic"}
+    ],
+    "detail_damage": [
+      {"downsample_factor": 0.35, "gaussian_blur_radius": 0.50, "jpeg_quality": 62, "sharpen_amount": 0.90},
+      {"downsample_factor": 0.32, "gaussian_blur_radius": 0.58, "jpeg_quality": 58, "sharpen_amount": 1.00},
+      {"downsample_factor": 0.29, "gaussian_blur_radius": 0.66, "jpeg_quality": 54, "sharpen_amount": 1.10},
+      {"downsample_factor": 0.27, "gaussian_blur_radius": 0.74, "jpeg_quality": 50, "sharpen_amount": 1.20},
+      {"downsample_factor": 0.25, "gaussian_blur_radius": 0.82, "jpeg_quality": 46, "sharpen_amount": 1.30},
+      {"downsample_factor": 0.23, "gaussian_blur_radius": 0.90, "jpeg_quality": 42, "sharpen_amount": 1.40},
+      {"downsample_factor": 0.21, "gaussian_blur_radius": 0.98, "jpeg_quality": 39, "sharpen_amount": 1.55},
+      {"downsample_factor": 0.20, "gaussian_blur_radius": 1.06, "jpeg_quality": 36, "sharpen_amount": 1.70},
+      {"downsample_factor": 0.19, "gaussian_blur_radius": 1.14, "jpeg_quality": 33, "sharpen_amount": 1.85},
+      {"downsample_factor": 0.18, "gaussian_blur_radius": 1.22, "jpeg_quality": 30, "sharpen_amount": 2.00}
+    ]
+  },
+  "candidate_pool": {
+    "status": "frozen",
+    "manifest_path": "../.benchmark-runs/v5-review/candidate-manifest.jsonl",
+    "manifest_sha256": "3fb49e34775905641334b15e81363af5f184cdf5422076badf8703d66830b4f5",
+    "candidate_count": 257
+  },
+  "exclusion_snapshot": {
+    "path": "../.benchmark-runs/v5-draft/historical-source-exclusions.json",
+    "sha256": "e36b97c0e1b3e31de8b2e8273b2056a0522eef3984659171a4ee155b4665c473",
+    "source_count": 550,
+    "overall_sha256": "be202acdd6116c619d5346019670f1037ae9c41a8fc32f7a4773aeecfb70f416"
+  },
+  "release_acceptance_thresholds": {
+    "minimum_overall_pass_rate": 0.80,
+    "minimum_band_pass_rate": 0.72,
+    "minimum_genre_pass_rate": 0.70,
+    "minimum_observation_recall": 0.75,
+    "minimum_failed_variant_detection_rate": 0.84,
+    "maximum_acclaimed_overcorrection_rate": 0.16,
+    "maximum_hallucination_violation_rate": 0.05
+  },
+  "threshold_snapshot": {
+    "path": "knowledge-status.json",
+    "sha256": "9d0540d35d8db63109a9c19ec193513fcf4468ad9d6c01eb03e2baf502a770ca",
+    "json_pointer": "/coverage_floors/benchmark_acceptance"
+  },
+  "real_stress_set": {
+    "case_count": 40,
+    "image_type": "real photographs with naturally occurring difficult conditions; no deterministic failure recipe",
+    "source_disjoint_from_formal_holdout": true,
+    "scored_separately": true,
+    "counts_toward_release_score": false,
+    "purpose": "Measure transfer to naturally occurring edge cases without changing or diluting the preregistered 180-case release score."
+  },
+  "selection_rule": "Select exact files by visible genre fit and benchmark role, not by title or reputation alone. No source page, image URL, source SHA-1, normalized Commons filename, stale materialization identity, or teaching-masterwork identity in the frozen exclusion snapshot may overlap the formal holdout.",
+  "annotation_rule": "Every must_notice relation and prohibited inference must be checked against the exact materialized image. The materialization manifest must bind source_sha1, source_page, variant_recipe, quality band, genre, and output SHA-256 before the audit freezes image SHA-256 and must_notice hash.",
+  "review_separation": "Blind writers receive only blind-inputs.jsonl, images, the current coaching protocol, and teaching knowledge. Separate answer-aware graders score frozen response hashes. No writer receives cases, transformations, answer-key audits, prior responses, grades, diagnostics, or reports.",
+  "threshold_policy": "Use the release_acceptance_thresholds frozen here and copied from the referenced knowledge-status snapshot. Do not tune thresholds, scoring anchors, quotas, recipes, or the formal/stress-set boundary after responses are seen.",
+  "independence_boundary": "Every source identity in the consolidated exclusion snapshot, including prior benchmark records, teaching masterworks, and stale materialization manifests, is development-only. Only the 180 newly selected and identity-verified v5 cases may contribute to release evidence; the separate 40-image real stress set is diagnostic and never contributes to the release score."
+}

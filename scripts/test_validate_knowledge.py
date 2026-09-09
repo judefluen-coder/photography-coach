@@ -10,6 +10,7 @@ from pathlib import Path
 
 from validate_knowledge import (
     canonical_url,
+    evidentiary_evaluated_cases,
     validate_benchmark_report,
     validate_search_aliases,
 )
@@ -162,6 +163,41 @@ class BenchmarkReportTests(unittest.TestCase):
             require_protocol_fingerprint=True,
         )
         self.assertIn("release requires a coaching protocol fingerprint", errors)
+
+    def test_invalidated_report_is_history_only_and_fails_release_clearly(self) -> None:
+        self.report.update(
+            {
+                "evidence_status": "invalidated",
+                "evidentiary": False,
+                "invalidation": {"reason": "materialized_identity_mismatch"},
+                "coaching_protocol_sha256": "a" * 64,
+            }
+        )
+        self.report["blind_integrity"]["annotation_audit_passed"] = True
+
+        history_errors: list[str] = []
+        validate_benchmark_report(
+            self.report,
+            self.status,
+            history_errors,
+            current_protocol_sha256="a" * 64,
+        )
+        self.assertEqual(history_errors, [])
+        self.assertEqual(evidentiary_evaluated_cases(self.report), 0)
+
+        release_errors: list[str] = []
+        validate_benchmark_report(
+            self.report,
+            self.status,
+            release_errors,
+            current_protocol_sha256="a" * 64,
+            require_protocol_fingerprint=True,
+        )
+        self.assertIn(
+            "release benchmark report is invalidated and non-evidentiary: "
+            "materialized_identity_mismatch",
+            release_errors,
+        )
 
 
 if __name__ == "__main__":

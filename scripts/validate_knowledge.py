@@ -388,6 +388,20 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def report_is_evidentiary(report: dict[str, Any]) -> bool:
+    return (
+        report.get("evidence_status") != "invalidated"
+        and report.get("evidentiary") is not False
+    )
+
+
+def evidentiary_evaluated_cases(report: dict[str, Any]) -> int:
+    if not report_is_evidentiary(report):
+        return 0
+    value = report.get("metrics", {}).get("evaluated_cases", 0)
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
 def validate_benchmark_report(
     report: dict[str, Any],
     status: dict[str, Any],
@@ -395,6 +409,26 @@ def validate_benchmark_report(
     current_protocol_sha256: str | None = None,
     require_protocol_fingerprint: bool = False,
 ) -> None:
+    evidence_status = report.get("evidence_status")
+    evidentiary = report.get("evidentiary")
+    invalidation = report.get("invalidation", {})
+    if evidence_status == "invalidated":
+        if evidentiary is not False:
+            errors.append("invalidated benchmark report must set evidentiary to false")
+        if not isinstance(invalidation, dict) or not invalidation.get("reason"):
+            errors.append("invalidated benchmark report must record an invalidation reason")
+    elif evidentiary is False:
+        errors.append("non-evidentiary benchmark report must be marked invalidated")
+    if require_protocol_fingerprint and not report_is_evidentiary(report):
+        reason = (
+            invalidation.get("reason", "unspecified")
+            if isinstance(invalidation, dict)
+            else "unspecified"
+        )
+        errors.append(
+            "release benchmark report is invalidated and non-evidentiary: " + str(reason)
+        )
+
     thresholds = status.get("coverage_floors", {}).get("benchmark_acceptance", {})
     if report.get("thresholds") != thresholds:
         errors.append("benchmark report thresholds do not match the preregistered status file")
@@ -528,7 +562,7 @@ def main() -> int:
             record.get("status") == "admitted" for record in collections["patterns"]
         ),
         "test_cases": len(collections["benchmarks"]),
-        "blind_cases_evaluated": benchmark_report.get("metrics", {}).get("evaluated_cases", 0),
+        "blind_cases_evaluated": evidentiary_evaluated_cases(benchmark_report),
     }
     thresholds = status.get("release_thresholds", {})
     coverage_floors = status.get("coverage_floors", {})
@@ -568,7 +602,10 @@ def main() -> int:
     if args.release:
         if not benchmark_report:
             errors.append("release requires references/benchmark-report.json")
-        elif benchmark_report.get("passed") is not True:
+        elif (
+            report_is_evidentiary(benchmark_report)
+            and benchmark_report.get("passed") is not True
+        ):
             errors.append("latest blind benchmark report did not pass acceptance checks")
         for metric, minimum in thresholds.items():
             if actual.get(metric, 0) < minimum:

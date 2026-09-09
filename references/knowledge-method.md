@@ -76,9 +76,12 @@ Required fields in `critique-patterns.jsonl`:
 2. Convert the leading candidate into two to four method tags, such as `figure-ground`, `gesture`, `edge-control`, or `color-anchor`.
 3. Search with `scripts/search_knowledge.py`; Chinese photography terms are expanded through the versioned `search-aliases.json` vocabulary while the original query terms remain active.
 4. Search critique patterns first, then exact masterwork cards, then broader sources.
-5. Prefer one strong method match over two famous but superficial matches.
-6. Re-open the direct source page before giving a user a web link; registry verification can become stale.
-7. State the meaningful difference between the reference and the user's image so the reference cannot become a copying recipe.
+5. Treat ranking as candidate generation only. Apply the four-part fit gate in `reference-policy.md`: localize the user-image relation, localize the same mechanism in the reference, name a transferable experiment, and name an anti-imitation difference.
+6. Prefer one strong method match over two famous but superficial matches. A shared subject, genre, palette, mood, or composition label does not clear the gate by itself.
+7. If no bundled card clears the gate and web access exists, search for a better exact photograph outside the collection. Verify the work identity, direct page, visible method, and display rights before using it. Do not silently admit the new work to the corpus.
+8. If neither the bundled set nor verified web search produces a strong match, omit the example and state the limitation instead of forcing one.
+9. Re-open the direct source page before giving a user a web link; registry verification can become stale.
+10. State the meaningful difference between the reference and the user's image so the reference cannot become a copying recipe.
 
 ## Copyright and evidence boundaries
 

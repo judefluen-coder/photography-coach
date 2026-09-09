@@ -1,6 +1,6 @@
 ---
 name: photography-coach
-description: Evidence-based critique and deliberate-practice coaching for a user-supplied photograph. Use when the user uploads or points to a photo and asks whether it works, what is wrong, how to reshoot or edit it, how to improve composition/light/tone/story/portrait treatment, for a score or objective assessment, or for comparable masterwork/reference examples. Also use for a second-pass critique after the user reveals intent. Do not use for camera-shopping advice, generic photography lessons without a target image, image generation/editing, or claims of authenticating authorship.
+description: Evidence-based critique and deliberate-practice coaching for a user-supplied photograph, with an optional local visual report and faithful crop/color treatment. Use when the user uploads or points to a photo and asks whether it works, what is wrong, how to reshoot or edit it, how to improve composition/light/tone/story/portrait treatment, for a score or objective assessment, for a visual critique page, or for comparable masterwork/reference examples. Also use for a second-pass critique after the user reveals intent. Do not use for camera-shopping advice, generic photography lessons without a target image, image generation/editing without critique, or claims of authenticating authorship.
 ---
 
 # Photography Coach
@@ -25,6 +25,7 @@ Read these files before critiquing:
 4. Read `references/reference-policy.md` and `references/knowledge-method.md` when giving an example image, photographer, course, or external link.
 5. Search `references/critique-patterns.jsonl`, `references/masterwork-cards.jsonl`, and `references/source-registry.jsonl` with `scripts/search_knowledge.py` after diagnosis when a rule, exercise, course, or reference is needed. The search expands Chinese photography vocabulary through `references/search-aliases.json`; use the user's natural Chinese terms or two to four method tags. Do not load every record for every photograph.
 6. Read `references/knowledge-status.json` before making any claim about knowledge-base coverage. While it says `bootstrap`, treat results as individually verified aids and continue targeted web verification; do not imply that the corpus is sufficient or representative.
+7. Read `references/visual-report.md` when the user asks for an interface, visual page, downloadable treatment, or a reusable Codex-app presentation.
 
 Never read `references/benchmark-cases.jsonl` during an ordinary critique or while producing a blind benchmark response. It contains holdout labels and answer keys. Use it only after a response is frozen for scoring or when maintaining the benchmark itself; follow `references/benchmark-method.md` in that mode.
 
@@ -101,7 +102,9 @@ When web access exists, add at least one and at most two verified method referen
 
 Never hand the user an undirected portfolio, exhibition, or search-results link. For every reference give a 20–60 second looking task, then explain the visible relation it addresses, what to inspect in that exact frame, one important difference from the user's photograph, and one transferable experiment. Fame is never scoring evidence. If source verification cannot be completed, omit the example instead of guessing.
 
-Convert the diagnosis into two to four method tags and search the bundled knowledge base before open web search. Prefer an admitted critique pattern and an exact masterwork card that share the diagnosed relation. Treat source tiers as provenance roles, not automatic truth weights: a creator may explain an idea clearly while the original photographer, work page, or curriculum remains the source of record. Re-open direct pages before delivery because links, course access, and rights can change.
+Treat reference selection as a fit gate, not a search result. A candidate is eligible only when it shares the leading diagnosis's photographic mechanism, the response can localize that mechanism in both images, a meaningful difference prevents recipe copying, and the user can transfer it into a concrete experiment. Similar subject matter, palette, mood, genre, or photographer fame is not enough. Give one reference by default; use two only when they teach genuinely different mechanisms.
+
+Convert the diagnosis into two to four method tags and search the bundled knowledge base first. Prefer an admitted critique pattern and an exact masterwork card that clear the fit gate. The bundled cards are a verified starting set, not a closed catalogue: when no local candidate clears the gate and web access exists, search beyond the collection for a better exact photograph, verify its identity, direct page, visible method, and display rights, then use it without implying that it has already been admitted to the local corpus. If neither route yields a strong match, omit the reference and say why rather than attaching a famous but irrelevant image. Treat source tiers as provenance roles, not automatic truth weights: a creator may explain an idea clearly while the original photographer, work page, or curriculum remains the source of record. Re-open direct pages before delivery because links, course access, and rights can change.
 
 In benchmark/audit runs with local knowledge assets, an exact-work reference is mandatory rather than optional. Use an admitted, verified masterwork card that matches the diagnosed relation and include the response-card comparison fields. A frozen benchmark response with only the omission sentence is structurally invalid.
 
@@ -111,7 +114,15 @@ When the user asks how the current file would look after cropping or color work,
 
 Inspect the result against the source. Reject and do not deliver a preview when the visible change is effectively crop-only, when the tonal claim cannot be seen, or when a generative tool changes people, text, objects, or gestures. In that case say that a faithful pixel-level preview is unavailable and give a crop boundary plus ordered adjustment recipe; never let a generated approximation impersonate a develop. Always list what the edit cannot repair.
 
-### 8. Offer optional context review
+### 8. Render a local visual report when the surface supports it
+
+When the user asks for a visual page or has chosen the Codex-native visual workflow, map the completed critique to `references/visual-report.md` and run `scripts/render_visual_report.py`. Treat the page as a presentation layer, not a second diagnosis: its judgment, priority, scores, edit limits, and reference must match the chat critique.
+
+Write report JSON and rendered files to a task-specific directory outside this skill repository. Never add a user photograph, treatment, report JSON, or rendered report to Git. If a faithful treatment exists, make it the default hero view, show the source beside it later, and provide both downloads. If no treatment passed source comparison, omit treatment controls instead of showing a simulated result.
+
+Open the rendered page and inspect one desktop and one narrow layout before delivery. Keep the chat response self-contained and concise because the page is an optional durable view, not a substitute for the answer.
+
+### 9. Offer optional context review
 
 End by inviting, not requiring, the user's purpose or intended meaning. A second pass may change intent fit, meaning, tradeoffs, or the recommended branch. It may not rewrite pixel facts. Name the new fact that changed the conclusion.
 

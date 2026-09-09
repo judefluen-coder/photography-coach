@@ -2,6 +2,31 @@
   "run_id": "holdout-v4-v16-final-20260908",
   "generated_at": "2026-09-08T09:16:55.016319+00:00",
   "benchmark_cases_sha256": "816b72e80d86aa57c2ee992bcab462bd0a0e6c8f6b064137a409979848552650",
+  "evidence_status": "invalidated",
+  "evidentiary": false,
+  "invalidation": {
+    "invalidated_at": "2026-09-09",
+    "reason": "materialized_identity_mismatch",
+    "summary": "The scored images came from a stale materialization whose case IDs no longer identified the current benchmark sources, bands, genres, or variant recipes. The raw metrics below are retained as historical outputs only and are not evidence of v1.6 capability or release readiness.",
+    "raw_metrics_retained_for_history_only": true,
+    "identity_mismatch_counts": {
+      "evaluated_cases": 100,
+      "source_sha1_mismatch": 97,
+      "quality_band_mismatch": 66,
+      "genre_mismatch": 76,
+      "variant_recipe_mismatch": 43
+    },
+    "shared_stale_materialization": {
+      "manifest_path": ".benchmark-runs/v4-materialized/manifest.json",
+      "all_runs_reused_same_old_image_set": true,
+      "images_matching_stale_manifest_per_run": 100,
+      "affected_run_ids": [
+        "holdout-v4-20260908",
+        "holdout-v4-v16-20260908",
+        "holdout-v4-v16-final-20260908"
+      ]
+    }
+  },
   "blind_integrity": {
     "labels_in_blind_packet": false,
     "answers_in_blind_packet": false,

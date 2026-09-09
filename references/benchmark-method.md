@@ -4,7 +4,7 @@ This benchmark tests whether the coach can observe, prioritize, and bound its cl
 
 ## Independent holdout
 
-- The current repository answer key is the source-disjoint 100-case `blind_holdout_v3`. It failed its preregistered release gate and its errors informed v1.5; a development replay on those same images then informed v1.6. It is development evidence and cannot certify either revision. A fresh source-disjoint `blind_holdout_v4` is required before release. Earlier sets remain archived for regression and leakage exclusion.
+- The current repository answer key was intended for `blind_holdout_v4`, but the completed v4 evaluation is invalidated because its three runs reused a stale materialized image set whose identities no longer matched the current cases. Its raw metrics are history only, not capability evidence. Earlier sets and the invalidated v4 remain development artifacts for regression and leakage exclusion; release requires a newly sourced, source-disjoint holdout.
 - Every case uses an exact Wikimedia Commons file page and an open licence or public-domain mark.
 - No benchmark source page may appear in `masterwork-cards.jsonl`.
 - No active holdout source page, image URL, or source SHA-1 may appear in the archived development benchmark.
@@ -36,6 +36,8 @@ Each JSONL record includes:
 Expected observations are not canned final prose. They are a compact scoring key: a response may use different wording if it localizes the same visible relation and assigns comparable priority.
 
 The key is valid only after it has been checked against the materialized image, including any deterministic variant. Source titles, descriptions, and thumbnails are discovery aids, not annotation evidence. Before a run can be graded, every `must_notice` item must be affirmed against the exact materialized bytes, at least two visible anchors must be named, and the audit must freeze both the image SHA-256 and the `must_notice` hash. If an object label, location, or relationship is wrong, correct the key and rematerialize before blind responses begin; do not excuse the mismatch during scoring.
+
+Case ID alone never establishes materialized-image identity. Every materialization or reuse manifest must retain `source_sha1`, `source_page`, `variant_recipe`, `quality_band`, `genre`, and the actual output SHA-256. Cache reuse, reviewed-directory reuse, and resume are permitted only when those case fields match the requested record and the adjacent image bytes match the recorded output hash; a missing, stale, or abbreviated manifest invalidates the reuse and the resulting run.
 
 ## Derived-failure operations
 
@@ -73,7 +75,7 @@ The grader records only unambiguous evidence; borderline matches go in `notes` a
 | `pattern_fit` | `0`: absent/contradictory; `1`: mechanism is broadly right but incomplete; `2`: mechanism, action, predicted effect, and cost align. |
 | `hallucination_violation` | `true` when any `must_not_infer` item is asserted as fact. A clearly marked question, alternative, or uncertainty at the point of first mention is not a violation; a disclaimer added later does not cancel an earlier assertion. |
 | `action_quality` | `0`: generic, impossible, unsafe, or promises recovery of missing data; `1`: executable action with a plausible effect; `2`: also names tradeoff, availability, and a bounded fallback exercise where needed. |
-| `reference_hygiene` | `0`: fabricated, dead, broad portfolio/search link, or fame used as proof; `1`: precise accessible work and relevant relation; `2`: also gives a short looking task, meaningful difference, and transferable experiment. |
+| `reference_hygiene` | `0`: fabricated, dead, broad portfolio/search link, fame used as proof, or only superficial subject/genre/palette/mood similarity; `1`: precise accessible work and the same mechanism localized in both the response image and reference; `2`: also gives a short looking task, meaningful difference, and transferable experiment. |
 | `score_integrity` | `0`: missing dimensions, false total/rank, or ethics scored aesthetically; `1`: eight intervals are present but some reasons are generic; `2`: every applicable interval has an image-specific reason and no total/percentile. |
 | `overcorrection` | Acclaimed only. `true` when the response invents a structural rebuild that would damage an answer-key strength. A costed optional experiment is not overcorrection. |
 | `degradation_detected` | Failed-imitation only. `true` when the response identifies the introduced failure family and localizes its visible effect. Merely saying “the edit feels off” is insufficient. |

@@ -17,7 +17,7 @@ from validate_candidate_selection import (
 )
 
 
-BLIND_PROMPT = (
+LEGACY_V4_BLIND_PROMPT = (
     "仅根据图像完成摄影教练盲评；不要使用文件名、作者、来源、平台评级或答案标签。"
     "先做场景拓扑快照，再运行完整性量化、六检和三条关系覆盖；用两条成立关系保护门与损失栅栏裁决唯一优先级，"
     "给八维区间、可执行方案、首次提及即生效的事实边界，以及一张经核验的精确作品参考。"
@@ -56,7 +56,7 @@ OPERATION_PATTERNS = {
     "tilt_and_crop": "pattern-roll-and-crop-require-independent-references",
     "detail_damage": "pattern-noise-sharpening-protects-material",
 }
-RECIPES = {
+LEGACY_V4_RECIPES = {
     "crop_pressure": [
         {"left_pct": .10, "right_pct": .02, "top_pct": .04, "bottom_pct": .03},
         {"left_pct": .02, "right_pct": .11, "top_pct": .03, "bottom_pct": .04},
@@ -96,19 +96,178 @@ RECIPES = {
     ],
 }
 
+RECIPE_PARAMETER_RULES = {
+    "crop_pressure": {
+        "left_pct": (0.0, 0.15),
+        "right_pct": (0.0, 0.15),
+        "top_pct": (0.0, 0.15),
+        "bottom_pct": (0.0, 0.15),
+    },
+    "shadow_crush": {
+        "black_point": (0.12, 0.35),
+        "gamma": (1.10, 2.20),
+    },
+    "highlight_clip": {
+        "exposure_stops": (0.50, 1.80),
+        "clip_point": (0.85, 0.99),
+    },
+    "color_excess": {
+        "saturation": (1.25, 2.20),
+        "red_gain": (0.80, 1.25),
+        "green_gain": (0.80, 1.25),
+        "blue_gain": (0.80, 1.25),
+    },
+    "tilt_and_crop": {
+        "angle_degrees": (-8.0, 8.0),
+        "resample": {"bicubic"},
+    },
+    "detail_damage": {
+        "downsample_factor": (0.15, 0.50),
+        "gaussian_blur_radius": (0.40, 2.00),
+        "jpeg_quality": (25, 70),
+        "sharpen_amount": (0.50, 2.50),
+    },
+}
+
+
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _validate_failure_recipes(
+    operation_counts: Any,
+    recipes: Any,
+) -> dict[str, list[dict[str, Any]]]:
+    operations = set(OPERATION_PATTERNS)
+    if not isinstance(operation_counts, dict) or set(operation_counts) != operations:
+        raise ValueError(
+            "failed_operation_counts must contain exactly: "
+            + ", ".join(sorted(operations))
+        )
+    if not isinstance(recipes, dict) or set(recipes) != operations:
+        raise ValueError(
+            "failure_recipe_profiles must contain exactly: "
+            + ", ".join(sorted(operations))
+        )
+
+    validated: dict[str, list[dict[str, Any]]] = {}
+    for operation in sorted(operations):
+        count = operation_counts[operation]
+        profiles = recipes[operation]
+        if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+            raise ValueError(f"failed_operation_counts.{operation} must be a positive integer")
+        if not isinstance(profiles, list) or len(profiles) != count:
+            actual = len(profiles) if isinstance(profiles, list) else "not-a-list"
+            raise ValueError(
+                f"failure_recipe_profiles.{operation} has {actual} profile(s); "
+                f"expected exactly {count}"
+            )
+
+        rules = RECIPE_PARAMETER_RULES[operation]
+        seen: set[str] = set()
+        validated_profiles: list[dict[str, Any]] = []
+        for index, profile in enumerate(profiles, 1):
+            label = f"failure_recipe_profiles.{operation}[{index}]"
+            if not isinstance(profile, dict) or set(profile) != set(rules):
+                raise ValueError(
+                    f"{label} must contain exactly: {', '.join(sorted(rules))}"
+                )
+            for parameter, constraint in rules.items():
+                value = profile[parameter]
+                if isinstance(constraint, set):
+                    if value not in constraint:
+                        raise ValueError(
+                            f"{label}.{parameter} must be one of {sorted(constraint)}"
+                        )
+                elif not _is_number(value) or not constraint[0] <= value <= constraint[1]:
+                    raise ValueError(
+                        f"{label}.{parameter} must be in "
+                        f"[{constraint[0]}, {constraint[1]}]"
+                    )
+            if operation == "tilt_and_crop" and abs(profile["angle_degrees"]) < 2.0:
+                raise ValueError(f"{label}.angle_degrees must have magnitude >= 2.0")
+            if operation == "crop_pressure" and not any(profile.values()):
+                raise ValueError(f"{label} must crop at least one edge")
+            fingerprint = json.dumps(profile, sort_keys=True, separators=(",", ":"))
+            if fingerprint in seen:
+                raise ValueError(f"{label} duplicates an earlier profile")
+            seen.add(fingerprint)
+            validated_profiles.append(dict(profile))
+        validated[operation] = validated_profiles
+    return validated
+
+
+def _assembly_settings(
+    plan: dict[str, Any] | None,
+    split: str,
+    reviewed_on: str,
+) -> tuple[str, str, str, dict[str, int] | None, dict[str, list[dict[str, Any]]]]:
+    if plan is None:
+        return split, reviewed_on, LEGACY_V4_BLIND_PROMPT, None, LEGACY_V4_RECIPES
+
+    plan_split = plan.get("split")
+    if not isinstance(plan_split, str):
+        raise ValueError("plan.split must be a string")
+
+    # Keep the already-frozen v4 plan replayable. New splits must preregister the
+    # exact prompt and every recipe profile instead of inheriting v4 capacity.
+    if plan_split == "blind_holdout_v4" and not any(
+        field in plan for field in ("blind_prompt", "failure_recipe_profiles")
+    ):
+        return (
+            plan_split,
+            plan.get("preregistered_on", reviewed_on),
+            LEGACY_V4_BLIND_PROMPT,
+            plan.get("failed_operation_counts"),
+            LEGACY_V4_RECIPES,
+        )
+
+    blind_prompt = plan.get("blind_prompt")
+    if not isinstance(blind_prompt, str) or not blind_prompt.strip():
+        raise ValueError("plan.blind_prompt must be a non-empty string")
+    operation_counts = plan.get("failed_operation_counts")
+    recipes = _validate_failure_recipes(
+        operation_counts,
+        plan.get("failure_recipe_profiles"),
+    )
+    plan_reviewed_on = plan.get("preregistered_on", reviewed_on)
+    if not isinstance(plan_reviewed_on, str) or not plan_reviewed_on:
+        raise ValueError("plan.preregistered_on must be a non-empty string when provided")
+    return plan_split, plan_reviewed_on, blind_prompt, operation_counts, recipes
+
 
 def assemble(
     rows: list[dict[str, Any]],
     seed: int,
     *,
+    plan: dict[str, Any] | None = None,
     split: str = "blind_holdout_v4",
     reviewed_on: str = "2026-09-08",
 ) -> list[dict[str, Any]]:
+    split, reviewed_on, blind_prompt, planned_operation_counts, recipes = (
+        _assembly_settings(plan, split, reviewed_on)
+    )
     rng = random.Random(seed)
     case_prefix = split.removeprefix("blind_holdout_")
     if not case_prefix or case_prefix == split:
         raise ValueError(f"split must start with blind_holdout_: {split}")
     rows = [dict(row) for row in rows]
+    if plan is not None:
+        case_count = plan.get("case_count")
+        if not isinstance(case_count, int) or isinstance(case_count, bool) or case_count < 1:
+            raise ValueError("plan.case_count must be a positive integer")
+        if len(rows) != case_count:
+            raise ValueError(f"row count {len(rows)} != plan.case_count {case_count}")
+        actual_operation_counts: dict[str, int] = defaultdict(int)
+        for row in rows:
+            if row.get("quality_role") == "failed_base":
+                actual_operation_counts[row.get("proposed_operation")] += 1
+        actual_operation_counts = dict(actual_operation_counts)
+        if actual_operation_counts != planned_operation_counts:
+            raise ValueError(
+                "failed-base operation counts do not match plan: "
+                f"{actual_operation_counts} != {planned_operation_counts}"
+            )
     rng.shuffle(rows)
     recipe_offsets: dict[str, int] = defaultdict(int)
     cases = []
@@ -122,7 +281,7 @@ def assemble(
             recipe_offsets[operation] += 1
             variant_recipe = {
                 "operation": operation,
-                "parameters": RECIPES[operation][recipe_index],
+                "parameters": recipes[operation][recipe_index],
                 "source_role": "open-license quality-image base",
                 "disclosure": "deterministic derived test variant; not the creator original",
             }
@@ -142,7 +301,7 @@ def assemble(
                 "provenance_status": "official-page-verified",
                 "reviewed_on": reviewed_on,
                 "split": split,
-                "blind_prompt": BLIND_PROMPT,
+                "blind_prompt": blind_prompt,
                 "expected_pattern_ids": expected_patterns,
                 "must_notice": row["visible_observations"],
                 "must_not_infer": row["must_not_infer"],
@@ -174,12 +333,11 @@ def main() -> int:
             print(f"ERROR: {error}")
         return 1
     plan = json.loads(args.plan.read_text(encoding="utf-8"))
-    cases = assemble(
-        rows,
-        args.seed,
-        split=plan["split"],
-        reviewed_on=plan.get("preregistered_on", "2026-09-08"),
-    )
+    try:
+        cases = assemble(rows, args.seed, plan=plan)
+    except ValueError as exc:
+        print(f"ERROR: invalid assembly plan: {exc}")
+        return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         "".join(json.dumps(case, ensure_ascii=False) + "\n" for case in cases),

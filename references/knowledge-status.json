@@ -1,7 +1,7 @@
 {
   "stage": "bootstrap",
-  "label": "corpus complete; v1.6 holdout v4 complete but release gate failed",
-  "user_claim": "Corpus and coverage floors are met. The fresh source-disjoint 100-case holdout v4 was materialized, visually audited, answered blind, frozen by response hash, and cross-graded by separate model contexts without changing the preregistered thresholds. It failed the release gate: 64% overall pass, 92.33% observation recall, 16% failed-variant detection, 0% acclaimed overcorrection, and 1% hallucination violations. The evidence suggests that v1.6 usually notices expected scene relations and protects strong photographs, but does not reliably recognize and localize visible processing or integrity damage; it detected only 4 of 25 controlled failures and missed every shadow-compression and colour-excess case. Keep the project at research-prototype status; do not claim objective taste, expert certification, release readiness, or proven learning improvement.",
+  "label": "corpus complete; v1.6 release evidence invalidated; new source-disjoint holdout required",
+  "user_claim": "Corpus and coverage floors are met, but the attempted v1.6 holdout v4 is non-evidentiary because all three v4 runs reused the same stale materialized image set. Against the current case records, 97 of 100 source identities, 66 quality bands, 76 genres, and 43 variant recipes were mismatched. Its retained raw scores support no conclusion about v1.6 capability or release readiness. Keep the project at research-prototype status; do not claim objective taste, expert certification, release readiness, or proven learning improvement. A newly sourced, source-disjoint holdout with verified image-to-case identity binding is required before any release claim.",
   "release_thresholds": {
     "sources": 100,
     "verified_sources": 80,

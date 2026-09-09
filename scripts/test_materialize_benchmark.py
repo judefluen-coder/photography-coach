@@ -81,6 +81,9 @@ class ResumeTests(unittest.TestCase):
         Image.new("RGB", (32, 24), (20, 40, 60)).save(self.image_path)
         self.case = {
             "id": "v4-001",
+            "quality_band": "ordinary",
+            "genre": "landscape",
+            "source_page": "https://example.test/source",
             "image_url": "https://example.test/original.jpg",
             "preview_url": "https://example.test/preview.jpg",
             "source_sha1": "a" * 40,
@@ -88,6 +91,9 @@ class ResumeTests(unittest.TestCase):
         }
         self.item = {
             "id": "v4-001",
+            "quality_band": self.case["quality_band"],
+            "genre": self.case["genre"],
+            "source_page": self.case["source_page"],
             "download_url": self.case["image_url"],
             "source_sha1": self.case["source_sha1"],
             "variant_recipe": None,
@@ -111,6 +117,13 @@ class ResumeTests(unittest.TestCase):
     def test_tampered_resume_output_fails(self) -> None:
         self.image_path.write_bytes(b"tampered")
         with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+            load_verified_resume_items(self.manifest, [self.case], self.output, True)
+
+    def test_stale_resume_source_page_fails(self) -> None:
+        stale = dict(self.item)
+        stale["source_page"] = "https://example.test/old-source"
+        write_manifest_atomic(self.manifest, [stale])
+        with self.assertRaisesRegex(ValueError, "does not match the requested case"):
             load_verified_resume_items(self.manifest, [self.case], self.output, True)
 
     def test_atomic_manifest_is_valid_json(self) -> None:

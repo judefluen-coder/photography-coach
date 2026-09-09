@@ -186,10 +186,16 @@ def load_verified_resume_items(
             continue
         expected_path = output / f"{case_id}.jpg"
         expected_url = case["image_url"] if use_original else case["preview_url"]
+        required_identity = (
+            "source_sha1",
+            "source_page",
+            "variant_recipe",
+            "quality_band",
+            "genre",
+        )
         identity_matches = (
-            item.get("source_sha1") == case["source_sha1"]
+            all(field in item and item[field] == case[field] for field in required_identity)
             and item.get("download_url") == expected_url
-            and item.get("variant_recipe") == case["variant_recipe"]
             and Path(item.get("output_path", "")) == expected_path
         )
         if not identity_matches:
