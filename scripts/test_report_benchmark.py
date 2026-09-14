@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stderr
 from pathlib import Path
+from unittest.mock import patch
 
 from report_benchmark import init_grades, sha256, validate_grade
 
@@ -96,6 +97,25 @@ class GradeValidationTests(unittest.TestCase):
             result = init_grades(run_dir, run_dir / "grades.jsonl")
         self.assertEqual(result, 1)
         self.assertFalse((run_dir / "grades.jsonl").exists())
+
+    def test_freeze_accepts_an_explicit_answer_key(self) -> None:
+        run_dir = Path(self.temp.name) / "custom-key-run"
+        run_dir.mkdir()
+        cases_path = Path(self.temp.name) / "custom-cases.jsonl"
+        cases_path.write_text(json.dumps(self.case) + "\n", encoding="utf-8")
+        (run_dir / "blind-inputs.jsonl").write_text(
+            json.dumps(
+                {"case_id": "bench-001", "response_path": str(self.response)}
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        grades_path = run_dir / "grades.jsonl"
+        with patch("report_benchmark.validate", return_value=[]):
+            result = init_grades(run_dir, grades_path, cases_path)
+        self.assertEqual(result, 0)
+        rows = [json.loads(line) for line in grades_path.read_text().splitlines()]
+        self.assertEqual([row["case_id"] for row in rows], ["bench-001"])
 
 
 if __name__ == "__main__":

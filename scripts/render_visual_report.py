@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -102,6 +104,10 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
 
     for field in ["title", "summary", "boundary_note", "research_status"]:
         data[field] = nonempty_text(data[field], field)
+    decision = data.get("decision", "STRUCTURAL_BOTTLENECK")
+    if decision not in {"STRUCTURAL_BOTTLENECK", "CONDITIONAL_BRANCH", "NO_STRUCTURAL_BOTTLENECK"}:
+        raise ReportError("decision is invalid")
+    data["decision"] = decision
 
     for section, required in NESTED_FIELDS.items():
         value = data.get(section)
@@ -114,6 +120,26 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
             value[field] = nonempty_text(value[field], f"{section}.{field}")
 
     data["reference"]["url"] = validate_url(data["reference"]["url"], "reference.url")
+    # Preserve the six-check summary and attribution when supplied by newer reports.
+    if "integrity" in data:
+        checks = data["integrity"]
+        families = ["边缘/裁切", "暗部", "高光", "色彩", "轴线/透视", "细节"]
+        if not isinstance(checks, list) or len(checks) != len(families):
+            raise ReportError("integrity must contain the six integrity families")
+        for index, (check, family) in enumerate(zip(checks, families)):
+            if not isinstance(check, dict) or check.get("family") != family:
+                raise ReportError("integrity must use the six families in documented order")
+            if check.get("verdict") not in {"通过", "观察", "问题"}:
+                raise ReportError(f"integrity[{index}].verdict is invalid")
+            check["basis"] = nonempty_text(check.get("basis"), f"integrity[{index}].basis")
+    if "source_credit" in data:
+        credit = data["source_credit"]
+        if not isinstance(credit, dict):
+            raise ReportError("source_credit must be an object")
+        for field in ("author", "license", "changes"):
+            credit[field] = nonempty_text(credit.get(field), f"source_credit.{field}")
+        for field in ("url", "license_url"):
+            credit[field] = validate_url(credit.get(field), f"source_credit.{field}")
 
     observations = data.get("observations")
     if not isinstance(observations, list) or not 6 <= len(observations) <= 9:
@@ -128,6 +154,11 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
         if item["priority"] not in allowed_priorities:
             raise ReportError(f"observations[{index}].priority is invalid")
         priority_counts[item["priority"]] += 1
+        regions = item.get("regions", [])
+        if not isinstance(regions, list) or len(regions) > 4:
+            raise ReportError(f"observations[{index}].regions must contain at most four rectangles")
+        for region in regions:
+            validate_rectangle(region, f"observations[{index}].regions")
     if priority_counts["首要"] != 1:
         raise ReportError("observations must contain exactly one 首要")
     if not 2 <= priority_counts["次要"] <= 5:
@@ -144,7 +175,14 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
             raise ReportError(f"scores[{index}] must be an object")
         for field in ["dimension", "interval", "reason"]:
             item[field] = nonempty_text(item.get(field), f"scores[{index}].{field}")
+        interval = item["interval"]
+        if interval != "N/A":
+            match = re.fullmatch(r"([0-5])\s*-\s*([0-5])\s*/\s*5", interval)
+            if not match or int(match[1]) > int(match[2]):
+                raise ReportError(f"scores[{index}].interval must be an ordered 0-5 integer interval or N/A")
         dimensions.append(item["dimension"])
+        if "uncertainty" in item:
+            item["uncertainty"] = nonempty_text(item["uncertainty"], f"scores[{index}].uncertainty")
     if dimensions != SCORE_DIMENSIONS:
         raise ReportError("scores must use all eight stable dimensions in the documented order")
 
@@ -152,8 +190,32 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
     treatment_path: Path | None = None
     if data.get("treatment_image") not in (None, ""):
         treatment_path = resolve_image(data["treatment_image"], "treatment_image", base_dir)
+    if data.get("color_image") not in (None, ""):
+        resolve_image(data["color_image"], "color_image", base_dir)
+    for kind in ("source", "color", "treatment"):
+        field = f"{kind}_preview_image"
+        if data.get(field) not in (None, ""):
+            if not data.get(f"{kind}_image"):
+                raise ReportError(f"{field} requires {kind}_image; a preview is not a downloadable master")
+            resolve_image(data[field], field, base_dir)
+    if "crop_region" in data["edit"]:
+        validate_rectangle(data["edit"]["crop_region"], "edit.crop_region")
 
     return data, source_path, treatment_path
+
+
+def validate_rectangle(value: Any, field: str) -> None:
+    """Coordinates refer to the source image, with the top-left at (0, 0)."""
+    if not isinstance(value, dict):
+        raise ReportError(f"{field} must be a rectangle")
+    for key in ("x", "y", "width", "height"):
+        number = value.get(key)
+        if isinstance(number, bool) or not isinstance(number, (int, float)) or not math.isfinite(number):
+            raise ReportError(f"{field}.{key} must be a finite number")
+    if (value["x"] < 0 or value["y"] < 0 or value["width"] <= 0 or value["height"] <= 0
+            or value["x"] + value["width"] > 1.000000001
+            or value["y"] + value["height"] > 1.000000001):
+        raise ReportError(f"{field} must stay within source coordinates 0 to 1")
 
 
 def safe_embedded_json(data: dict[str, Any]) -> str:
@@ -189,24 +251,26 @@ def render_report(input_path: Path, output_dir: Path, force: bool = False) -> Pa
     asset_dir = output_dir / "assets"
     asset_dir.mkdir(parents=True, exist_ok=True)
 
-    source_name = f"source{source_path.suffix.lower()}"
-    source_output = asset_dir / source_name
-    shutil.copy2(source_path, source_output)
-    data["source_asset"] = f"assets/{source_name}"
-    data["source_extension"] = source_path.suffix.lower().lstrip(".")
-
-    if treatment_path:
-        treatment_name = f"treatment{treatment_path.suffix.lower()}"
-        treatment_output = asset_dir / treatment_name
-        shutil.copy2(treatment_path, treatment_output)
-        data["treatment_asset"] = f"assets/{treatment_name}"
-        data["treatment_extension"] = treatment_path.suffix.lower().lstrip(".")
-    else:
-        data["treatment_asset"] = None
-        data["treatment_extension"] = None
-
-    data.pop("source_image", None)
-    data.pop("treatment_image", None)
+    color_path = (resolve_image(data["color_image"], "color_image", input_path.parent)
+                  if data.get("color_image") else None)
+    for kind, master in (("source", source_path), ("color", color_path), ("treatment", treatment_path)):
+        # Generated paths always replace caller-supplied paths, including stale demo overrides.
+        data[f"{kind}_asset"] = None
+        data[f"{kind}_download"] = None
+        data[f"{kind}_extension"] = None
+        if master:
+            name = f"{kind}{master.suffix.lower()}"
+            shutil.copy2(master, asset_dir / name)
+            data[f"{kind}_asset"] = data[f"{kind}_download"] = f"assets/{name}"
+            data[f"{kind}_extension"] = master.suffix.lower().lstrip(".")
+            preview_field = f"{kind}_preview_image"
+            if data.get(preview_field):
+                preview = resolve_image(data[preview_field], preview_field, input_path.parent)
+                preview_name = f"{kind}-preview{preview.suffix.lower()}"
+                shutil.copy2(preview, asset_dir / preview_name)
+                data[f"{kind}_asset"] = f"assets/{preview_name}"
+        data.pop(f"{kind}_image", None)
+        data.pop(f"{kind}_preview_image", None)
 
     template_path = skill_root / "assets" / "visual-report-template.html"
     try:

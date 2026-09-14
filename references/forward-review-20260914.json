@@ -1,0 +1,687 @@
+{
+  "date": "2026-09-14",
+  "status": "first-pass qualitative review complete; narrow rule corrections not independently retested",
+  "writer": "gpt-5.6-sol-high; one clean-context child",
+  "reviewer": "gpt-6-astra-high; foreground model review, not a human expert",
+  "scope": "Twelve purposively selected, source-disjoint inputs: six unaltered and six controlled variants. Recipe and community quality labels are not ground truth. No aggregate pass rate, representative accuracy, learning-effect or release claim.",
+  "status_meanings": {
+    "supported": "The inspected evidence supports this field; not a universal correctness certification.",
+    "partial": "Useful evidence coexists with a material omission, overstatement or insufficiently grounded step.",
+    "failed": "A concrete contradiction undermines this field.",
+    "unresolved": "Insufficient evidence for a verdict; never counted as passed."
+  },
+  "reference_checks": {
+    "oraa": {
+      "url": "https://www.worldpressphoto.org/collection/photo-contest/2025/Gabriela-Oraa/1",
+      "root_view": "官方单图页和全屏原图已看。中央高位人物双手交叉在胸前，周围手臂朝中央伸出；亮点向后方人群延伸。不是与举臂目标图完全相同的手势。",
+      "display": "copyright; links only"
+    },
+    "shore": {
+      "url": "https://www.moma.org/collection/works/165375",
+      "root_view": "官方单图页和放大图已看。街边店面窗框竖向、招牌和路面横向并置，建筑之间及边框有余量；用于区分画框稳定与透视收束，不证明目标图所有斜线必须拉平。",
+      "display": "copyright; links only"
+    },
+    "brouillet": {
+      "url": "https://www.worldpressphoto.org/collection/photo-contest/2025/Jerome-Brouillet/1",
+      "root_view": "官方单图页和全屏原图已看。人物和右侧竖板在灰云前分开，脚踝到板底有可见细绳相连；不能把轮廓分离等同于物理脱离。",
+      "display": "copyright; links only"
+    },
+    "watkins": {
+      "url": "https://www.metmuseum.org/art/collection/search/262612",
+      "root_view": "官方单图页图像已看。左前树干、底部暗灌木与斜枝围住浅水面，远岸和淡山形成远层；暗前景仍有局部纹理与边界。",
+      "display": "official page Public Domain; responses used links"
+    },
+    "cameron": {
+      "url": "https://www.metmuseum.org/art/collection/search/267426",
+      "root_view": "官方单图页图像已看。正面脸的一侧明显暗、另一侧亮，眼部和脸缘仍可辨，头发轮廓较柔；不宜笼统称为低反差肖像。",
+      "display": "official page Public Domain; responses used links"
+    },
+    "talbot": {
+      "url": "https://www.metmuseum.org/art/collection/search/289173",
+      "root_view": "官方单图页图像已看。四层架板隔开不同器物，杯、瓶、盘的轮廓及间隙大多完整。页面日期是 before January 1844，原回答简写 1844 不够精确。",
+      "display": "official page Public Domain; responses used links"
+    },
+    "kertesz": {
+      "url": "https://www.moma.org/collection/works/57425",
+      "root_view": "官方单图页和放大图已看。前方持包人物、向内延伸的街道与中景行人、高架桥顶的列车构成尺度分层；列车在桥上，不是穿过下方拱洞。",
+      "display": "copyright; links only"
+    },
+    "levitt": {
+      "url": "https://www.moma.org/collection/works/45324",
+      "root_view": "官方单图页和放大图已看。三个戴面具的人在门前台阶上呈不同高度，门框、砖墙及栏杆组织位置。可教群体节奏，不能代替目标图的色彩修正参考。",
+      "display": "copyright; links only"
+    },
+    "muholi": {
+      "url": "https://www.moma.org/collection/works/164003",
+      "root_view": "官方单图页和放大图已看。人物穿条纹衣、戴格纹帽，眼部朝镜头；灰墙、深衣和脸部形成分离。可教面部与外形两层阅读，不直接解释犬图尾端边距。",
+      "display": "copyright; links only"
+    },
+    "adams": {
+      "url": "https://www.moma.org/collection/works/45176",
+      "root_view": "官方单图页和放大图已看。近处浅土地、弯路和深车，中层浅屋与远山在明亮范围内仍分层；近处土纹、右缘建筑板缝可辨，大块亮天保留为空。",
+      "display": "copyright; links only"
+    }
+  },
+  "cases": [
+    {
+      "case_id": "forward-01",
+      "reference_id": "oraa",
+      "correction": "保持不重构；参考标为学保留，灯带调整只作可撤销实验。",
+      "fields": {
+        "localized_observation": {
+          "status": "supported",
+          "quote": "中央 V 形手臂与周围低姿态人物",
+          "reason": "中央红衣举臂与低位人群符合画面；火点和上方树枝的框架也被看到。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "中央脸、双臂、周围人群层次和主要色彩材料仍可读",
+          "reason": "保护举臂例外和群体层次有依据；没有因暖色强而要求重构。"
+        },
+        "fact_boundary": {
+          "status": "supported",
+          "quote": "不能据此确认活动名称、宗教／政治性质",
+          "reason": "活动身份、情绪及火点用途留待语境，没有用动作替代事实。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "先压偏左建筑灯带，直到它低于中央白色下装的吸引力",
+          "reason": "可作为偏好实验，但建筑灯带也承担远层定位；这个强制注意力排序不是已证实的必要修复。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "参考图也以高位人物、汇聚／发散手势和点状灯光组织大群体",
+          "reason": "单图与姿态、群体、亮点确实相关；应明确教保留这些关系，而非暗示它在解决本答卷列为首要的色彩问题。"
+        },
+        "eight_dimension_reasons": {
+          "status": "supported",
+          "quote": "群体、点光、雾状介质和建筑提供丰富线索，同时保留语境未知",
+          "reason": "八项各有局部理由，信息分没有把未知活动身份当作缺陷。区间仍是模型判断。"
+        }
+      },
+      "image_sha256": "0b0a790d04eca82271b57946562f96d91cff8059b952508804bef613f6581e51",
+      "response_sha256": "bb01bfc7ac11a2b000d10487f60adc28e22b35a4599e186c38d1311c069ea132",
+      "frozen_visible_anchors": [
+        "中央红衣站立人物双臂抬起，与下方一排排较低的人体形成高低对比；双手轮廓和红衣褶皱仍可辨。",
+        "前景多个暖色亮点沿人群间隙向中央与后方浅亮棚架延伸；上缘横枝、右侧树干和后方薄雾形成框架与纵深。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Rakher_Upobash_40.jpg",
+      "source_sha1": "5e4199b4560acc529cb679efb122beee5e99d29c",
+      "source_creator": "Azimronnie",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-01.md"
+    },
+    {
+      "case_id": "forward-02",
+      "reference_id": "shore",
+      "correction": "保留有限顺时针试校，撤回窗洞出画和全幅断裂，优先保护尖顶；静态关键关系仍评分。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "右侧附属立面贴近边缘且窗框截入",
+          "reason": "右侧窗框并未截断；上方尖顶离画框极近才是更需要点名的修正约束。窗列、入口和近远关系观察成立。"
+        },
+        "priority_and_protection": {
+          "status": "partial",
+          "quote": "轴线问题造成全幅关系断裂",
+          "reason": "顺时针试校有可见依据，但建筑节奏和纵深仍可读，称全幅关系断裂过重。"
+        },
+        "fact_boundary": {
+          "status": "failed",
+          "quote": "右=附属建筑与窗洞贴边出画",
+          "reason": "把未出画的窗洞当作出画事实；结尾身份未知不能抵消这个像素描述错误。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "先做小幅顺时针方向旋转",
+          "reason": "方向正确且说明代价；应把顶部尖顶也纳入停止条件，并降低对台阶/道路天然水平的确定性。未实际生成校正图。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "supported",
+          "quote": "参考图并未消灭所有透视，而是让正立参照与空间收束各司其职",
+          "reason": "Shore 单图的横竖框架可支持稳定轴与纵深并存的学习；不是要求所有收束线平行。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "时机与关键关系：N/A — 核心是静态几何与建筑关系，不依赖瞬时动作",
+          "reason": "建筑仍有窗列、入口、边框关系，静态不足以豁免整个复合维度。"
+        }
+      },
+      "image_sha256": "92af3c8c1179003ebb2835ae034cf0e04168dfc72bf955312ac601ffbf314e56",
+      "response_sha256": "fcc69e213226b17310b2a110d34975af7cd511a63dcd305169cc7d6ffdfa0106",
+      "frozen_visible_anchors": [
+        "近处楼角与竖管上端相对下端向画面左侧偏；窗框横线与屋檐同时向右上方退远，后者包含透视，不可直接当水平标尺。",
+        "上方钟塔尖端离上缘很近；主体右端屋面也接近边缘，任何旋转或透视修正都要单独考虑裁切余量。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:2_rue_des_Ecoles_in_St-Cernin_(1).jpg",
+      "source_sha1": "c9aaacce4907d629b95a84456c9ccd3b1e6689b8",
+      "source_creator": "Tournasol7",
+      "source_license": "CC BY 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-02.md"
+    },
+    {
+      "case_id": "forward-03",
+      "reference_id": "brouillet",
+      "correction": "将完全分开改为接触仍在但轮廓可辨；不确认模糊成因，不因未知物种或事件结果扣分。",
+      "fields": {
+        "localized_observation": {
+          "status": "supported",
+          "quote": "喙尖夹住一条细长物，物体下端垂落",
+          "reason": "喙与垂下物接触清楚；展翼、尾尖及朝左留白也有完整观察。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "喙—物体接触、翼形和方向空间同时成立",
+          "reason": "正确保护当前关系，没有被全图细节统计牵着走。"
+        },
+        "fact_boundary": {
+          "status": "partial",
+          "quote": "平滑背景是深度结果而非全图糊化",
+          "reason": "关键区清楚可观察；背景平滑的具体成因不能由成片确认。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "failed",
+          "quote": "选择喙中物体与嘴缘完全分开",
+          "reason": "按字面执行会破坏原本要保护的喙—物体接触。应要求接触点和两侧轮廓可辨，而非物体脱离。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "主体、接触物、姿态线和背景同时清楚的对齐",
+          "reason": "参考图人、板、细绳在云前可辨，有轮廓学习价值；迁移时需说明细绳连接与喙部直接接触的差别，不能一概要求完全分开。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "但物种、物体身份与事件结果需外部语境",
+          "reason": "这是事实边界，不是单帧信息分降低的充分理由。其余眼、羽、方向等理由有对应。"
+        }
+      },
+      "image_sha256": "3eb69323cd1768a4d746a5ce34671de19010dbe038ab0d707f950ae0d06b842d",
+      "response_sha256": "1345ddcaece8351bbf22f8ba8a3585e21b288fc4d25619faf33f7e4e6788bd06",
+      "frozen_visible_anchors": [
+        "鸟的红色喙夹着鱼状对象，眼睛、喙与夹持接口可辨；上举翼与向右的尾部完整保留。",
+        "喙朝画面左，左方有绿色虚背景余量；白灰羽毛仍有羽片与明暗层次，主体轮廓和背景分离。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Common_tern_(Sterna_hirundo)_with_common_roach_(Rutilus_rutilus)_Haff_Reimech.jpg",
+      "source_sha1": "6aaf7ef27ac6dad176b6fb5db881a9b984a8fc34",
+      "source_creator": "Charles J. Sharp",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-03.md"
+    },
+    {
+      "case_id": "forward-04",
+      "reference_id": "watkins",
+      "correction": "把暗部问题限定在具体树群内部；不宣称草面全失、不推断是哪一步后期造成。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "左下草面也合并为大片暗值",
+          "reason": "右侧暗树内部局部合并明显，但左下草地仍有较多可读纹理；损失范围写大了。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "候选A=暗部",
+          "reason": "优先检查树群内部而非先改蓝绿偏好有依据，同时保留水道纵深和疏密两组关系。不是凭变体配方作裁决。"
+        },
+        "fact_boundary": {
+          "status": "partial",
+          "quote": "处理强度让地貌和植被差异被统一成色块",
+          "reason": "成片能支持局部近黑，不足以确认处理过程，也不能泛化为全部植被。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "supported",
+          "quote": "直到至少能分出两层树冠和一段地表",
+          "reason": "给出可观察的树群停止条件，并同时要求云纹仍在、警告提亮噪声及源文件限制。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "supported",
+          "quote": "参考图的近岸与远处地形也依靠前后明度和重叠把视线送入深处",
+          "reason": "Watkins 的暗前景、亮水与淡远山有实际层级，匹配树群保留边界与水道深度的目标；可再具体到左前树干和底部灌木。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "但处理强度让地貌和植被差异被统一成色块",
+          "reason": "技术、影调等理由有局部依据，但信息项复用了过宽损失及未证实原因，需收窄。"
+        }
+      },
+      "image_sha256": "f2a5d17822a19bd98af9f025581809b6f8b379debcbe9058def14522a81a42f2",
+      "response_sha256": "9493afc2fc81415bf9ace80cd31c1f5ca6931bbb449768a4f70889e21d1cbe94",
+      "frozen_visible_anchors": [
+        "右半山坡及中央树丛中，多棵树的暗面相互粘连，内部层次远弱于天际轮廓和前景草叶；不能由此断言整片纯黑。",
+        "溪流从右下弯向中部，多处浅色水面与岸边棕色带仍能区分；大块明亮天空与较暗林地的对比把注意力往上拉。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Stream_in_Yellowstone_(89427).jpg",
+      "source_sha1": "dc0ab7d4d6200514f9d72a5607a32ebd5c07f17b",
+      "source_creator": "Rhododendrites",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-04.md"
+    },
+    {
+      "case_id": "forward-05",
+      "reference_id": "cameron",
+      "correction": "撤回头顶截断；把相机转向和机位移动分开；修正参考图影调描述。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "头顶、右肩和身体下部出画",
+          "reason": "头顶完整且上方有背景余量；左下浅发与镜架碎片确实存在。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "它没有遮住脸，也可能保留现场多人语境",
+          "reason": "把左下碎片作为可选边缘整理而非全图失败，保护面部和服装关系有依据。"
+        },
+        "fact_boundary": {
+          "status": "failed",
+          "quote": "上=头顶以上有散焦背景余量",
+          "reason": "此句正确，却直接与开头头顶出画矛盾；需要交付前回看并统一，不是加未知项。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "向画面左侧微移取景或等左下人物碎片完全退出",
+          "reason": "等待退出可行；向左转取景通常让左缘碎片更入画，移动机位的视差又不可预先保证，应分清动作并给可见停止条件。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "参考图是低反差、柔焦的单色肖像",
+          "reason": "Cameron 确有柔边与脸部信息，但脸两侧明暗差明显；也未直接示范如何处理目标左下碎片，只能标为保留脸部可读性。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "但场合与情绪原因不能由像素确认",
+          "reason": "应移入非评分事实边界。其余分数多有面部、领带、白斑的具体依据。"
+        }
+      },
+      "image_sha256": "1fa5530cab7b22acc00226d7e4cb7e1a175fcf3102550d085b07cb6803058872",
+      "response_sha256": "46cf71fd487a9d48e502547101c74ed44da643ab4f65a1f1facff55b57cebcb5",
+      "frozen_visible_anchors": [
+        "画面中部人脸的双眼、头发与面部明暗可辨，朝画面左侧的视线与右侧较亮虚背景形成对比。",
+        "右后方大片浅色虚背景比左后方亮，左下边缘还露出另一小段深色头发状轮廓；后者是局部边缘观察项而非全图必重构。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Peter_Malinauskas_at_Rundle_Mall's_50th_Birthday_Moment_event_(028A0822).jpg",
+      "source_sha1": "f2e7cb5346746f00ff54cc2dea3a161093d6620b",
+      "source_creator": "Yu Chu Chin",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-05.md"
+    },
+    {
+      "case_id": "forward-06",
+      "reference_id": "talbot",
+      "correction": "逐枚核对完整/出画状态；静物评间距、形态和排列，不以无动作或平面化机械扣分。",
+      "fields": {
+        "localized_observation": {
+          "status": "failed",
+          "quote": "中央四枚完整",
+          "reason": "六个视图中只有上排中间两枚完整；左右上方及左右下方共四枚在侧边被切。漏看下排使完整性地图失真。"
+        },
+        "priority_and_protection": {
+          "status": "partial",
+          "quote": "损失是否阻断核心取决于用途",
+          "reason": "用途分支可以讨论，但必须先完整承认四处截断，不能基于错误的完整数量宣布装饰节奏已经成立。"
+        },
+        "fact_boundary": {
+          "status": "failed",
+          "quote": "左、右缘各截入一枚壳",
+          "reason": "左右实际各有上下两枚触边截断，明确数量错误，非审美分歧。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "当前文件不能通过向外裁切补全左右壳",
+          "reason": "不能裁回画外内容说得对；但后续实验仍只处理边缘两个单元，并把请他人评判作为步骤，未适配自我练习。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "参考图的对象大多以完整轮廓承担目录式信息",
+          "reason": "Talbot 四层器物的轮廓与间距确实相关；页面日期为 before January 1844，原答简写1844应校正。迁移实验还漏了目标下排两处切边。"
+        },
+        "eight_dimension_reasons": {
+          "status": "failed",
+          "quote": "空间与层次：2–3/5 — 这是平面并置关系，深度与真实尺度信息有限",
+          "reason": "平面组织不天然需要纵深；另以没有瞬时动作标关键关系N/A，两个维度口径都不成立。"
+        }
+      },
+      "image_sha256": "9c8b0eb2fba11e8f861f272d6351a27c9ba6e0c34cc45b138aed08c8b67827a7",
+      "response_sha256": "5a758ebabeb78b08fc680d176cc745f4dc7cd2cecadd1cbc36467f33325997be",
+      "frozen_visible_anchors": [
+        "黑底上多组贝壳外观视图：上排左右大块及下排左右薄片在左右边缘被截断，外侧轮廓不完整。",
+        "中间两片竖向弯曲壳形仍完整，中央黑色间隙与外侧受挤的轮廓形成余量对比；壳表脊线与浅色内面仍清晰。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Vasticardium_lacunosum_02.jpg",
+      "source_sha1": "f1464b9643b1b892a20ce102e54a0ca429cb51ed",
+      "source_creator": "H. Zell",
+      "source_license": "CC BY-SA 3.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-06.md"
+    },
+    {
+      "case_id": "forward-07",
+      "reference_id": "kertesz",
+      "correction": "修正三盏灯；一次只测试取景或暗部，参考标学保留，速度未知不混入质量理由。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "黑色机车正面与两盏圆灯",
+          "reason": "车头可见上方一盏及下方两盏，共三盏；车厢回折和环境通道主体观察成立。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "裁掉环境会失去曲线通道与尺度",
+          "reason": "保护近大远小的车厢曲线、岩壁与植被通道恰当，没有因黑色机车深而全盘提亮。"
+        },
+        "fact_boundary": {
+          "status": "partial",
+          "quote": "中心锚点=圆形车头、两盏灯和白色数字",
+          "reason": "两灯错误被重复写入锚点；运行速度与地点则恰当地留为未知。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "用稍宽取景让车头下方多出约一个缓冲器高度",
+          "reason": "安全距离与完整转弯约束好；该步骤同时改变取景和暗部显示，且未说明当前哪段管线必须恢复，单一练习目标不够集中。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "近前元素、建筑框架和远处列车把多个深度层连接成一条事件路径",
+          "reason": "Meudon 的前景人物、街道和桥上列车确有三层尺度；教的是保留环境深度，不是本答首要的车头暗部修正，且定位仍可更具体。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "单帧不足以确认运行速度或前后过程",
+          "reason": "不知速度是事实边界，不是时机关系只能获此区间的充分理由；应只谈整列弯曲状态和接口。"
+        }
+      },
+      "image_sha256": "d15418fb755a57331b65d784597012bb629b1eed2b4bb8838162a4026fba7659",
+      "response_sha256": "700e91fe9e748f6bf409e300ffb9580805a736c31b4af8c7fbcd616617a42f5c",
+      "frozen_visible_anchors": [
+        "近处黑红机车位于左下，后方一节节车厢向右再向左弯，重复车顶组成连续弧线与前后尺度差。",
+        "机车虽黑，前端标记、管道及下方红色轮杆仍可区分；前景栏杆贴近下缘，与上方烟雾、树林和后车形成多层。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg",
+      "source_sha1": "eb140cf8fbcf35c295f39020224c0658c8cb2113",
+      "source_creator": "Ermell",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-07.md"
+    },
+    {
+      "case_id": "forward-08",
+      "reference_id": "cameron",
+      "correction": "删除室内断言；练习改为关键接口可辨，不要求主体清晰度胜过所有背景。",
+      "fields": {
+        "localized_observation": {
+          "status": "supported",
+          "quote": "眼睑—面部毛、鼻端—口鼻部、前足趾端—地面均难以分开",
+          "reason": "眼鼻、毛纹与足端广泛软化，且右缘条纹碎片确实可见；没有把裁切当作细节修复。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "细节信息损失不可逆、影响范围覆盖主体",
+          "reason": "将关键区域可读性排在边缘整理之前合理，同时保留横向体态及大块明度分区。"
+        },
+        "fact_boundary": {
+          "status": "partial",
+          "quote": "横向体态与室内几何仍有基本呼应",
+          "reason": "画面可见地砖、墙和花盆，不能确定室内；后面不推断室内地点的声明不能消除先前断言。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "三处都比背景边缘更清楚",
+          "reason": "对焦确认与后期不可恢复说明有用，但背景边缘可以同样清楚；应按眼鼻接口本身及同尺度细节判读，而非要求背景永远更糊。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "supported",
+          "quote": "参考图虽有柔焦，却仍让眼部、脸部外形和亮暗方向相互支撑",
+          "reason": "实际参考脸缘较柔但脸、眼和明暗方向仍成立，作为柔软质感与关键关系丢失的对照有价值；仅针对当前动物肖像用途。"
+        },
+        "eight_dimension_reasons": {
+          "status": "supported",
+          "quote": "眼鼻、足端和毛纹均缺少可靠清晰点",
+          "reason": "各项区间分别谈边框、主体落点、层次及体态，技术低分有局部依据；数值本身未经专家标定。"
+        }
+      },
+      "image_sha256": "46fe7e0ea6ac57d81e2a8c57c31ced393d7e004de1ad05e411249ce8111b588d",
+      "response_sha256": "49f83162c89dd54436b674dc0c38f5b0e99280319c2726e6a3a503f147f008ed",
+      "frozen_visible_anchors": [
+        "猫脸的眼部、口鼻和胡须边缘都显得松软，前爪与身体毛纹也缺少清楚的高频细节。",
+        "附近地砖接缝和左上花盆边缘也偏软；但猫头在右、躯体斜向左的整体轮廓与浅背景分离仍清楚。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Cat_in_%C4%B0zmir_(04092026)_03.jpg",
+      "source_sha1": "20d8ef8642c238a80a196d4729fd84cbb282a03e",
+      "source_creator": "Kadı",
+      "source_license": "CC BY 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-08.md"
+    },
+    {
+      "case_id": "forward-09",
+      "reference_id": "watkins",
+      "correction": "把已有暗背景写成要保留；评分理由不借未知地点填充。",
+      "fields": {
+        "localized_observation": {
+          "status": "supported",
+          "quote": "右下水流出口→逆向沿白色跌水和中央水面→终点中上部窄河道",
+          "reason": "水道路线、前后石块尺度和上方拱枝均可指认，白水内灰线没有被误判为全白。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "白水、石块边界和前中后纹理均仍可读",
+          "reason": "不重构成立；明确抬暗过度会削弱亮水优势，保护路径而非清空杂物。"
+        },
+        "fact_boundary": {
+          "status": "supported",
+          "quote": "不能由叶色确认季节，也不能由丝状水面确认具体快门或水速",
+          "reason": "可见状态与拍摄/环境原因分开，长曝光式被表达为外观而非已知设置。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "先找让主跌水背后出现连续深色石面的站位",
+          "reason": "这种背景在当前图已基本存在，适合作为下次保留条件；未说明是保持现状而非修复缺失，局部修色则有可撤销代价。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "supported",
+          "quote": "近岸与远景也由斜向地形、明度和尺度递减相连",
+          "reason": "Watkins 的近岸暗枝、浅水与远山匹配空间路线；强于仅共享瀑布题材，但定位仍可写得更像指图。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "地点与自然语境仍未核实",
+          "reason": "地理信息未核实不能单独支撑信息维度降档；水、石、枝的可追踪关系才是可评分依据。"
+        }
+      },
+      "image_sha256": "277a11d712595da42a2837dbfefc2711bc8f0e77a76e0dde9aa3e412dbe8a698",
+      "response_sha256": "85ca95aa922057fd0ff7a381b0a79886645304cd8d7db13d0db203e2a849ba27",
+      "frozen_visible_anchors": [
+        "亮水流从远处中间曲折进入右下，穿过暗石分段展开；石头、苔面和叶片比水流的拖曳纹理更清楚。",
+        "近处白水仍有灰色条带与暗石分隔；两侧绿苔、橙褐落叶和上方交叉枝条形成包围水道的多层结构。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Birks_of_Aberfeldy_(55085667062).jpg",
+      "source_sha1": "49dab619ddddf5c1ee783f03c96fa4b01d0f1a29",
+      "source_creator": "Eric Kilby from Somerville, MA, USA",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-09.md"
+    },
+    {
+      "case_id": "forward-10",
+      "reference_id": "levitt",
+      "correction": "重数前景六人；撤回凭空的音箱间隙修复；以颜色局部证据决定调整幅度，保留面具姿态节奏。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "前景约八名装束人物",
+          "reason": "前景主体组可分辨六人，其中四个骷髅状面具；重复面具和黑白地垫关系看到了，但人数与下缘小物截断描述不准。"
+        },
+        "priority_and_protection": {
+          "status": "partial",
+          "quote": "候选A=高光",
+          "reason": "回答注意到暖色与浅衣薄层次，却主要以动作仍可读来保护；应独立比较橙红肤色、泛粉浅衣等色彩关系。不因已知色彩变体就强迫判结构失败。"
+        },
+        "fact_boundary": {
+          "status": "failed",
+          "quote": "两个黑色小物均被截入",
+          "reason": "地垫上的暗物并非这句话所说的两处下缘截断；与人数错误共同损害拓扑事实可靠性。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "failed",
+          "quote": "向左微移到右侧音箱与高帽人物之间出现一条可见空隙",
+          "reason": "两者本来已有可见空隙，行动在修一个未见的重叠；也无法保证往左移动必定增大间隔。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "参考图也以重复面具、分散人物和建筑框架维持群体统一与个体差异",
+          "reason": "Levitt 的三个人物及台阶确能教重复与高度变化；应标学保留，不能让它充当首要亮部/色彩问题的解决例图。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "浅衣仅局部亮端偏薄",
+          "reason": "技术可读性仍在并非必须低分，但光色理由未充分检验强橙红及粉色浅衣；不能只用面具轮廓完整来认证光色质量。"
+        }
+      },
+      "image_sha256": "a216323478f81a2cc30fa9da41a0c106f8bb8e000a6cf326bf5de8dc73e16043",
+      "response_sha256": "944857736cf7ffccf1d48851037471d6f0ab598a198830793254d55b66c9ee0e",
+      "frozen_visible_anchors": [
+        "中央前后人物黑白衣片相间，多张面具重复，抬臂、屈膝与站立姿态形成不同高度；与地面黑白格的节奏呼应。",
+        "后排多张露出的人脸和手呈强烈橙红，左中亮粉衣块与绿色衣块突出，浅色紧身衣也偏粉；与较中性的后墙相比有明显色域差别。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:39._Ulica_-_Krakowski_Teatr_Ta%C5%84ca_-_Szach_mat%21_-_20260711_1725_3124.jpg",
+      "source_sha1": "e705b92206479acab301f7d853e9a4c7a1ec8345",
+      "source_creator": "Jakub Hałun",
+      "source_license": "CC BY 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-10.md"
+    },
+    {
+      "case_id": "forward-11",
+      "reference_id": "muholi",
+      "correction": "撤回耳宽式假精确；不为优秀照片强造修复任务，保留现有亮毛纹理和端点空间。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "尾毛与右边距离约小于一只耳宽",
+          "reason": "尾端外有明确余量，没有支持小于一耳宽的画面证据；脸—背—卷尾路径和足地关系描述正确。"
+        },
+        "priority_and_protection": {
+          "status": "partial",
+          "quote": "这是 watch item，不要求重构",
+          "reason": "不重构适当，但用错误的相对边距制造了首要观察项；优先保护完整轮廓已经足够。"
+        },
+        "fact_boundary": {
+          "status": "partial",
+          "quote": "受压侧尾毛与右边距离约小于一只耳宽",
+          "reason": "这是未经核实的量化事实，不因写约就可靠；另对未知身份与状态的处理较谨慎。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "直到毛束方向重新可见",
+          "reason": "前文和图片都显示毛束方向已经可见，应是保留亮毛层次的可选实验，而非声称需要恢复。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "partial",
+          "quote": "参考图的直视眼部与较素的背景也用局部明暗差把观看压回面部",
+          "reason": "Muholi 单图有眼部、衣物、背景层级，能教保留面部与外形；没有直接对应被列为首要的尾端边距。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "右上尾端余量明显少于左侧头前",
+          "reason": "边缘项及完成度沿用了未核实的紧边判断，其他眼鼻、毛发、足地理由有依据。"
+        }
+      },
+      "image_sha256": "b3dcf8af33b307c8d63f343b05f923fbea92b54355e225a126cab5d60f988653",
+      "response_sha256": "e0ef4d0cf650e262f6ad80a7b4f08066fbf79151f12588c79035008fddd109b4",
+      "frozen_visible_anchors": [
+        "白色长毛犬的双眼、鼻与舌清楚，背部、胸前和尾部仍能看见白毛方向及奶白层次。",
+        "耳、上卷尾端与脚部都保留余量，白色全身对灰色虚背景和绿色地面分离；尾端亮毛边与背部较暗毛纹有区别。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Samoyed_dog_two_year_old_female_dllu.jpg",
+      "source_sha1": "4c3db1e1e85fa3eb9b6b474638dffcbebedafa1d",
+      "source_creator": "Dllu",
+      "source_license": "CC BY-SA 4.0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-11.md"
+    },
+    {
+      "case_id": "forward-12",
+      "reference_id": "adams",
+      "correction": "只指认残留线和中断，不猜原来有头部；固定背景做单变量曝光练习，静态连接仍评分。",
+      "fields": {
+        "localized_observation": {
+          "status": "partial",
+          "quote": "上部形体轮廓、与背景分界、台座连接及大部分石面纹理均在纯白中消失",
+          "reason": "上部大片近白和多处轮廓不可辨成立，但下部右侧曲线与接缝仍可见，台座连接不能不分位置全称消失。"
+        },
+        "priority_and_protection": {
+          "status": "supported",
+          "quote": "候选A=高光",
+          "reason": "将亮部边界丢失置于风格偏好前，同时保护下部支撑和残余冷暖，有图像依据。"
+        },
+        "fact_boundary": {
+          "status": "failed",
+          "quote": "现有文件中已成纯白的头部",
+          "reason": "不能从不可辨白区确认原本存在头部；正确做法是只说上部轮廓与背景关系，不补全未见结构。"
+        },
+        "action_direction_feasibility_tradeoff": {
+          "status": "partial",
+          "quote": "只改变曝光与背景角度",
+          "reason": "承认源文件无信息就不可恢复正确，但练习同时改变两个变量；应固定背景先测试曝光，且不要求恢复未证实存在的头部。"
+        },
+        "exact_reference_access_and_mechanism_fit": {
+          "status": "supported",
+          "quote": "亮色建筑与更远地形在高调范围内仍靠细微明度和层次相互分开",
+          "reason": "Adams 近地、浅屋、远山和大块亮天的不同处理真实可见，适合对照白场保留关键信息，未照搬宽幅比例。"
+        },
+        "eight_dimension_reasons": {
+          "status": "partial",
+          "quote": "时机与关键关系：N/A — 核心问题是静态对象的曝光与形状，不依赖瞬时动作",
+          "reason": "本答核心就是上部与基座连接关系，不能因静态标N/A；取景项也应避免重复计入纯技术损失。"
+        }
+      },
+      "image_sha256": "69f8725a58601b6be4691ebda24c7f435a8cd76942d7fe8c2c04641b1afb9c6b",
+      "response_sha256": "8393c0c2b6b4019d08ac419be2f58fa0a9fe20b7c01ad48f0e344a5ea73c1109",
+      "frozen_visible_anchors": [
+        "上半主体轮廓大片融入白背景，只剩上方少量金黄色羽状纹及中段纵向褶线，形体连接难以完整读取。",
+        "下半右侧台座弧线、接缝与灰褐表面仍清晰，左侧和底部大块浅面也与背景粘连，形成跨两区域的亮部信息缺失。"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:Nike_of_Samothrace,_Paris,_Louvre.jpg",
+      "source_sha1": "0a0fb9316074e1e337f6a6a3f30f7648fd3d9585",
+      "source_creator": "Wilfredor",
+      "source_license": "CC0",
+      "response_file": ".benchmark-runs/forward-12-20260914/responses/forward-12.md"
+    }
+  ],
+  "not_tested": [
+    "independent human expertise",
+    "representative population accuracy",
+    "learning improvement",
+    "faithful edit generation for these twelve images",
+    "desktop and narrow-screen interaction",
+    "post-fix behavior on a new blind sample"
+  ],
+  "limitations": "The writer had task-level access restrictions, not an OS filesystem sandbox. Historical/corpus page and source-SHA-1 exclusion does not prove pretraining disjointness. The reviewer saw frozen expected observations and variants but based findings on actual images and preserved answer disagreements. Evidence quotes are checked mechanically; qualitative judgments remain model-authored. Raw answers, keys and snapshots remain unchanged. No overall case pass labels or aggregated quality percentage are assigned.",
+  "bindings": {
+    "input_freeze_sha256": "806a6efe89b35dae32ddd5af3081d104330bcffe7266e39c1a6aafc942736cf3",
+    "responses_freeze_sha256": "9e8089aa626a95bcd174431329da39c60cef1a4e58e069467b501c2bc6062406",
+    "review_protocol_sha256": "1615daf1331fe0ca877dbdfd2e03faae83f8e0647fea6e33854bd8b9431298d9",
+    "review_notes_sha256": "2dd152d7ef0174968ce9b3c02ecfc5888296170ddb3e748eddb81c6c5cbcf64e",
+    "review_protocol": {
+      "run_type": "small_source_disjoint_forward_check",
+      "date": "2026-09-14",
+      "case_count": 12,
+      "writer": "gpt-5.6-sol-high",
+      "reviewer": "gpt-6-astra-high",
+      "sampling": "Purposive selection for varied scenes from newly retrieved Commons category members, excluding historical cases, materialized/reviewed candidates and teaching sources by normalized source page and original SHA-1. Six unchanged images and one each of six declared integrity transformations; community categories are sampling metadata, not aesthetic truth.",
+      "writer_inputs": "Only isolated protocol/teaching assets, anonymized image files and blind-inputs.jsonl. No prior turns, case metadata, answer key, source names, transformation recipes or review findings. Exactly one child agent, no further delegation.",
+      "freeze": "Parent visually writes and freezes localized expected observations against actual materialized images before writer begins. All writer responses and protocol inputs are SHA-256 bound before evaluation. Neither responses nor key may be rewritten to improve the first-pass result.",
+      "review_fields": [
+        "localized_observation",
+        "priority_and_protection",
+        "fact_boundary",
+        "action_direction_feasibility_tradeoff",
+        "exact_reference_access_and_mechanism_fit",
+        "eight_dimension_reasons"
+      ],
+      "evidence": "Each case needs two visible anchors, verbatim response quotes and a field-specific explanation. Every field is supported, partial, failed or unresolved; never bulk-assign grades or count keyword presence as a visual-quality pass.",
+      "completion": "Review all twelve frozen outputs, report concrete failures and uncertainty, make only supported narrow fixes if needed, verify affected code and deliver the audit. Any feedback-aware retry is a regression check, not a fresh blind pass. No release-level success percentage from twelve purposively chosen cases.",
+      "not_tested": [
+        "independent human expertise",
+        "learning improvement",
+        "representative population accuracy",
+        "generated edit fidelity on these twelve cases",
+        "desktop/mobile browser behavior"
+      ]
+    },
+    "source_packet_location": "/Users/jiangfeng12/.codex/visualizations/photography-forward-20260914-a7vpmu",
+    "scope": "Hash and quote checks only; all qualitative findings are manually authored model review."
+  }
+}

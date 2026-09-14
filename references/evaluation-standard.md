@@ -169,6 +169,7 @@ Apply two additional constraints from the v0.6 holdout:
 
 4. **Branch does not erase shared defects.** A purpose-dependent fork may protect blur, darkness, context, tilt, or negative space, but an edge cut, focus miss, intrusive object, or processing excess that weakens both branches stays in the ledger and may outrank the fork.
 5. **Separate severity from existence.** Classify the best-supported issue internally as `rebuild`, `correctable`, or `preference`. A correctable issue may be mentioned without declaring the whole image structurally broken; a minor but concrete adjustment must not disappear merely because the core works.
+   Apply the same separation inside the six-family check: a localized shadow, highlight, colour, crop, axis, or detail loss can be real without becoming the public structural bottleneck. Do not mark the entire family `通过` merely because the central subject or one material remains readable.
 
 Apply two integrity constraints from the 100-case blind baseline:
 
@@ -181,13 +182,15 @@ Apply three constraints from the v3 failure analysis:
 9. **Direction space is not edge contact.** A person, animal, vehicle, line, or repeated module can be crop-pressured without touching the frame. Compare continuation and closure on opposite edges, including unrelated slack elsewhere.
 10. **Fact boundaries are sentence-local.** A closing unknowns list cannot repair unsupported roles, relationships, states, emotions, time, weather, process, speed, or causality already asserted as facts.
 
-Apply five constraints from the v1.5 development replay:
+Apply the following constraints from development replay and subsequent calibration:
 
 11. **Topology precedes cue strength.** Count repeated units and states, trace one start-to-end path, name an exception, scan edge endpoints, and find a scale anchor before reading the probe. If the later diagnosis contradicts that snapshot, revisit the pixels rather than rationalizing the contradiction.
 12. **Probe cues nominate; visible loss ranks.** `强` and `复核` determine where to inspect, never what must be `首要`. A family leads only after localized evidence shows lost information or a broken relationship with useful repair value.
-13. **Tilt needs a signed counter-rotation test.** Call roll repairable only when one reliable horizontal and one reliable vertical improve together under the same counter-rotation and the edge-pressure result also improves. A hill, road, tree, curved facade, or one converging line is insufficient. A strong axis statistic may be marked `通过` when localized references falsify common roll.
+13. **Tilt diagnosis and repairability are separate.** Evidence common roll only when one reliable horizontal and one reliable vertical improve together under the same counter-rotation. Then record collateral crop as a repair constraint rather than using it to erase the geometric diagnosis. A hill, road, tree, curved facade, or one converging line is insufficient. A strong axis statistic may be marked `通过` when localized references falsify common roll.
 14. **Crop and detail need operation-specific tests.** For crop pressure, compare threatened-side room to body/action/module scale and unrelated opposite-side slack; no literal cut is required. For detail damage, test waxy smearing, halo or false microcontrast, and blocking or ringing, then compare high-frequency textures of similar apparent scale across two depth planes. Bokeh versus a face is not sufficient by itself.
 15. **Protect before correcting.** Before `STRUCTURAL_BOTTLENECK`, name two currently successful relations, one concrete information loss, and the proposed correction's cost to both relations. Without a localized loss, keep the issue as observation, purpose branch, or optional experiment.
+16. **Overlap needs a loss, not a cleanliness preference.** Natural occlusion, complex layering, several attention anchors, or a continuation beyond the frame may be an existing spatial device. Promote it to a structural defect only when a named object boundary, action interface, sequence, or route becomes unreadable and the proposed change recovers more than it destroys.
+17. **Do not fake measurement.** Without a measured preview, describe edit direction and an observable stop condition first. Approximate angles, crop percentages, exposure values, and slider amounts are trial starting points, not facts about the image.
 
 ## Decision rules
 
@@ -231,6 +234,8 @@ Every action includes action, expected viewing effect, tradeoff, availability (`
 - Object removal/movement/generation is a composite or generative edit and may require disclosure.
 - Advice must not require unsafe or unauthorized access.
 
+Recheck the premise of each action: name a currently visible defect or label a preference experiment. Do not promise to separate a gap that is already open, recover texture that is already readable, or physically disconnect a contact that the photograph needs. “Make the contact boundary legible” is different from “make the objects completely separate.” For directional advice, distinguish panning the frame from moving the camera position and use a visible stop condition; do not guarantee an unseen parallax result. Judge key-region readability against the task, not a universal requirement that the subject be sharper than every background edge. Keep a drill to one changed variable and make self-review sufficient; another participant is optional.
+
 ## Crop and color preview constraints
 
 When a visual treatment preview is requested:
@@ -256,6 +261,6 @@ Always show integer intervals from 0–5 in the ordinary response and give one i
 - information/story/emotional response;
 - expressive consistency and finish.
 
-State purpose fit as a conditional branch when the intended use is unknown. Treat originality/voice as a named observation inside expressive consistency, not a penalty for failing to resemble famous work. Ethics, consent, authenticity, safety, and factual context remain non-scored gates. Use `N/A` when a dimension genuinely does not apply.
+State purpose fit as a conditional branch when the intended use is unknown. Treat originality/voice as a named observation inside expressive consistency, not a penalty for failing to resemble famous work. Ethics, consent, authenticity, safety, and factual context remain non-scored gates. Unknown location, species, speed, or backstory is not itself a reason to lower a photographic interval; keep it outside the score unless a stated use requires that information and the missing evidence has a named consequence. Use `N/A` when a dimension genuinely does not apply. A static subject still has spacing, contact, overlap, and shape connections: lack of action alone does not make `moment and key relationship` inapplicable. Likewise, successful flat organization need not have deep perspective. Each dimension needs its own visible consequence; do not charge the same technical loss to framing without an actual framing consequence.
 
 Anchors: 0 absent/contradictory; 1 severe problem dominates; 2 problems outweigh strengths; 3 basically works; 4 choices mostly reinforce one another; 5 highly unified. Use `N/A` when irrelevant. Do not rank unlike genres.

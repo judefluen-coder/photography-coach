@@ -96,6 +96,12 @@ Release reporting must show results by band and genre, not only one aggregate pe
 
 A separate model context is acceptable as a repeatable internal reviewer when a human photography panel is unavailable, but it is not independent expert validation. Record the exact model/version and prompt policy in `reviewer_id` and keep that limitation in the release claim.
 
+### Answer-aware diagnostic calibration
+
+Use an answer-aware calibration only to find prompt, rubric, or answer-key problems after responses have been frozen. Bind every case note to the materialized image SHA-256, an exact response quote, at least two localized image anchors, a bounded finding, and the rule implication. Allow `key_disputed` and `unresolved_resolution`; do not force ambiguous evidence into a hit or miss. Separate image-to-diagnosis review from reference, action, score, and full-contract review, leaving unreviewed fields explicitly unreviewed.
+
+Do not calculate a pass rate from a purposive calibration set. Once its findings change the skill, rubric, key, or code, all reviewed cases are development evidence only. Record the review artifact and use new, source-disjoint photographs for any later release claim.
+
 Once answer keys, failed IDs, operation families, or response-specific errors from a holdout influence prompts, thresholds, retrieval, or code, that set becomes a development benchmark for the revised protocol. A rerun can measure regression on known failures but cannot restore independence. Release validation for the revision requires newly sourced photographs and frozen keys that were not used to design it.
 
 ## Leakage and validity checks

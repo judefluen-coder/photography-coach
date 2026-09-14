@@ -90,6 +90,16 @@ flowchart LR
 
 ## 知识与证据
 
+2026-09-11 复核更正：本地 v5 回答包已有 180 条记录，但随后生成的评分存在批量默认赋值，行动质量、参考质量、评分依据统一满分，无依据推断统一为零。因此该报告中的 81.11%、普通照片 100% 和零幻觉等指标不能作为质量结论或发布依据。需逐例补充回答原句、图像定位和裁决理由后重新评定；既有回答及原始评分保留作审计记录。
+
+2026-09-14 完成了一组 24 张的答案可见诊断校准，逐条绑定图片 SHA-256、回答原句与画面位置。它发现了漏判全局滚转、把局部损失扩大成全幅失败、把自然遮挡误判为结构问题、以及测试答案本身过度确定等问题，并据此收窄规则。该组是有目的的开发样本，不是独立盲测，不能换算为通过率。记录见 [`calibration-review-20260914.json`](references/calibration-review-20260914.json)。
+
+GPT-6 随后复核了其中 9 张争议/动作样本和 4 张保护性样本，发现并纠正了审查记录中的倾斜方向、遮挡对象定位和未经测量的角度比较；也确认“诊断对了”不代表“修复方向给对了”。24 条记录现在同时绑定回答文件哈希。随后在用户授权下，由一位干净上下文的 GPT-5.6 Sol 独立写完 12 张新图点评，再由前台 GPT-6 逐项核图、核引用。发现了重复物数量、截断位置、修复建议前提和评分理由等具体问题，原答卷未改写。详见 [`forward-review-20260914.json`](references/forward-review-20260914.json)。
+
+**148 项自动化测试通过，不等于摄影质量通过。** 本轮收窄了相应规则，尚未在另一批新图上验证修订后的行为；桌面/窄屏交互也未实测。12 张是有目的的小规模查错，不发布通过率，不替代完整发布评测。交付与限制见 [`gpt6-final-review-20260914.md`](references/gpt6-final-review-20260914.md)。
+
+当前界面支持点评区域定位、原图上的裁切框、原图与已有调整版切换和下载、评分不确定性说明，以及复制练习复盘说明。页面仍是本地报告，不包含自动上传评图服务；实际调整版需要先完成图像编辑与核对。
+
 截至 2026-09-09，仓库包含：
 
 | 资产 | 数量 | 用途 |
@@ -103,7 +113,7 @@ flowchart LR
 
 先前的 v4 测试因复用了与当前 case 身份错位的旧物化图片而被正式作废：100 张中有 97 张来源身份不匹配，因此原始分数只作为流程事故记录，不能证明模型能力。详情见 [`benchmark-report.json`](references/benchmark-report.json)。
 
-新的 v5 计划已冻结历史来源排除、候选池哈希、180 张配额、损坏参数和发布阈值，当前仍在执行。只有来源不重合、图片—答案身份绑定、盲评响应冻结和独立评分全部完成后，结果才有资格进入发布判断。
+v5 曾冻结历史来源排除、候选池哈希、180 张配额、损坏参数和发布阈值；其回答已生成，但评分证据无效，且样本已参与规则校准，现属开发材料。不能通过重评旧样本把它恢复为新版的独立盲测。2026-09-14 的 12 张前向检查在答题前冻结题目与教学快照、答题后冻结原回答，再作逐例审查；它也不替代发布标准要求的完整、来源隔离评测。排除了已知历史来源，不等于排除了模型预训练见过图片的可能。
 
 ## 仓库结构
 
@@ -118,7 +128,9 @@ flowchart LR
 | [`references/masterwork-cards.jsonl`](references/masterwork-cards.jsonl) | 精确单图教学卡片 |
 | [`references/critique-patterns.jsonl`](references/critique-patterns.jsonl) | 点评模式、反例、动作和练习 |
 | [`references/benchmark-method.md`](references/benchmark-method.md) | 来源隔离盲测与发布门槛 |
-| [`references/benchmark-v5-plan.json`](references/benchmark-v5-plan.json) | 当前 180 张盲测预注册计划 |
+| [`references/calibration-review-20260914.json`](references/calibration-review-20260914.json) | 24 张答案可见诊断校准及逐例证据 |
+| [`references/forward-review-20260914.json`](references/forward-review-20260914.json) | 12 张前向查错：72 条分项证据、冻结哈希与具体参考图复核 |
+| [`references/benchmark-v5-plan.json`](references/benchmark-v5-plan.json) | 历史 180 张 v5 预注册计划，现用于审计 |
 | [`scripts/`](scripts/) | 检索、图像探针、报告渲染、数据校验与盲测工具 |
 
 完整 benchmark 图片和工作包不会提交到仓库；Git 只跟踪来源身份、许可证元数据、变换、答案键哈希、冻结响应、评分与报告。
@@ -138,7 +150,7 @@ python3 scripts/validate_knowledge.py
 python3 scripts/validate_knowledge.py --release
 ```
 
-它目前会按设计失败，因为旧报告已经作废，而新的来源隔离盲测尚未完成。结构完整不等于效果已经得到验证。
+它目前仍会失败，因为旧报告已经作废，12 张前向查错也不满足完整发布门槛。结构完整不等于效果已经得到验证。
 
 ## 明确不做
 

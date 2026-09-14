@@ -53,15 +53,23 @@ def response_files(run_dir: Path) -> dict[str, Path]:
     return {item["case_id"]: Path(item["response_path"]) for item in inputs}
 
 
-def init_grades(run_dir: Path, destination: Path) -> int:
-    cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
+def init_grades(
+    run_dir: Path,
+    destination: Path,
+    cases_path: Path = CASES_PATH,
+) -> int:
+    cases = {case["id"]: case for case in load_jsonl(cases_path)}
     responses = response_files(run_dir)
     inputs = {item["case_id"]: item for item in load_jsonl(run_dir / "blind-inputs.jsonl")}
     run_path = run_dir / "run.json"
     if run_path.exists():
         run = json.loads(run_path.read_text(encoding="utf-8"))
         if run.get("annotation_audit_required") is True:
-            audit_errors = validate_audit(run_dir, run_dir / "annotation-audit.jsonl")
+            audit_errors = validate_audit(
+                run_dir,
+                run_dir / "annotation-audit.jsonl",
+                cases_path=cases_path,
+            )
             if audit_errors:
                 print(
                     f"ERROR: freeze refused; {len(audit_errors)} annotation-audit issue(s)",
@@ -194,24 +202,34 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_dir", type=Path)
     parser.add_argument("--grades", type=Path)
+    parser.add_argument(
+        "--cases",
+        type=Path,
+        default=CASES_PATH,
+        help="Answer-key JSONL; defaults to references/benchmark-cases.jsonl",
+    )
     parser.add_argument("--init", action="store_true", help="Create a grade template after responses are frozen")
     parser.add_argument("--output", type=Path, help="Report path; defaults to RUN_DIR/report.json")
     args = parser.parse_args()
     grades_path = args.grades or args.run_dir / "grades.jsonl"
     if args.init:
-        return init_grades(args.run_dir, grades_path)
+        return init_grades(args.run_dir, grades_path, args.cases)
 
-    cases = {case["id"]: case for case in load_jsonl(CASES_PATH)}
+    cases = {case["id"]: case for case in load_jsonl(args.cases)}
     responses = response_files(args.run_dir)
     run = json.loads((args.run_dir / "run.json").read_text(encoding="utf-8"))
     errors: list[str] = []
-    if run.get("benchmark_cases_sha256") != sha256(CASES_PATH):
+    if run.get("benchmark_cases_sha256") != sha256(args.cases):
         errors.append("benchmark answer key changed after the run was prepared")
     if set(responses) != set(cases):
         errors.append("blind packet case IDs do not match the current benchmark")
     annotation_audit_passed = False
     if run.get("annotation_audit_required") is True:
-        audit_errors = validate_audit(args.run_dir, args.run_dir / "annotation-audit.jsonl")
+        audit_errors = validate_audit(
+            args.run_dir,
+            args.run_dir / "annotation-audit.jsonl",
+            cases_path=args.cases,
+        )
         errors.extend(f"annotation audit: {error}" for error in audit_errors)
         annotation_audit_passed = not audit_errors
     for case_id, path in responses.items():

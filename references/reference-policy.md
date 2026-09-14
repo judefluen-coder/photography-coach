@@ -2,13 +2,13 @@
 
 ## Goal
 
-A reference is useful only when it isolates the same photographic problem. Match a method—such as edge control, competing salience, gesture timing, figure-ground separation, tonal layering, or intentional occlusion—not prestige or superficial subject matter.
+A reference is useful only when it isolates a relevant photographic mechanism. Label its purpose: `学修正` the leading problem, `学保留` a specifically protected strength, or `对照边界` why a similar treatment succeeds or fails. Match a method—such as edge control, competing salience, gesture timing, figure-ground separation, tonal layering, or intentional occlusion—not prestige or superficial subject matter. Prefer the leading problem when it is evidenced; a strength reference cannot be presented as its repair example.
 
 ## Eligibility gate
 
 Treat the bundled reference library as a verified starting set, not a closed catalogue. Do not select a card merely because retrieval ranked it highly. Before delivery, require all four conditions:
 
-1. `User-image anchor`: name the two localized things in the user's photograph whose relation created the leading diagnosis.
+1. `User-image anchor`: name the two localized things in the user's photograph whose relation creates the declared learning target, and connect that target to the diagnosis or protection statement.
 2. `Reference-image anchor`: name the two localized things in the candidate photograph that demonstrate the same mechanism.
 3. `Transfer`: give one shooting, selection, or editing experiment that tests that mechanism.
 4. `Anti-imitation`: name one important difference that makes literal copying inappropriate.

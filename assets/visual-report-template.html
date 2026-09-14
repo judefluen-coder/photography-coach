@@ -76,8 +76,9 @@
       object-fit: contain;
       transition: opacity 160ms ease;
     }
-    .photo-stage .treatment { opacity: 0; }
-    .photo-stage[data-mode="treatment"] .source { opacity: 0; }
+    .photo-stage img { opacity: 0; }
+    .photo-stage[data-mode="source"] .source { opacity: 1; }
+    .photo-stage[data-mode="color"] .color { opacity: 1; }
     .photo-stage[data-mode="treatment"] .treatment { opacity: 1; }
     .photo-toolbar {
       display: flex;
@@ -85,10 +86,12 @@
       justify-content: space-between;
       gap: 18px;
       margin-top: 14px;
+      flex-wrap: wrap;
     }
     .tabs {
       display: inline-grid;
-      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
       padding: 4px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -184,13 +187,19 @@
     .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .compare.single { grid-template-columns: 1fr; max-width: 720px; }
     .compare figure { margin: 0; }
+    .compare .combined { grid-column: 1 / -1; width: min(100%, 900px); margin: 16px auto 0; }
+    .version-hint { margin: 12px 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .integrity { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .integrity p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+    .integrity strong { display: block; color: var(--text); margin-bottom: 6px; }
+    .source-credit { margin: 24px clamp(20px,4vw,56px); color: var(--muted); font-size: 13px; }
     .compare img { width: 100%; aspect-ratio: 1.62; object-fit: contain; border-radius: var(--radius); background: #090a09; }
     .compare figcaption { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 12px; }
     .compare figcaption strong { color: var(--text); }
     .edit-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
     .edit-notes h3 { margin-bottom: 8px; font-size: 17px; }
     .edit-notes p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
-    .edit-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .edit-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
     .reference { display: grid; grid-template-columns: 0.6fr 1.4fr; gap: 42px; align-items: start; }
     .reference-title {
       min-height: 230px;
@@ -211,6 +220,21 @@
     summary { cursor: pointer; font-size: 14px; font-weight: 650; }
     details p { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
     footer { padding: 26px clamp(20px, 4vw, 56px) 40px; border-top: 1px solid var(--line); color: var(--faint); font-size: 12px; text-align: center; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .inspection { margin-top: 34px; }
+    .annotated-photo { position: relative; background: #090a09; }
+    .annotated-photo img { width: 100%; height: auto; }
+    .region-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .region { position: absolute; border: 2px solid var(--accent); background: rgba(228,154,102,.12); }
+    .region.crop { border-style: dashed; background: transparent; box-shadow: 0 0 0 2000px rgba(0,0,0,.45); }
+    .inspection-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .inspection-toolbar button, .map-item button, #copyPractice { cursor: pointer; }
+    .inspection-toolbar button[aria-pressed="true"], .map-item.selected { border-color: var(--accent); }
+    .inspection-caption { min-height: 3em; color: var(--muted); font-size: 14px; }
+    .map-item button { margin-top: 10px; padding: 8px 12px; border: 1px solid var(--line); background: transparent; color: var(--accent); border-radius: 8px; }
+    .uncertainty { display: block; margin-top: 6px; color: var(--accent); }
+    .practice-return { margin-top: 22px; color: var(--muted); font-size: 14px; }
+    #practicePrompt { width: 100%; min-height: 110px; padding: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--line); font: inherit; }
     @media (max-width: 1000px) {
       .hero { grid-template-columns: 1fr; min-height: 0; }
       .hero-copy { max-width: 760px; }
@@ -230,7 +254,7 @@
       .lead { font-size: 16px; }
       .report { margin-top: 0; padding: 0 16px 72px; }
       section { padding: 50px 0; }
-      .read-grid, .map, .scores, .compare, .edit-notes { grid-template-columns: 1fr; }
+      .read-grid, .map, .scores, .compare, .edit-notes, .integrity { grid-template-columns: 1fr; }
       .score { grid-template-columns: 128px 1fr; }
       .compare { gap: 28px; }
       .edit-actions { flex-direction: column; }
@@ -250,22 +274,25 @@
         <div class="photo-shell">
           <div class="photo-stage" id="photoStage">
             <img class="source" id="heroSource" alt="用户提交的原始照片">
-            <img class="treatment" id="heroTreatment" alt="裁切并调整影调色彩后的照片">
+            <img class="color" id="heroColor" alt="仅调整影调色彩，保留原图取景">
+            <img class="treatment" id="heroTreatment" alt="调整后的照片，具体改动见下方说明">
           </div>
           <div class="photo-toolbar">
-            <div class="tabs treatment-only" aria-label="照片版本">
+            <div class="tabs edit-only" aria-label="照片版本">
               <button type="button" data-mode="source">看原图</button>
-              <button type="button" data-mode="treatment">看调整后</button>
+              <button class="color-only" type="button" data-mode="color">仅调色</button>
+              <button class="treatment-only" type="button" data-mode="treatment" id="treatmentTab">看调整后</button>
             </div>
-            <a class="button-primary treatment-only" id="heroDownload" download>下载调整后的照片</a>
+            <a class="button-primary edit-only" id="heroDownload" download>下载当前版本</a>
           </div>
+          <p class="version-hint" id="versionHint"></p>
         </div>
         <div class="hero-copy">
           <p class="kicker">先说结论</p>
           <h1 id="title"></h1>
           <p class="lead" id="summary"></p>
           <div class="priority">
-            <span class="priority-label">先改这一件事</span>
+            <span class="priority-label" id="decisionLabel">先改这一件事</span>
             <strong id="priorityTitle"></strong>
             <p id="priorityBody"></p>
           </div>
@@ -280,9 +307,15 @@
           <p id="strengthBody"></p>
         </div>
         <div class="read-grid">
-          <div class="main-read"><small>真正卡住画面的地方</small><h3 id="readPriorityTitle"></h3><p id="readPriorityBody"></p></div>
+          <div class="main-read"><small id="readDecisionLabel">真正卡住画面的地方</small><h3 id="readPriorityTitle"></h3><p id="readPriorityBody"></p></div>
           <div class="keep-read"><small>调整时要保住</small><h3 id="strengthTitle"></h3><p id="strengthBodyRepeat"></p></div>
         </div>
+        <div class="inspection" id="inspection" hidden>
+          <div class="annotated-photo"><img id="inspectionSource" alt="原图：点评标记仅标示所讨论的区域"><div class="region-layer" id="regionLayer" aria-hidden="true"></div></div>
+          <div class="inspection-toolbar"><button class="button-quiet" id="clearRegions" type="button">隐藏标记</button><button class="button-quiet" id="showCrop" type="button" aria-pressed="false" hidden>看建议裁切范围</button></div>
+          <p class="inspection-caption" id="regionCaption" aria-live="polite">点击下方点评的“在照片上看”，对照具体位置。</p>
+        </div>
+        <div id="integritySection" hidden><h3>完整性六检</h3><div class="integrity" id="integrityChecks"></div></div>
         <div class="map" id="observationMap"></div>
       </section>
 
@@ -303,13 +336,15 @@
         <div class="section-head"><h2 id="editTitle"></h2><p id="editSummary"></p></div>
         <div class="compare" id="compare">
           <figure><img id="compareSource" alt="调整前的原始照片"><figcaption><strong>原图</strong><span>保留文件</span></figcaption></figure>
-          <figure class="treatment-only"><img id="compareTreatment" alt="裁切并调整影调色彩后的照片"><figcaption><strong>调整后</strong><span>可下载</span></figcaption></figure>
+          <figure class="color-only"><img id="compareColor" alt="仅调色，保留原图取景"><figcaption><strong>仅调色</strong><span>同一取景，单看颜色和明暗</span></figcaption></figure>
+          <figure class="treatment-only" id="treatmentFigure"><img id="compareTreatment" alt="调整后的照片"><figcaption><strong id="treatmentCaption">调整后</strong><span>可下载</span></figcaption></figure>
         </div>
         <div class="edit-notes">
-          <div><h3>我具体动了什么</h3><p id="editRecipe"></p></div>
+          <div><h3 id="editRecipeTitle"></h3><p id="editRecipe"></p></div>
           <div><h3>这一步修不了什么</h3><p id="editLimit"></p></div>
         </div>
         <div class="edit-actions">
+          <a class="button-primary color-only" id="downloadColor" download>下载仅调色</a>
           <a class="button-primary treatment-only" id="downloadTreatment" download>下载调整后</a>
           <a class="button-quiet" id="downloadSource" download>下载原图</a>
         </div>
@@ -326,10 +361,12 @@
       <section aria-labelledby="practiceTitle">
         <div class="section-head"><h2 id="practiceTitle">30 分钟练习</h2><p>只练一个变量，并给照片一个看得见的通过条件。</p></div>
         <p class="practice"><strong id="exerciseTitle"></strong> <span id="exerciseInstructions"></span></p>
+        <div class="practice-return"><p>练完后，把新照片和下面的练习说明一起发回摄影教练，复盘这次练习有没有改善。这个报告页本身不接收上传。</p><button type="button" class="button-quiet" id="copyPractice">复制复盘说明</button><p id="copyStatus" role="status"></p><textarea id="practicePrompt" aria-label="复盘说明，可手动复制" readonly hidden></textarea></div>
         <details><summary>事实边界</summary><p id="boundaryNote"></p></details>
       </section>
     </div>
   </main>
+  <p class="source-credit" id="sourceCredit" hidden><span id="creditAuthor"></span> · <a id="creditSource" target="_blank" rel="noreferrer">原图出处</a> · <a id="creditLicense" target="_blank" rel="noreferrer"></a>。<span id="creditChanges"></span></p>
   <footer id="researchStatus"></footer>
 
   <script id="reportData" type="application/json">__REPORT_JSON__</script>
@@ -339,6 +376,24 @@
     const source = data.source_asset;
     const treatment = data.treatment_asset || '';
     const hasTreatment = Boolean(treatment);
+    const color = data.color_asset || '';
+    const hasColor = Boolean(color);
+    const hasEdit = hasColor || hasTreatment;
+    const treatmentLabel = hasColor ? (data.edit.crop_region ? '裁切＋调色' : '综合调整') : '调整后';
+    text('#treatmentTab', treatmentLabel);
+    text('#treatmentCaption', treatmentLabel);
+    text('#downloadTreatment', `下载${treatmentLabel}`);
+    text('#versionHint', hasColor
+      ? '先切原图 / 仅调色，单看颜色和明暗。再看其他调整；下载为对应版本的完整文件。'
+      : hasTreatment ? '当前只有原图与调整后两版，未单独提供仅调色对照。' : '当前没有可交付的修图文件，下方为调整建议。');
+    const decisionLabels = {
+      STRUCTURAL_BOTTLENECK: ['先改这一件事', '最值得先处理的地方'],
+      CONDITIONAL_BRANCH: ['先选你更想表达什么', '两种取舍'],
+      NO_STRUCTURAL_BOTTLENECK: ['可以试试，不必硬改', '一个可选的小调整']
+    };
+    const decisionLabelsForReport = decisionLabels[data.decision] || decisionLabels.STRUCTURAL_BOTTLENECK;
+    text('#decisionLabel', decisionLabelsForReport[0]);
+    text('#readDecisionLabel', decisionLabelsForReport[1]);
 
     document.title = `${data.title} | Photography Coach`;
     text('#title', data.title);
@@ -354,7 +409,8 @@
     text('#reshootEffect', data.reshoot.effect);
     text('#reshootCost', data.reshoot.cost);
     text('#reshootAvailability', data.reshoot.availability);
-    text('#editTitle', hasTreatment ? '我已经直接帮你调了一版' : '这张可以怎样调整');
+    text('#editTitle', hasEdit ? '我已经直接帮你调了一版' : '这张可以怎样调整');
+    text('#editRecipeTitle', hasEdit ? '我具体动了什么' : '建议怎样动手');
     text('#editSummary', data.edit.summary);
     text('#editRecipe', `${data.edit.crop} ${data.edit.tone_color}`);
     text('#editLimit', data.edit.limit);
@@ -367,27 +423,78 @@
     text('#exerciseInstructions', data.exercise.instructions);
     text('#boundaryNote', data.boundary_note);
     text('#researchStatus', data.research_status);
+    if (data.integrity) {
+      document.querySelector('#integritySection').hidden = false;
+      data.integrity.forEach(check => {
+        const row = document.createElement('p');
+        const label = document.createElement('strong');
+        label.textContent = `${check.family} · ${check.verdict}`;
+        const basis = document.createElement('span');
+        basis.textContent = check.basis;
+        row.append(label, basis);
+        document.querySelector('#integrityChecks').append(row);
+      });
+    }
+    if (data.source_credit) {
+      document.querySelector('#sourceCredit').hidden = false;
+      text('#creditAuthor', data.source_credit.author);
+      text('#creditLicense', data.source_credit.license);
+      text('#creditChanges', data.source_credit.changes);
+      document.querySelector('#creditSource').href = data.source_credit.url;
+      document.querySelector('#creditLicense').href = data.source_credit.license_url;
+    }
 
     document.querySelector('#heroSource').src = source;
     document.querySelector('#compareSource').src = source;
-    document.querySelector('#downloadSource').href = source;
+    document.querySelector('#downloadSource').href = data.source_download;
     document.querySelector('#downloadSource').download = `photography-coach-source.${data.source_extension}`;
     document.querySelector('#referenceLink').href = data.reference.url;
 
-    if (hasTreatment) {
-      document.querySelector('#heroTreatment').src = treatment;
-      document.querySelector('#compareTreatment').src = treatment;
-      document.querySelector('#heroDownload').href = treatment;
-      document.querySelector('#downloadTreatment').href = treatment;
-      document.querySelector('#heroDownload').download = `photography-coach-treatment.${data.treatment_extension}`;
-      document.querySelector('#downloadTreatment').download = `photography-coach-treatment.${data.treatment_extension}`;
-    } else {
-      document.querySelectorAll('.treatment-only').forEach((element) => element.hidden = true);
-      document.querySelector('#compare').classList.add('single');
+    for (const [kind, available] of [['color', hasColor], ['treatment', hasTreatment]]) {
+      document.querySelectorAll(`.${kind}-only`).forEach(element => element.hidden = !available);
+      if (!available) continue;
+      const suffix = kind === 'color' ? 'Color' : 'Treatment';
+      document.querySelector(`#hero${suffix}`).src = data[`${kind}_asset`];
+      document.querySelector(`#compare${suffix}`).src = data[`${kind}_asset`];
+      document.querySelector(`#download${suffix}`).href = data[`${kind}_download`];
+      document.querySelector(`#download${suffix}`).download = `photography-coach-${kind}.${data[`${kind}_extension`]}`;
     }
+    document.querySelectorAll('.edit-only').forEach(element => element.hidden = !hasEdit);
+    if (!hasEdit) document.querySelector('#compare').classList.add('single');
+    if (hasColor && hasTreatment) document.querySelector('#treatmentFigure').classList.add('combined');
 
+    const inspection = document.querySelector('#inspection');
+    const regionLayer = document.querySelector('#regionLayer');
+    const cropButton = document.querySelector('#showCrop');
+    inspection.hidden = !data.observations.some(item => item.regions?.length) && !data.edit.crop_region;
+    document.querySelector('#inspectionSource').src = source;
+    const clearRegions = () => {
+      regionLayer.replaceChildren();
+      document.querySelectorAll('.map-item').forEach(item => item.classList.remove('selected'));
+      document.querySelectorAll('.map-item button').forEach(button => button.setAttribute('aria-pressed', 'false'));
+      cropButton.setAttribute('aria-pressed', 'false');
+    };
+    const addRegion = (region, crop = false) => {
+      const box = document.createElement('div');
+      box.className = crop ? 'region crop' : 'region';
+      Object.entries({left: region.x, top: region.y, width: region.width, height: region.height}).forEach(([key, value]) => box.style[key] = `${value * 100}%`);
+      regionLayer.append(box);
+    };
+    document.querySelector('#clearRegions').addEventListener('click', () => {
+      clearRegions();
+      text('#regionCaption', '已隐藏标记。你可以继续查看其他点评。');
+    });
+    if (data.edit.crop_region) {
+      cropButton.hidden = false;
+      cropButton.addEventListener('click', () => {
+        const active = cropButton.getAttribute('aria-pressed') === 'true';
+        clearRegions();
+        if (!active) { addRegion(data.edit.crop_region, true); cropButton.setAttribute('aria-pressed', 'true'); }
+        text('#regionCaption', active ? '已隐藏裁切范围。' : `虚线内为保留区域。${data.edit.crop}`);
+      });
+    }
     const map = document.querySelector('#observationMap');
-    data.observations.forEach((observation) => {
+    data.observations.forEach((observation, index) => {
       const item = document.createElement('div');
       item.className = `map-item${observation.priority === '首要' ? ' primary' : ''}`;
       const label = document.createElement('div');
@@ -400,6 +507,23 @@
       body.textContent = observation.text;
       label.append(strong, small);
       item.append(label, body);
+      if (observation.regions?.length) {
+        const locate = document.createElement('button');
+        locate.type = 'button';
+        locate.textContent = `${index + 1}. 在照片上看`;
+        locate.setAttribute('aria-label', `在照片上看：${observation.label}`);
+        locate.setAttribute('aria-pressed', 'false');
+        locate.setAttribute('aria-controls', 'regionLayer');
+        locate.addEventListener('click', () => {
+          clearRegions();
+          observation.regions.forEach(region => addRegion(region));
+          item.classList.add('selected');
+          locate.setAttribute('aria-pressed', 'true');
+          text('#regionCaption', `${observation.label}：${observation.text}`);
+          inspection.scrollIntoView({block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+        });
+        item.append(locate);
+      }
       map.append(item);
     });
 
@@ -415,6 +539,12 @@
       value.textContent = score.interval;
       const reason = document.createElement('p');
       reason.textContent = score.reason;
+      if (score.uncertainty) {
+        const uncertainty = document.createElement('span');
+        uncertainty.className = 'uncertainty';
+        uncertainty.textContent = `暂不能确定：${score.uncertainty}`;
+        reason.append(uncertainty);
+      }
       title.append(value);
       item.append(title, reason);
       scores.append(item);
@@ -423,11 +553,32 @@
     const stage = document.querySelector('#photoStage');
     const buttons = document.querySelectorAll('.tabs button');
     const setMode = (mode) => {
+      if (!data[`${mode}_asset`]) return;
       stage.dataset.mode = mode;
       buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+      for (const kind of ['source', 'color', 'treatment']) {
+        const suffix = kind[0].toUpperCase() + kind.slice(1);
+        document.querySelector(`#hero${suffix}`).setAttribute('aria-hidden', String(kind !== mode));
+      }
+      const download = document.querySelector('#heroDownload');
+      download.href = data[`${mode}_download`];
+      download.download = `photography-coach-${mode}.${data[`${mode}_extension`]}`;
     };
     buttons.forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
-    setMode(hasTreatment ? 'treatment' : 'source');
+    setMode(hasColor ? 'color' : hasTreatment ? 'treatment' : 'source');
+    const practicePrompt = document.querySelector('#practicePrompt');
+    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
+    document.querySelector('#copyPractice').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(practicePrompt.value);
+        text('#copyStatus', '已复制。发新照片时粘贴这段说明即可。');
+      } catch {
+        practicePrompt.hidden = false;
+        practicePrompt.focus();
+        practicePrompt.select();
+        text('#copyStatus', '浏览器未允许自动复制，请复制下面选中的文字。');
+      }
+    });
   </script>
 </body>
 </html>

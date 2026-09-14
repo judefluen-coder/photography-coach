@@ -20,7 +20,7 @@ Complete this visual snapshot before reading quantitative results:
 - `边缘唯一项`: scan all four edges for unique objects, clipped modules, and line endpoints.
 - `尺度锚点`: name a small or distant element that makes relative scale legible, or state that none is reliable.
 
-Do not let later probe strength change this ledger without reopening the image. In ordinary chat this remains a silent seeing routine; benchmark/audit responses expose one compact `场景拓扑快照` line.
+Do not let later probe strength change this ledger without reopening the image. Before delivery, cross-check any claimed count, truncation, or relative margin against every relevant unit, not just a representative pair. Distinguish `完整`, `贴边`, `出画`, and `遮挡`; reconcile contradictions between the opening, edge ledger, and advice. Use measured or clearly visible proportions only: an invented “less than one ear-width” can manufacture a defect. In ordinary chat this remains a silent seeing routine; benchmark/audit responses expose one compact `场景拓扑快照` line.
 
 ## Quantitative attention probe
 
@@ -57,12 +57,14 @@ When the image is a local file, run `python3 scripts/analyze_image_integrity.py 
 
 - Check the brightest repeated surfaces, skin patches, clouds, reflections, lamps, signs, and pale objects for retained edge, texture, and color variation.
 - Distinguish a small specular point from a broad pale region whose shape or material is needed.
+- Describe only the surviving contours and their visible interruption. A white gap does not prove that an unseen head, limb, ornament, or texture originally existed there.
 - Falsifier: clipping is confined to plausible speculars or intentional white fields while adjacent important highlights retain form.
 
 ## 4. Color excess or cast
 
 - Find likely neutral or low-chroma anchors and compare them across the frame; avoid assuming an object's real-world color when uncertain.
 - Check whether several unrelated surfaces drift toward the same warm/cool hue, or whether saturated areas lose internal hue/value variation.
+- Test colour loss on colour evidence: readable poses or object outlines do not disprove merged hues or colour competition. Conversely, vivid colour alone does not prove a structural failure.
 - Compare the color treatment's structural job with a neutral mental alternative: does it separate planes and guide attention, or merely coat everything with mood?
 - Falsifier: repeated surfaces retain distinct hue/value relationships, neutral anchors are coherent with the light, and saturation has a clear hierarchy.
 
@@ -71,9 +73,9 @@ When the image is a local file, run `python3 scripts/analyze_image_integrity.py 
 - Use at least two independent stability references: a true horizon, waterline, hanging vertical, repeated architecture, door frame, or other plausibly level/plumb structure.
 - Separate camera roll from sloping ground and normal perspective convergence. Never level from a single uncertain line.
 - State whether the independent references show common roll (`是/否/不确定`) and separately test where perspective lines converge. Convergence explains depth; it does not by itself prove that the frame is level.
-- Run a signed counter-rotation test: identify one reliable horizontal and one reliable vertical, predict the same corrective rotation direction for both, and check whether the correction also reduces rather than worsens collateral edge pressure. Hills, roads, trees, curved facades, or a lone converging edge are not reliable by themselves.
+- Run a signed counter-rotation test: identify one reliable horizontal and one reliable vertical and predict the same corrective rotation direction for both. Describe endpoints before using clockwise/counterclockwise: for a genuinely vertical reference whose top is image-left of its base, clockwise correction moves the top toward alignment; for a top image-right of its base, counterclockwise does. Check this against the horizontal reference and any actual preview; do not infer direction from a tool's signed angle convention. Assess collateral edge pressure separately. Hills, roads, trees, curved facades, or a lone converging edge are not reliable by themselves.
 - Check whether the suspected roll co-occurs with squeezed corners, uneven headroom, clipped geometry, or lost trajectory space. Co-occurrence strengthens the candidate.
-- Falsifier: the reliable horizontal and vertical do not improve together under one counter-rotation, or the proposed correction worsens edge pressure; the visible orientation is then unsupported as common repairable roll.
+- Geometry falsifier: the reliable horizontal and vertical do not improve together under one counter-rotation. Treat collateral crop separately: if the axes improve but edge pressure worsens, common roll may still be evidenced while repair in the current file is constrained or unavailable without original-file margin.
 
 ## 6. Detail damage
 

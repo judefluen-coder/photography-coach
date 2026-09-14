@@ -23,6 +23,7 @@ All text uses the user's language. `source_image` and `treatment_image` may be a
 {
   "title": "画面有三层，但主次还没站稳。",
   "source_image": "/absolute/path/source.jpg",
+  "color_image": "/absolute/path/color-only.png",
   "treatment_image": "/absolute/path/treatment.jpg",
   "summary": "Two or three short sentences in plain language.",
   "priority": {
@@ -71,11 +72,22 @@ All text uses the user's language. `source_image` and `treatment_image` may be a
 
 ## Validation rules
 
+- Optional `decision` is one of `STRUCTURAL_BOTTLENECK`, `CONDITIONAL_BRANCH`, or `NO_STRUCTURAL_BOTTLENECK`; it changes the leading labels so a sound photograph is not presented as broken.
+- Each observation may include `regions`, up to four rectangles `{ "x": 0.1, "y": 0.2, "width": 0.3, "height": 0.2 }`. Coordinates are fractions of the original image from its top-left. Identify regions by inspecting the image. Multiple rectangles can explain a distance or relationship. The page displays these only on its dedicated original-image view, never over cropped output.
+- `edit.crop_region` uses the same coordinates and marks the retained area. It must describe the actual crop when a treatment is supplied.
+- Each score may carry a plain-language `uncertainty` string. Do not invent confidence percentages.
+- Optional `integrity` carries six `{ "family": "暗部", "verdict": "观察", "basis": "Localized evidence" }` records, ordered as `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, `细节`; use only `通过`, `观察`, or `问题`. Supply it for new critiques so the six-check summary survives rendering; older reports without it remain supported.
+- For third-party example images, `source_credit` carries `author`, direct `url`, `license`, `license_url`, and `changes` (including derivative-license terms and no endorsement). It is displayed as text and validated links, never raw HTML. Preserve attribution when moving an example from a custom page into the common renderer.
+- The practice section copies a self-contained follow-up prompt for use with a new photograph in Codex. It is not an upload endpoint or automatic progress tracker.
+
 - Include exactly the eight stable score dimensions from `response-card.md`; never add a total.
 - Include six to nine prioritized observations. Use exactly one `首要`, two to five `次要`, and at least one `要保护`.
 - Keep the first screen to the photograph, judgment, summary, priority, and treatment control.
-- Default to the treatment view only when `treatment_image` exists and passed source comparison.
-- Show source and treatment side by side later in the report and make both downloadable.
+- Optional `color_image` is an inspected full-frame color-only master, not a crop or a generated approximation. When both it and `treatment_image` are supplied, the latter is the combined treatment; `edit.crop_region` describes its actual crop. Do not force cropping where there is no useful crop.
+- The renderer supports source-only, source + color-only, legacy source + treatment, and all three. Missing versions are hidden, never replaced with copies of the source. Legacy reports remain readable and explicitly say when color was not separately supplied.
+- Default to color-only when supplied, otherwise treatment when supplied, otherwise source. The current-version download follows the selection. All supplied masters have their own download links.
+- Optional `source_preview_image`, `color_preview_image`, and `treatment_preview_image` provide smaller display exports of their corresponding masters. A preview requires its master; do not substitute it for the full-size download. The renderer copies both into the output so the report remains portable, and creates asset/download paths itself. Do not hand-author `*_asset` or `*_download` fields.
+- Compare source and color-only at identical framing and scale; show the combined version separately when present. The renderer checks paths and structure, not pixel fidelity, matching framing, edit quality, or whether the crop was actually derived from the color-only master; these require source/result inspection and, where feasible, pixel checks before rendering.
 - Never show a generated approximation as a develop. If content changed, omit it and render the exact recipe instead.
 - Link one exact verified reference by default. Do not embed it unless its specific license permits redistribution.
 - Treat the bundled reference library as a starting set, not a ceiling. Use an externally verified exact work when no bundled card clears the reference fit gate.

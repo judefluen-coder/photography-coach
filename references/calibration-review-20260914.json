@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "review_type": "answer-aware_purposive_calibration",
+  "reviewer": "gpt-5.6-sol-high",
+  "revision_reviewer": "gpt-6-astra-high",
+  "revision_note": "GPT-6 rechecked nine disputed/action cases and four protected cases; see gpt6-final-review-20260914.md. Corrections to anchors and action findings are retained here; frozen responses and answer keys were not edited.",
+  "review_date": "2026-09-14",
+  "benchmark_cases_sha256": "13da852ad0452820223de521f716b6f11c60129123e9ffd60c00b44b30414a4d",
+  "run_manifest_sha256": "61f0f8186ea776b1b5d93b5317a33b6430508da15b16bd0d3f0a6e29a5caf339",
+  "limitations": [
+    "This calibration is answer-aware and has already influenced diagnosis; it is not an independent blind evaluation.",
+    "The 24 cases are purposively selected for error analysis and cannot establish a representative pass rate.",
+    "This pass reviews image-to-diagnosis alignment only. Reference quality, all score dimensions, and complete response compliance remain unreviewed unless a case note says otherwise.",
+    "The viewing surface may resize large images; pixel-level findings that cannot be settled at the available display scale remain unresolved rather than forced into pass/fail."
+  ],
+  "status_values": {
+    "diagnosis_supported": "The response's main diagnosis is supported by localized visible evidence.",
+    "diagnosis_partial": "The response notices the family but overstates, understates, or localizes it poorly.",
+    "diagnosis_miss": "The response rejects or omits a visible, consequential issue.",
+    "overcorrection": "The response promotes a defensible existing relationship into a structural defect without proving information or relationship loss.",
+    "key_disputed": "The answer key treats a defensible visual choice as an unambiguous failure.",
+    "unresolved_resolution": "Available viewing scale is insufficient to settle a pixel-level disagreement."
+  },
+  "cases": [
+    {
+      "case_id": "v5-018",
+      "image_sha256": "79476a142bb37a1b91a370a7094bfedad4a773e03ff282d6a02cdd2847f97bf2",
+      "response_sha256": "db764656f5ca7b57a01cbbd2a33bae43feeeaf185d66a7e4bb59c9539056d020",
+      "status": "key_disputed",
+      "response_quote": "watch item 是长轴两端余量略短，但两件完整、界面和比较关系成立。",
+      "visible_anchors": ["两件褐色端头均在框内，其中画面位置更低的一件更接近右缘", "黄色端头均完整，其中最低端接近下缘；左上有大片黑场"],
+      "finding": "边距不均是事实；回答已经指出并建议增加端头余量。把它一概判为未识别的裁切损坏缺乏依据。",
+      "change_implication": "分别判断边缘紧迫、真实截断和核心关系损失。"
+    },
+    {
+      "case_id": "v5-156",
+      "image_sha256": "3fc4c14922432f97d1f7a8e7d6ba896fa4939383d123283304885b373e0a05ea",
+      "response_sha256": "63d53c486c507a2971844bfed0603a9d213e2952195f47d483d81476a6149a41",
+      "status": "diagnosis_supported",
+      "response_quote": "现有图可以用作局部展示，但若声称完整记录，底座缺失构成结构性问题。",
+      "visible_anchors": ["冠顶上方留有背景", "最下方台座被下缘直接截断而双脚仍可辨"],
+      "finding": "底座截断可见，按完整记录用途提示扩大取景合理；用途条件必须保留。",
+      "change_implication": "分别说明局部展示与完整记录的代价，不把完整底座变成所有雕塑照片的硬规则。"
+    },
+    {
+      "case_id": "v5-017",
+      "image_sha256": "7412a440585e4b03333f9b90b546a27ac69917ab4423140af7ce6ca1f7dca98e",
+      "response_sha256": "6f429bdc231e61170b9aee2284897b233c9907a10881d1d7126e6003f9f6a3d9",
+      "status": "diagnosis_partial",
+      "response_quote": "暗面：顶部背景与右后石块接近黑；反证：头冠外缘、右肩轮廓和石块接缝仍可分，关键形体没有融入同一黑面。",
+      "visible_anchors": ["顶部和右后外侧区域近黑，部分纹理不可辨", "中央象鼻、手指、衣饰与膝部纹理仍清楚"],
+      "finding": "回答正确保护主体，但用主体可辨证明整类暗部通过并不充分；顶部和右后局部纹理不可辨，应列为观察。仅凭此成片不能确认那里原有多少纹理或恢复是否必要。",
+      "change_implication": "按区域报告损失，并区分技术状态与修复优先级。"
+    },
+    {
+      "case_id": "v5-046",
+      "image_sha256": "95c8aead7aef2a50592124fdbb2fd720842dd0c050a881bb19d3d6c4c1484d5c",
+      "response_sha256": "53c1cfdc56fbe37e330c8df07d784fa5f518e8bb6aa9de61405de5a762c9a506",
+      "status": "diagnosis_partial",
+      "response_quote": "最需要处理的是右半树林的暗部压缩：它不只是“风格偏暗”，而是让多个深度面的树干和枝叶变成同一黑块。",
+      "visible_anchors": ["中央下方林间存在近黑间隙", "右中粗树干和中央多根浅色细树干仍清楚，左下坡面颗粒可辨"],
+      "finding": "暗部偏重有依据，但把多层树干整体说成同一黑块范围过大。",
+      "change_implication": "将暗部损失限定到具体区域，避免把局部不可见扩大成全局层次消失。"
+    },
+    {
+      "case_id": "v5-002",
+      "image_sha256": "0be6e4e3e9ac76094bdbe09b10d5c25c9da9e30795b727236fecffe164734ba7",
+      "response_sha256": "59719738b59e1cdf95157cd81e0c6cf9827fd4caf92f798c28faaa4098567137",
+      "status": "diagnosis_supported",
+      "response_quote": "首要瓶颈是池面跨越多个深度层的大面积高光剪切，它让材料信息实际消失，优先级高于人物贴边。",
+      "visible_anchors": ["前景与中景多块浅色池格内部呈大面积无纹理白面", "褐色边壁和左右山坡仍连续，人物小单元仍提供尺度"],
+      "finding": "大面积亮部内部信息丢失可见，回答也保护了仍在的收束结构与尺度关系。",
+      "change_implication": "保留局部反证，并避免从池格外观推断内容物或生产过程。"
+    },
+    {
+      "case_id": "v5-169",
+      "image_sha256": "13fc8474d2ac4db3cd79c5da00875c054d58b12e5f80358aa1cac6f085ab237b",
+      "response_sha256": "1edfcb3f7c377291c59e73b266a2fb84d3a6251758f8c846abc9128e95154dff",
+      "status": "diagnosis_supported",
+      "response_quote": "先检查原始文件能否回收白位；若只有当前像素，只能压低白形亮度，不能恢复结构。",
+      "visible_anchors": ["头肩内部大面积接近纯白，眼鼻口和胸肩塑形消失", "深绿背景仍托出头部、颈肩外轮廓"],
+      "finding": "高光损失和无法从成片恢复结构的边界判断合理。",
+      "change_implication": "重拍曝光建议应根据直方图或包围曝光反馈，不把未知现场量写成精确必然值。"
+    },
+    {
+      "case_id": "v5-004",
+      "image_sha256": "2c9dc7c847a42fe90fe6d1327f3249c4c9e11bb96c2172ad497ab6620ac8b98f",
+      "response_sha256": "7f650d93f314343bc3e19508ffdd54046730a0cc19eee673c6298a19854d857c",
+      "status": "diagnosis_partial",
+      "response_quote": "没有结构损坏；绿色体量过大是 watch item。强饱和没有吃掉材质，不该机械地全部去色，先让红色核心重新占主导。",
+      "visible_anchors": ["红色圆片、亮绿叶片和粉色桌布同时醒目", "叶脉、盘沿、白色碎块和红片表面仍可分"],
+      "finding": "回答看到了颜色竞争并给出降饱和方案，但材质尚可辨不足以单独证明色彩层级受控。多块鲜色同时醒目可列为观察；红色必须占主导是目的选择，不能仅凭鲜艳认定信息损坏。",
+      "change_implication": "色彩过强与材质完全丢失不是同一阈值；可以标为观察或问题而不必宣布整张结构损坏。"
+    },
+    {
+      "case_id": "v5-123",
+      "image_sha256": "5a71a724fd231e0074b9ab10c761444a960c2e5abeb780d0b02178325825f69e",
+      "response_sha256": "28ce1d2bd8af7bb93861f4961cbbfbf0d164e90ce0d46b8786f39741d6d2c246",
+      "status": "diagnosis_supported",
+      "response_quote": "红衣、青蓝袖和亮绿草地同级饱和，肤色偏橙红，削弱球—手—脸的注意力次序。",
+      "visible_anchors": ["红蓝服装、橙红肤色与亮绿草地同时高饱和", "球、号码和手势轮廓仍清楚"],
+      "finding": "主要色彩诊断有依据；但回答反复把画面中央人物伸向画面右侧的手称为右手，解剖侧别缺少可靠依据。",
+      "change_implication": "不确定身体侧别时使用画面左侧/右侧，避免把空间位置误写成人体左右。"
+    },
+    {
+      "case_id": "v5-019",
+      "image_sha256": "18542c26e1715f051b4dfccdc8c8ab0088c41b7a869ed900e8238e5a209aa3a8",
+      "response_sha256": "26086b90291f507dca4a19d0f60ca29eea67dd62f78a7776d4d5951434f2f700",
+      "status": "unresolved_resolution",
+      "response_quote": "细节｜通过｜同尺度：近景两块石形与邻近碎石均有自然纹理；关键接口：石形底部—地面；",
+      "visible_anchors": ["缩放后的全景中石柱轮廓、孔洞和地表草茎仍可辨", "原文件横向 8489 像素，当前查看面被缩至 2048 像素"],
+      "finding": "现有查看尺度不能可靠裁决答案键所称的普遍软化，也不能据此确认回答的细节通过。GPT-6 另以 original 模式复看，但查看工具仍将 8489 像素宽的原图缩为 4911 像素；轮廓可辨，像素级结论保持未决。需同尺度像素局部或与未降质原图对照。",
+      "change_implication": "像素级争议在查看尺度不足时保持未决，不用答案配方替代成片观察。"
+    },
+    {
+      "case_id": "v5-132",
+      "image_sha256": "ee4833a25699f677f67a3b0083cffafbb262a000525ad44c0242c7eb0e12c516",
+      "response_sha256": "3e04d2869519842ef448fd374c68fda0b13cbd9de12b165a1eb7c1d84e58bfee",
+      "status": "diagnosis_supported",
+      "response_quote": "首要瓶颈是跨越多个景深层的细节损失。前景铭牌本应最容易读，却与后方窗框、屋瓦和树叶一起发软；",
+      "visible_anchors": ["前景铭牌文字边缘无法清晰辨认", "远处塔窗、屋瓦与两侧树叶也呈扩散柔化"],
+      "finding": "细节损失跨越近中远多层，回答正确排除了只由景深造成的局部柔化。",
+      "change_implication": "保留同尺度、多深度面的比较方式。"
+    },
+    {
+      "case_id": "v5-111",
+      "image_sha256": "7a20fdd7675bdc7199a76980f5d8ae403c389ea48d8020d7083438ad05d2552e",
+      "response_sha256": "7a3c651381a27d74497e06ac3070d1a67d1630756039168f9bad0a60924909cb",
+      "status": "diagnosis_miss",
+      "response_quote": "透视收束是表达资源而非错误；画面没有结构性瓶颈，只需测试如何让横向电线少挡住向上的通道。",
+      "visible_anchors": ["右墙排水管的上端在下端的画面右侧，远处黄色开口的竖边也向右上偏", "远处开口的短横边向画面右上抬升，与向右上偏的竖边构成可共同逆时针试校的参照；左右近墙另有透视收束"],
+      "finding": "回答用仰拍汇聚排除了整幅旋转，却没有解释远处横竖参照的同向偏转。应先试校并比较透视与滚转，不宜断言轴线通过。前版审查的左倾和右窗截断定位不可靠，已撤回。",
+      "change_implication": "轴线是否滚转与校正后是否需要裁边必须分开判断；裁边代价影响修复方案，不应反过来否认已存在的滚转。"
+    },
+    {
+      "case_id": "v5-118",
+      "image_sha256": "c06385d90f563ee402a25c483e669eff7985a342ca0f1334cceebc07eb2f235a",
+      "response_sha256": "3ad3ccbcc40985d971055ea74c3191e5f80598869e230284c7ceddd10557c7c5",
+      "status": "diagnosis_supported",
+      "response_quote": "这张照片存在结构瓶颈：全局滚转。它不是单纯的仰视收束；楼角、独立路灯和窗带横线形成同向约 9°共识，",
+      "visible_anchors": ["中央楼角与独立灯杆同向偏离竖直", "多层窗带和底部店面横檐呈持续斜势"],
+      "finding": "全局滚转判断有依据，但中央楼角和独立灯杆均是上端在下端的画面左侧。回答建议逆时针试校会加重偏斜，应顺时针小幅试校。9°没有实测依据；不能用变体操作的5.6°反推最终画面应校正的角度，因为原图也可能偏斜。",
+      "action_review": "incorrect_direction",
+      "action_quote": "先逆时针试校约 9°",
+      "change_implication": "先核对端点位移与旋转方向，再给停止条件；区分识别对问题和给对修复动作。"
+    },
+    {
+      "case_id": "v5-007",
+      "image_sha256": "beb32938f6cf419287241dd7a1a21171456ad3b28d9b7cd5f4aca59a463750ca",
+      "response_sha256": "510ff54a75851bb8afd8a5963cb4b3bcfa3e1af3d1f1f384443ec9399e711843",
+      "status": "diagnosis_supported",
+      "response_quote": "无需重建；序列、间隔和材质信息都完整。上方空场偏多是 watch item：若用于标签或版面，它有功能；若作为独立静物图，可适度裁短，但不应打乱四件间隔。",
+      "visible_anchors": ["四件浅色器物共用近似水平底座线且彼此有灰色间隙", "黑帽、紫花、浅紫与红披肩构成逐件变化，最右红色最强"],
+      "finding": "回答保护了序列、间隔、材质和色彩中断；上方留白只作为用途相关的可选调整，没有把优秀作品硬判为失败。",
+      "change_implication": "保留优秀作品的保护门与有代价的可选实验。"
+    },
+    {
+      "case_id": "v5-039",
+      "image_sha256": "02c43df13ffec969e6703ca42d62acafd0fc519fb33c5bf10648260d24296d33",
+      "response_sha256": "c56dbaade9c0ff23a18eecf5c5d8ceac424c786138c63785059256b15b8d3854",
+      "status": "overcorrection",
+      "response_quote": "这张图真正卡住的不是“东西太多”，而是最重要的黄色结构、粗灰柱和桁架交会被叠在同一小块中心：空间信息很多，却没有一个关系能完整落地。",
+      "visible_anchors": ["前景灰柱遮到右后方较小的黄色重复单元，并未盖住画面中部主要黄色框架；桁架和桌椅仍收束到右后方", "左侧开阔水面与右侧有顶通道形成清楚的开放/封闭双空间带"],
+      "finding": "回答把主要黄色框架与较小重复单元的遮挡混为一谈。没有证明关键空间关系丢失，却建议移动机位和大幅裁左，可能破坏双空间关系。",
+      "change_implication": "自然遮挡、复杂性或多个锚点不能自动升级为结构失败；必须指出被遮挡后确实无法读取的关键关系。"
+    },
+    {
+      "case_id": "v5-031",
+      "image_sha256": "a7534323f68d4425cdaea7bda695bdf2d8317b4879e9e903a784a29f0e25b2fb",
+      "response_sha256": "594e98d6b0d67b77beea6814fbbae25536c4fa5b2f93ee3ff35b2604fff7bcb0",
+      "status": "diagnosis_supported",
+      "response_quote": "当前没有需要重构的瓶颈。下面是可选实验，不代表现有做法错误；实验会同时说明牺牲的当前优点。最具体的 watch item 是底边零散树梢：",
+      "visible_anchors": ["近树、湖、建筑、林带、坡地和峰线形成连续距离层", "湖岸建筑与道路提供尺度锚点，底边只有少量树梢和岩点短促截断"],
+      "finding": "回答准确保护多层纵深和尺度，底边仅作为小幅可选清理，并说明会损失近景站位感。",
+      "change_implication": "保留结构成立时的轻量 watch item，不用小边缘问题贬低整体。"
+    },
+    {
+      "case_id": "v5-010",
+      "image_sha256": "1e4ee17265d05318d6a129fea70593b57ac2944e2f3c2eaa12474361179dc5be",
+      "response_sha256": "725d9dd17cb460456d5696a2dd3e6baa7b564466ee7fabf4f4c8c9cbff3a07e8",
+      "status": "diagnosis_supported",
+      "response_quote": "最强 watch item 是黑衣大面积闭合，但它没有吞掉眼、口、脸缘或领口，因此属于可微调而非结构失败；",
+      "visible_anchors": ["人物双眼、额头和面颊纹理清楚并直视镜头", "深色头发与西装仍可分，白领和领带形成稳定下部结构"],
+      "finding": "回答用关键面部与领口仍可读作为暗部反证，没有为了技术洁净破坏肖像的黑白结构。",
+      "change_implication": "保留关键区域优先于全局黑位指标的判断。"
+    },
+    {
+      "case_id": "v5-028",
+      "image_sha256": "78806b3d5fe01fc5c3722adbe59f87cc1fd846f653e7dbc46414a8a914335970",
+      "response_sha256": "d7c3e764a216a46f61b8f9a14d3962792791e3525666e68f1c1fcc8808bc891c",
+      "status": "diagnosis_supported",
+      "response_quote": "最具体的 watch item 是上方背景稍宽；它只是集中度选择，并未造成材质或形状缺失。",
+      "visible_anchors": ["圆形主体缺口同时露出白色外层、浅黄层与更深断面", "顶部放射纹、缺口平滑表面和木板纹理保持清楚差异"],
+      "finding": "回答保护了缺口的三层材质和浅空间，上方余量只作为可逆的集中度选择。",
+      "change_implication": "保留材质关系优先于机械紧裁的判断。"
+    },
+    {
+      "case_id": "v5-009",
+      "image_sha256": "c7feb9cdbe76e929ebfabb8d77132071283f279c24ad0bb57c4ce75311e1cfe9",
+      "response_sha256": "3eb2aff6f9cdf8d46a47021a72b27a284f2ace315981a24f8534267c0c9cd974",
+      "status": "diagnosis_supported",
+      "response_quote": "当前没有需要重构的瓶颈。watch item 是黄色长带来源在画外，但主体入水、装备和水花关系完整。",
+      "visible_anchors": ["人物身体自左上向右下进入水面，右下脚部与扇形飞溅同时出现", "黄色头部装置、连接件、黑黄管线和长黄色软带形成连续装备链"],
+      "finding": "回答准确保护不可重建的动作相位与装备链，画外软带仅作为轻度边缘提示。",
+      "change_implication": "动作照片先保护接触相位，再谈边缘完整性。"
+    },
+    {
+      "case_id": "v5-001",
+      "image_sha256": "e674a2164f71f3091d13c308b5cd7ca1acf7454ed235d0bf6854797cc525ee95",
+      "response_sha256": "d6c83f0d67f3c013610a1f8f20d7fd4452f76b2a59149bef887a6a1c28b49ef1",
+      "status": "diagnosis_supported",
+      "response_quote": "画面没有结构性损坏，但存在目的分支：若重点是雕塑园整体，当前多对象层级应保留；若重点是右前雕塑，就应改变站位而非小修小裁。",
+      "visible_anchors": ["右前浅色曲折体最大，中央金色环更小且更远", "白色建筑、远处深色小人形与树木把前后尺度串联"],
+      "finding": "回答识别了多对象尺度链，并把取舍明确放在整体环境与单一主体两种用途上，没有假定唯一正确主角。",
+      "change_implication": "目的分支只在它真正改变画面主体时使用。"
+    },
+    {
+      "case_id": "v5-003",
+      "image_sha256": "c0c36582866d7be6acc2819c281e84f585954d6c88164677964dc260786e4a70",
+      "response_sha256": "ce8d699e1cfacf50804ca057beb552a8af32ce4c81765d13edcccaaea9eba0d1",
+      "status": "diagnosis_supported",
+      "response_quote": "最值得看的 watch item 是右前高灯杆与楼体边缘的贴合：只需轻微换位即可分开，不足以推翻道路、网格和灯影已经成立的关系。",
+      "visible_anchors": ["红黄建筑网格与左右树影形成规则/不规则对照", "清出的深色步道由下缘弯向入口，右前灯杆与建筑边缘局部贴合"],
+      "finding": "回答保护道路、网格和圆形灯影的节奏，只把灯杆贴边作为轻微换位实验。",
+      "change_implication": "保留局部相切与整体组织价值的分级。"
+    },
+    {
+      "case_id": "v5-061",
+      "image_sha256": "c1c8d73724e3467e8e6bb9706d03109a2ec25fe8268483e98748f607c5274795",
+      "response_sha256": "2f2d8a20d78d5dce37a52c4a9b654c48df532a5970efe27926826d6a3a46f566",
+      "status": "diagnosis_supported",
+      "response_quote": "这张没有结构性损坏；栏杆略抢眼是 watch item，却也是画面唯一可靠的尺度和路径说明。处理方向应是压低它的视觉权重，不是把它裁掉。",
+      "visible_anchors": ["左右岩壁夹出中央窄通道，多根细岩柱由近到远重叠", "右下栏杆与石质步道折向中央暗水并产生反射"],
+      "finding": "回答没有把现代栏杆简单当成干扰物，而是识别其尺度和路径功能；轻度压权重的取舍合理。",
+      "change_implication": "环境元素是否该删取决于它是否承担空间说明。"
+    },
+    {
+      "case_id": "v5-016",
+      "image_sha256": "ae63e0dba0e2c0d5479d9c10aae521d12dbb4c42a865491073d729983e991c91",
+      "response_sha256": "185b686d28ac13dda3fc04d455fa92bbd694e43e32c6a7c419fe71296538b03c",
+      "status": "diagnosis_supported",
+      "response_quote": "最值得看的 watch item 是左右边缘他人被截成高显著碎片：拍摄时用小幅横移或更明确纳入即可修正，不足以推翻中央人物与器物的强关系。",
+      "visible_anchors": ["中央人物的手、长直管和金属器具形成完整垂直关系链", "左缘肢体碎片与右上人物脸肩被截入，且右上白衣较醒目"],
+      "finding": "回答正确保护中央手—管—器具链，同时指出边缘人物碎片的高显著性，属于有证据的小问题。",
+      "change_implication": "人物照片要同时看片内主体和边缘人物片段。"
+    },
+    {
+      "case_id": "v5-006",
+      "image_sha256": "0ed2a058a038b0add717504e662d629dd4a0d6a7bd3ebfaccf81ad6cc7223308",
+      "response_sha256": "68cadaedeb5937dab97d1d2c70b1a32e98b4152c85502c7a03005e174da67b6b",
+      "status": "diagnosis_partial",
+      "response_quote": "当前没有需要重构的瓶颈。watch item 是右侧前臂出画，略少操作者信息，但特写所需的手—工具—主体接口完整。",
+      "visible_anchors": ["右上手握透明刷状工具，刷头接触橙黄色悬挂主体", "右下另一只手握白色双耳杯，杯外有两条橙色滴痕"],
+      "finding": "主要动作接口判断成立；但“烟、杆和架具说明制作现场”把可见烟雾状区域与器具推进为未经证实的用途语境。",
+      "change_implication": "把“制作现场”改为“处理动作与器具同时出现”，事实边界必须在首次提及时生效。"
+    },
+    {
+      "case_id": "v5-011",
+      "image_sha256": "bb1a48b2789e64a765dac807cd7f1f67138862d07942fc93989b75549d27f067",
+      "response_sha256": "d8f0688dddb91681ee3f096dd49a79969dda4e15fa03dec46f0df515cdaabbec",
+      "status": "diagnosis_supported",
+      "response_quote": "最值得看的 watch item 是胸前及衣领的亮色标记：可通过更小幅度的局部压亮降低竞争，不足以推翻脸与双手已经成立的关系。",
+      "visible_anchors": ["人物正面面向镜头并向两侧伸出相似拇指手势", "黑色外套围住白衬衫和领带，胸前黄色标记形成小面积高对比中断"],
+      "finding": "回答保护脸—双手的宽三角关系，亮色标记只作为小幅可逆处理；优先级不过度。",
+      "change_implication": "人物手势和面部关系优先于服装上的小面积显著元素。"
+    }
+  ]
+}
