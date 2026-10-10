@@ -4,13 +4,15 @@
 
 一个在 Codex 中使用的摄影教练：从你的一张照片出发，指出值得保留的地方、最值得调整的问题，给出重拍方法、调色对照和真正相关的优秀作品参考。
 
-[界面预览](#界面预览) · [开始使用](#开始使用) · [反馈长什么样](#反馈长什么样) · [怎么看调整](#怎么看调整) · [验证进展](#验证进展) · [开发文档](docs/development.md)
+[在线打开完整示例](https://judefluen-coder.github.io/photography-coach/demo/) · [界面预览](#界面预览) · [开始使用](#开始使用) · [验证进展](#验证进展) · [开发文档](docs/development.md)
 
 > 当前为研究原型，交付形态是 **Codex 技能 + 本地视觉报告**，不是独立 App 或在线评图网站。评分用于辅助练习，不是客观审美排名；摄影质量仍在验证中。
 
 ## 界面预览
 
 先看照片和一句结论，再区分“可以调整什么”与“应该保住什么”。版本切换和下载紧挨照片，便于边看边对照。
+
+想直接操作，可[打开完整报告示例](https://judefluen-coder.github.io/photography-coach/demo/)；它包含原图、实际处理的仅调色版与裁切＋调色版，以及完整点评和下载文件。[示例来源及限制](docs/demo/README.md)。这是静态报告，不提供在线上传或自动评图。
 
 ![摄影教练点评首页示意：左侧为列车照片和三个版本按钮，右侧为具体判断，下方区分可选调整与要保留的关系](docs/images/report-overview.png)
 
@@ -105,7 +107,7 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 - **下载当前版本的完整图片**，而非页面缩小预览；
 - **复制练习说明**，和新照片一起发回 Codex，继续复盘。
 
-报告是生成到本机的 `index.html` 和配套 `assets/`。保存或转移时请保留整个文件夹。目前仓库没有公开在线演示，也不附带用户照片；**报告页本身不会接收上传、调用模型或自动修图。**
+报告是生成到本机的 `index.html` 和配套 `assets/`。保存或转移时请保留整个文件夹。仓库有[静态在线示例](https://judefluen-coder.github.io/photography-coach/demo/)，但不附带用户照片；**报告页本身不会接收上传、调用模型或自动修图。**
 
 ## 参考作品为什么值得看
 
@@ -171,6 +173,8 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 - [参考作品匹配规则](references/reference-policy.md)
 - [视觉报告字段与约束](references/visual-report.md)
 - [知识库状态](references/knowledge-status.json)
+
+项目还提供[可再生成的完整示例](docs/demo/README.md)、[版本记录](CHANGELOG.md)和[有来源的相邻产品对比](docs/alternatives.md)。GitHub Actions 会运行代码与结构检查；它的绿色状态不代表摄影点评已经通过独立盲测。
 
 最有帮助的反馈是具体错例：**原话是什么、图中哪里与它矛盾、建议执行后会损失什么。** 欢迎在 [Issues](https://github.com/judefluen-coder/photography-coach/issues) 提交错误点评、参考图匹配问题、中文表达建议或可复现的页面问题。图片请只使用有明确公开授权的材料；修改评测时需保留原答卷与证据，不把已参与调参的样本继续称为独立盲测。
 

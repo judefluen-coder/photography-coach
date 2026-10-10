@@ -59,6 +59,8 @@ node scripts/test_visual_report_ui.mjs /absolute/path/to/report-page/index.html
 
 该脚本在 DOM 测试替身中运行真实内联 JavaScript，覆盖版本状态、下载链接等逻辑；不是真实浏览器验收，不验证下载完成、响应式布局或摄影判断。
 
+GitHub Actions 在推送和拉取请求时运行上述单元测试与知识结构校验，并重新生成 [公开报告示例](demo/README.md)，核对生成的 HTML 与仓库版本一致，再执行该示例的 JavaScript 状态测试。示例的二进制图片文件与报告输入均保存在 `docs/demo/`，不需要私有照片。
+
 正式发布另有质量门槛：
 
 ```bash
