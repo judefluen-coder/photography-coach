@@ -61,6 +61,8 @@ node scripts/test_visual_report_ui.mjs /absolute/path/to/report-page/index.html
 
 GitHub Actions 在推送和拉取请求时运行上述单元测试与知识结构校验，并重新生成 [公开报告示例](demo/README.md)，核对生成的 HTML 与仓库版本一致，再执行该示例的 JavaScript 状态测试。示例的二进制图片文件与报告输入均保存在 `docs/demo/`，不需要私有照片。
 
+一项 v5 冻结快照测试依赖未公开的 `.benchmark-runs/` 文件；公开 CI 会明确跳过它，本地存在这两份文件时仍会核对哈希与条目数。跳过不算摄影发布验收通过。
+
 正式发布另有质量门槛：
 
 ```bash

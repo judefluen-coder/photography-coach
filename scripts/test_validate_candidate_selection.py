@@ -283,6 +283,16 @@ class V5PlanTests(unittest.TestCase):
             self.assertEqual(len(self.plan["failure_recipe_profiles"][operation]), 10)
 
     def test_v5_exclusion_snapshot_and_candidate_pool_are_frozen(self) -> None:
+        snapshot_path = validator.resolve_plan_path(
+            self.plan_path, self.plan["exclusion_snapshot"]["path"]
+        )
+        pool = self.plan["candidate_pool"]
+        manifest_path = validator.resolve_plan_path(
+            self.plan_path, pool["manifest_path"]
+        )
+        if not snapshot_path.is_file() or not manifest_path.is_file():
+            self.skipTest("local v5 benchmark snapshots are not published")
+
         errors: list[str] = []
         excluded = validator.load_exclusion_snapshot(
             self.plan, self.plan_path, errors
@@ -291,10 +301,6 @@ class V5PlanTests(unittest.TestCase):
         self.assertEqual(self.plan["exclusion_snapshot"]["source_count"], 550)
         self.assertTrue(all(excluded))
 
-        pool = self.plan["candidate_pool"]
-        manifest_path = validator.resolve_plan_path(
-            self.plan_path, pool["manifest_path"]
-        )
         self.assertEqual(
             hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
             pool["manifest_sha256"],
