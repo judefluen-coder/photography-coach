@@ -3,10 +3,61 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=demo/">
-  <title>Photography Coach 示例</title>
+  <meta name="description" content="Photography Coach 摄影教练：一个从自己的照片开始的 Codex Skill。看具体点评、真实调色对照和相关作品，再拍好下一张。">
+  <meta name="color-scheme" content="light dark">
+  <title>Photography Coach · 从自己的照片开始</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="site.css">
+  <script src="site.js" defer></script>
 </head>
 <body>
-  <p>正在打开摄影教练的完整报告示例。<a href="demo/">点此进入</a>。</p>
+  <a class="skip" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="wordmark" href="index.html">见一张<span>Photography Coach</span></a>
+    <nav aria-label="项目导航"><a href="demo/index.html">完整示例</a><a href="#start">开始使用</a><a href="https://github.com/judefluen-coder/photography-coach">GitHub ↗</a></nav>
+    <button class="theme-button" id="themeToggle" type="button" hidden aria-label="切换深浅主题">切换主题</button>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="intro">
+        <p class="eyebrow">摄影练习，从你拍的照片开始</p>
+        <h1 id="heroTitle">看懂这一张，<br>拍好下一张。</h1>
+        <p class="intro-copy">不只说“主体不够突出”。<br>把值得保留的、可以调整的，<br>指给你看。</p>
+        <div class="actions"><a class="button primary" href="demo/index.html">打开完整点评 <span aria-hidden="true">↗</span></a><a class="text-link" href="#start">用自己的照片试试 ↓</a></div>
+        <p class="boundary">Codex Skill ＋ 可视化报告<br>当前是研究原型，网页展示已有示例，不在线评图。</p>
+      </div>
+      <figure class="sample">
+        <div class="sample-topline"><span>看片桌 / 公开示例 01</span><span id="sampleVersion" aria-live="polite">仅调色</span></div>
+        <div class="sample-image"><img id="sampleImage" src="demo/assets/color-preview.jpg" width="1800" height="1349" alt="仅调色版：弯道上的列车，车头暗部略微提亮，外围绿叶颜色收敛"></div>
+        <div class="sample-controls" id="sampleControls" role="group" aria-label="预览照片版本" hidden>
+          <button type="button" data-version="source" aria-pressed="false">原图</button><button type="button" data-version="color" aria-pressed="true">仅调色</button><button type="button" data-version="treatment" aria-pressed="false">裁切＋调色</button>
+        </div>
+        <figcaption><strong>弯道已经成立，不必急着裁。</strong><span id="sampleNote">先让车头多露一点细节，再收一点旁边的亮绿。完整保留原图取景和内容。</span></figcaption>
+        <p class="photo-credit">摄影：Reinhold Möller（Ermell） · <a href="https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg">原图</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · 本项目另做调色及裁切，作者未背书。</p>
+      </figure>
+    </section>
+    <section class="walkthrough" aria-labelledby="walkTitle">
+      <div class="section-intro"><p class="eyebrow">一张照片，不止一句评价</p><h2 id="walkTitle">把“为什么”<br>放回画面里。</h2><p>先看全画面，再挑出一个重点。<br>不是把你的照片塞进一套构图口诀。</p></div>
+      <ol class="feature-list">
+        <li><a href="demo/index.html#readTitle"><span class="number">01</span><div><h3>说的是哪里，直接在图上看</h3><p>边缘、线条、空间、人与物的关系。点开点评位置，核对它有没有看错。</p></div><span class="arrow" aria-hidden="true">↗</span></a></li>
+        <li><a href="demo/index.html#photoStage"><span class="number">02</span><div><h3>调色和裁切，分开比较</h3><p>拖动原图和仅调色对照，再决定要不要裁。看到改善，也看到代价。</p></div><span class="arrow" aria-hidden="true">↗</span></a></li>
+        <li><a href="demo/index.html#scoreTitle"><span class="number">03</span><div><h3>有分数，也有每一分的理由</h3><p>八个维度，区间评分。不合成审美总分，不把不同题材排高低。</p></div><span class="arrow" aria-hidden="true">↗</span></a></li>
+        <li><a href="demo/index.html#referenceTitle"><span class="number">04</span><div><h3>只找真正值得对照的那张</h3><p>一件具体作品、一个观看任务。参考库不是上限，名气不是推荐理由。</p></div><span class="arrow" aria-hidden="true">↗</span></a></li>
+      </ol>
+    </section>
+    <section class="getting-started" id="start" aria-labelledby="startTitle">
+      <div class="section-intro"><p class="eyebrow">从示例，回到自己的照片</p><h2 id="startTitle">把教练带到<br>你的 Codex。</h2><p>不用先选课程，也不用准备“好照片”的标准。附一张自己拍的照片就能开始。</p><a class="text-link" href="https://github.com/judefluen-coder/photography-coach#开始使用">完整安装说明 ↗</a></div>
+      <div class="steps">
+        <div class="step"><div class="step-heading"><span class="number">01</span><h3>安装 Skill</h3></div><p>需要 Git 和能查看图片的 Codex。以下为 macOS / Linux 默认目录；已有同名目录时先保留自己的改动。</p><div class="copy-block"><pre><code id="installCommand">git clone https://github.com/judefluen-coder/photography-coach.git ~/.codex/skills/photography-coach</code></pre><button type="button" data-copy="installCommand" hidden>复制命令</button></div></div>
+        <div class="step"><div class="step-heading"><span class="number">02</span><h3>新开任务，附照片，再发这句话</h3></div><div class="copy-block"><p id="starterPrompt">请用 $photography-coach 点评这张照片。看完整个画面，保留八维评分，重点说清楚最值得改什么。请给出相关作品参考；如果能忠实调整图片，再生成包含原图、仅调色和可选裁切版的可视化报告。</p><button type="button" data-copy="starterPrompt" hidden>复制请求</button></div></div>
+        <div class="step"><div class="step-heading"><span class="number">03</span><h3>看对照，拍一张，再回来</h3></div><p>报告里可复制本次练习说明。下次把新照片和说明一起发给教练，就能围绕同一个问题继续讨论。</p></div>
+        <p id="copyStatus" class="status" role="status"></p><textarea id="copyFallback" aria-label="自动复制不可用，请手动复制" readonly hidden></textarea>
+        <p class="service-note">Skill 不附带模型或修图服务；调用费用与数据处理取决于你使用的服务及权限。生成的报告可保存在本地，这不等于 AI 处理全程离线。</p>
+      </div>
+    </section>
+    <section class="contribute" aria-labelledby="contributeTitle"><div><p class="eyebrow">让它更会看片</p><h2 id="contributeTitle">有用的错例，比一句好评更重要。</h2><p>告诉我们哪句话看错了、图中证据在哪里、照做会损失什么。<br>只分享有公开授权的材料，不上传私人照片。</p></div><a class="button secondary" href="https://github.com/judefluen-coder/photography-coach/issues/new/choose">提交具体反馈 ↗</a></section>
+  </main>
+  <footer><p>见一张 · Photography Coach<br><span>A photo-first critique Skill, with visual reports.</span></p><div><a href="https://github.com/judefluen-coder/photography-coach/blob/main/CONTRIBUTING.md">参与改进</a><a href="https://github.com/judefluen-coder/photography-coach#验证进展">验证进展</a><a href="https://github.com/judefluen-coder/photography-coach#许可证">许可说明</a><p>摄影质量仍在验证；代码许可证待选，公开可见不等于开源授权。</p></div></footer>
+  <noscript><p class="noscript">已展示调色后的静态示例。交互报告需要 JavaScript；安装命令与请求文字仍可手动复制。</p></noscript>
 </body>
 </html>

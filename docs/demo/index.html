@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Photography Coach 单张照片点评">
   <title>Photography Coach</title>
+  <link rel="icon" href="data:,">
   <style>
     :root {
       color-scheme: dark;
@@ -13,15 +14,15 @@
       --surface-strong: #1d211e;
       --text: #f0f1ed;
       --muted: #9da39d;
-      --faint: #737a74;
+      --faint: #a0a79f;
       --line: #2d332f;
       --accent: #e49a66;
       --accent-text: #1d120c;
-      --radius: 12px;
+      --radius: 6px;
       --sans: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 78px; }
     body {
       margin: 0;
       background: var(--bg);
@@ -46,6 +47,11 @@
     }
     .brand { font-size: 19px; font-weight: 720; letter-spacing: 0.04em; }
     .topbar span { color: var(--muted); font-size: 13px; }
+    .report-nav { position: sticky; top: 0; z-index: 5; display: flex; gap: 28px; overflow-x: auto; padding: 0 clamp(20px,4vw,56px); border-bottom: 1px solid var(--line); background: var(--bg); }
+    .report-nav a { flex: 0 0 auto; padding: 14px 0; color: var(--muted); text-decoration: none; font-size: 13px; }
+    .report-nav a:hover { color: var(--accent); }
+    .skip { position: absolute; left: 20px; top: -100px; background: var(--bg); padding: 12px; z-index: 6; }
+    .skip:focus { top: 12px; }
     .workspace {
       max-width: 1540px;
       margin: 0 auto;
@@ -53,16 +59,16 @@
     }
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(330px, 0.64fr);
+      grid-template-columns: minmax(0, 1.5fr) minmax(340px, 0.85fr);
       gap: clamp(28px, 4vw, 60px);
       align-items: center;
-      min-height: calc(100dvh - 152px);
+      min-height: 0;
     }
     .photo-shell { min-width: 0; }
     .photo-stage {
       position: relative;
       width: 100%;
-      aspect-ratio: 1.62;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
       border-radius: var(--radius);
       background: #090a09;
@@ -80,6 +86,18 @@
     .photo-stage[data-mode="source"] .source { opacity: 1; }
     .photo-stage[data-mode="color"] .color { opacity: 1; }
     .photo-stage[data-mode="treatment"] .treatment { opacity: 1; }
+    .photo-stage[data-mode="compare"] .source { opacity: 1; }
+    .photo-stage[data-mode="compare"] .color { opacity: 1; clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0); }
+    .comparison-labels { position: absolute; inset: 0; pointer-events: none; }
+    .comparison-labels span { position: absolute; top: 12px; padding: 4px 9px; font-size: 12px; background: #101210e8; color: #f0f1ed; }
+    .comparison-labels span:first-child { left: 12px; }
+    .comparison-labels span:last-child { right: 12px; }
+    .comparison-divider { position: absolute; inset-block: 0; left: var(--split, 50%); width: 2px; background: #f0f1ed; pointer-events: none; }
+    .comparison-control { padding: 12px 0 0; }
+    .comparison-control label { display: block; font-size: 12px; color: var(--muted); }
+    .comparison-control input { display: block; width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: ew-resize; }
+    #toggleCompare { cursor: pointer; }
+    #toggleCompare[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
     .photo-toolbar {
       display: flex;
       align-items: center;
@@ -126,12 +144,12 @@
     h1, h2, h3, p { margin-top: 0; }
     h1 {
       margin-bottom: 22px;
-      font-size: clamp(34px, 3.3vw, 52px);
-      line-height: 1.18;
+      font-size: clamp(30px, 2.8vw, 40px);
+      line-height: 1.4;
       letter-spacing: -0.035em;
       font-weight: 720;
     }
-    .lead { margin-bottom: 30px; color: #c9ccc7; font-size: 18px; line-height: 1.75; }
+    .lead { margin-bottom: 24px; color: #c9ccc7; font-size: 16px; line-height: 1.85; }
     .priority { padding: 20px 0 0; border-top: 1px solid var(--line); }
     .priority-label { display: block; margin-bottom: 6px; color: var(--accent); font-size: 12px; font-weight: 700; }
     .priority strong { display: block; margin-bottom: 8px; font-size: 20px; line-height: 1.5; }
@@ -245,12 +263,12 @@
       .topbar { min-height: 60px; padding: 0 16px; }
       .workspace { padding: 18px 14px 36px; }
       .hero { gap: 30px; }
-      .photo-stage { aspect-ratio: 1.25; }
+      .photo-stage { aspect-ratio: 4 / 3; }
       .photo-stage img { object-position: center; }
-      .photo-toolbar { align-items: stretch; flex-direction: column; }
-      .tabs { width: 100%; }
+      .photo-toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+      .tabs { width: 100%; grid-column: 1 / -1; }
       .button-primary { width: 100%; }
-      h1 { font-size: 34px; }
+      h1 { font-size: 30px; }
       .lead { font-size: 16px; }
       .report { margin-top: 0; padding: 0 16px 72px; }
       section { padding: 50px 0; }
@@ -267,7 +285,9 @@
   </style>
 </head>
 <body>
+  <a class="skip" href="#title">跳到点评结论</a>
   <header class="topbar"><div class="brand">见一张</div><span>单张照片点评</span></header>
+  <nav class="report-nav" aria-label="报告章节"><a href="#title">结论</a><a href="#readTitle">画面观察</a><a href="#scoreTitle">八维评分</a><a href="#editTitle">实际调整</a><a href="#referenceTitle">作品参考</a><a href="#practiceTitle">下次练习</a></nav>
   <main>
     <div class="workspace">
       <div class="hero">
@@ -276,13 +296,17 @@
             <img class="source" id="heroSource" alt="用户提交的原始照片">
             <img class="color" id="heroColor" alt="仅调整影调色彩，保留原图取景">
             <img class="treatment" id="heroTreatment" alt="调整后的照片，具体改动见下方说明">
+            <div class="comparison-divider" id="comparisonDivider" hidden></div>
+            <div class="comparison-labels" id="comparisonLabels" aria-hidden="true" hidden><span>仅调色</span><span>原图</span></div>
           </div>
+          <div class="comparison-control" id="comparisonControl" hidden><label for="comparisonRange">拖动滑块，比较同一取景的颜色和明暗。也可用左右方向键。</label><input id="comparisonRange" type="range" min="0" max="100" value="50" aria-label="调色版显示范围" aria-valuetext="左侧 50% 为仅调色，右侧为原图"></div>
           <div class="photo-toolbar">
             <div class="tabs edit-only" aria-label="照片版本">
               <button type="button" data-mode="source">看原图</button>
               <button class="color-only" type="button" data-mode="color">仅调色</button>
               <button class="treatment-only" type="button" data-mode="treatment" id="treatmentTab">看调整后</button>
             </div>
+            <button class="button-quiet color-only" id="toggleCompare" type="button" aria-pressed="false" aria-controls="comparisonControl">滑动对照</button>
             <a class="button-primary edit-only" id="heroDownload" download>下载当前版本</a>
           </div>
           <p class="version-hint" id="versionHint"></p>
@@ -368,6 +392,7 @@
   </main>
   <p class="source-credit" id="sourceCredit" hidden><span id="creditAuthor"></span> · <a id="creditSource" target="_blank" rel="noreferrer">原图出处</a> · <a id="creditLicense" target="_blank" rel="noreferrer"></a>。<span id="creditChanges"></span></p>
   <footer id="researchStatus"></footer>
+  <noscript><p class="source-credit">这个交互报告需要 JavaScript 才能显示点评与图片；不会在线上传照片或调用模型。</p></noscript>
 
   <script id="reportData" type="application/json">{"title":"弯道已经拍出来了，先让车头更好读。","decision":"NO_STRUCTURAL_BOTTLENECK","source_credit":{"author":"Reinhold Möller（Ermell）","url":"https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg","license":"CC BY-SA 4.0","license_url":"https://creativecommons.org/licenses/by-sa/4.0/","changes":"本示例基于公开图 JPEG 副本作局部影调色彩调整，另版裁上方及右侧。衍生图同以 CC BY-SA 4.0 提供，作者未背书此点评或调整。"},"summary":"我先看到近处圆形车头，再沿着车顶往右上转，最后看到远处一节节小车厢。大与小、直与弯的关系都在。这张不用重构；可以试着把车头暗面稍微打开，让它不只剩一个黑色轮廓。","priority":{"title":"车头多露一点细节，旁边的绿别那么抢眼。","body":"车头号码还能读，但它下面的黑色面、管线之间的暗缝，在小图里分得费劲；右侧大片亮绿叶又比这些细节更容易被看见。先轻提车头里已有的暗部层次，再收一点外围绿叶。它比裁切更值得先试，因为裁掉绿叶也不会让车头内部更清楚。别把黑色车身修成灰色。"},"strength":{"title":"保住从大车头绕到小车厢的整条弧线。","body":"近处车头占得大，远处车窗变成一列小竖格；车顶在右上折回，能看出整列车怎样转弯。下方钢轨接近车轮，上方车厢接回树林，前后是连着的，不是一辆孤立的车头。"},"integrity":[{"family":"边缘/裁切","verdict":"观察","basis":"车头前部和最下方钢轨离底边较近，右边却有一大片植被余量。车头未被截断，但不能再收底边；右侧可小幅试裁。"},{"family":"暗部","verdict":"观察","basis":"量化触发暗部复核；圆形车头下半部与下方连接处很深。号码、外圈及部分管线仍分得开，因此是局部可读性调整，不是整辆车消失。"},{"family":"高光","verdict":"通过","basis":"近处浅车顶还有连续亮暗条纹；左侧路面仍与白边分开。三个灯心很亮，但不据此要求压暗整个画面。"},{"family":"色彩","verdict":"观察","basis":"右边亮黄绿叶与上方较深的树叶有色差，绿色没有全并成一块；不过右侧碎亮点相对暗车头更抢眼。调整是取舍，不是判定真实颜色错误。"},{"family":"轴线/透视","verdict":"通过","basis":"车厢和护栏随弯道改变方向，没有可靠水平线与竖线同时支持同向滚转。不能按铁轨斜线把整张旋正。"},{"family":"细节","verdict":"观察","basis":"局部放大后，号码和管线轮廓可辨，但细字与远端小人信息有限；不靠锐化补造细节。相近大小的近处细管与较远窗框都没有明显大块涂抹。"}],"observations":[{"label":"车头与亮叶","priority":"首要","text":"左下车头内部偏深，右侧碎亮叶面积大。先让暗面多出一点变化、外围绿稍收敛，视线更容易留在车上。","regions":[{"x":0.12,"y":0.43,"width":0.34,"height":0.42},{"x":0.85,"y":0.36,"width":0.15,"height":0.6}]},{"label":"弧线与重复","priority":"要保护","text":"近处长车顶向右上转，再接回远处一列小车厢。重复的窗格配合方向变化，交代了弯道，不要只裁出车头。","regions":[{"x":0.4,"y":0.12,"width":0.44,"height":0.26},{"x":0.56,"y":0.29,"width":0.28,"height":0.35}]},{"label":"前方留白","priority":"次要","text":"车头和前方钢轨已经靠近下边；右侧绿地比下边余量宽得多。可以动右边，但底部再收，会让车头更像撞向边框。","regions":[{"x":0.06,"y":0.8,"width":0.4,"height":0.2},{"x":0.9,"y":0.05,"width":0.1,"height":0.95}]},{"label":"亮车顶与黑车身","priority":"要保护","text":"车顶上长条反光与下面黑色车身相接，已经说明圆弧和体积。提暗部时保留这一级亮暗差，不做全图平均提亮。","regions":[{"x":0.52,"y":0.27,"width":0.3,"height":0.26},{"x":0.29,"y":0.43,"width":0.29,"height":0.21}]},{"label":"红、绿与黑","priority":"次要","text":"下方红色构件把黑色车身和绿色环境隔开；右边叶子又比车厢更偏黄绿。只轻收外围叶子，保留红色这条线和车厢自己的绿。"},{"label":"护栏、道路与遮挡","priority":"次要","text":"前景护栏斜着经过车轮附近，后面的路面则沿左岸展开。它们说明车所处的位置；栏杆也遮住少量下部细节，现有文件不能靠调色把它挪开。"},{"label":"小人和观看距离","priority":"次要","text":"远处车窗旁能辨认几个很小的人形，它们让车厢的大小更好理解；不足以读清表情，也不据此编造旅途故事。主角仍是列车在弯道上的形状。"},{"label":"静止的一张与运动感","priority":"无明显问题","text":"轮廓和线路让画面有向前延伸的感觉，但一张成片不能证明车速。没有明显拖影，不代表必须补上运动模糊。"}],"scores":[{"dimension":"技术可读性","interval":"3-4 / 5","reason":"号码、管线与窗框可辨；局部黑面和细小人物的可读性有限。"},{"dimension":"取景与边缘控制","interval":"3-4 / 5","reason":"整段弯道保住了，车头前方和底部余量偏紧。"},{"dimension":"注意力与形式组织","interval":"4-5 / 5","reason":"大车头、弯曲车顶、小窗格形成明确的观看顺序。"},{"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"车顶和车身体积清楚；暗车头与外围亮绿的竞争可小调。"},{"dimension":"空间与层次","interval":"4-5 / 5","reason":"近大远小、车厢相接、前景护栏一起交代纵深。"},{"dimension":"时机与关键关系","interval":"4-5 / 5","reason":"车頭与后段车厢同时进入视野，转弯关系完整。"},{"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"能看懂列车与沿线环境，小人补充尺度；不强求一张图讲出事件。"},{"dimension":"表达一致性与完成度","interval":"4-5 / 5","reason":"机械结构和整列车的曲线都得到交代，调整宜克制。"}],"reshoot":{"action":"在允许拍摄的安全观景点，先给车头前方多留一点空间，再等后面几节车厢也进入弯道。按下前看一眼：车头、车轮、远端车厢都还在不在。","effect":"既保住长弧线，也让车头前方不那么紧。不是越近越有冲击力。","cost":"取景宽一点，列车在画面里会小一些，环境也更多。这个瞬间不一定还能重来。","availability":"相似场景；不进入轨道、不探身越过护栏，不假定原拍摄位置对公众开放。"},"edit":{"summary":"先在顶部切“原图 / 仅调色”：看车头号码下面的黑面，以及右侧亮绿叶。车头稍清楚，绿叶稍收敛，亮车顶没有一起被推亮。再切“裁切＋调色”，单独判断是否要收右边和上面的小条环境。","crop":"仅调色保留 3992×2992 全画幅。裁切版只去掉上方 60 像素、右侧 120 像素；左边和底边完全不动，保护车头前方钢轨。这个小裁切是可选的。","crop_region":{"x":0,"y":0.020053475935828877,"width":0.969939879759519,"height":0.9799465240641712},"tone_color":"已做两件事：局部提车头已有的暗部层次，黑缝和灯心不跟着抬；外围亮绿叶降低饱和度（蒙版最强处 24%）和亮度（最多约 0.32 档），保护中间车厢的绿色及下方红色。没有套统一滤镜或添加细节。","limit":"调色会少一点原来的硬朗和鲜亮；裁切会少一点沿线环境。后期无法恢复被护栏遮住的细节、看不清的表情，也补不回画外空间。示例公开包将原尺寸 PNG 调整图转成高质量 JPEG，页面另使用缩小 JPEG 预览。"},"reference":{"photographer":"Alfred Stieglitz","title":"The Hand of Man","year":"1902，1910 年印制","url":"https://www.nga.gov/artworks/35420-hand-man","looking_task":"看 30 秒：从画面底部选一条亮轨线，沿着它走到中间偏右的暗机车，再看机车上方的深色烟柱。暗车没有被整体提亮，为什么仍然容易找到？","match":"学保留，也给提暗部划一道界限：本图近处黑车头借亮车顶、红色构件和弧线显形；参考图的暗机车借下方亮轨线与后方较浅的背景显形。两张都提醒我们，主体清楚不等于它每个角落都得亮。","difference":"参考的机车小、环境和烟柱占重要位置；本图机械细节本身更重要，可以多露一点暗面。学的是明暗边界与路径，不是把本图转黑白或压成剪影。可迁移实验：只改暗部强度，选既能读出号码、又保留黑车身重量的版本。"},"exercise":{"title":"20 分钟，只练黑色主体的明暗。","instructions":"用这张图或自己拍的一件黑色物体，固定构图和颜色，只做原样、轻提、中提、重提四个暗部版本。缩小再放大看：关键标记和表面边界能读出，同时主体仍比旁边浅表面明显暗，就停。自己即可复盘，不需要邀人评审。"},"boundary_note":"本次是换题材示例，不是新增盲测。原图沿用已 materialize 的无测试变体 JPEG 副本，不冒充相机原始文件。作者 Reinhold Möller（Ermell），公开来源与 CC BY-SA 4.0 许可于 2026-09-14 核对；新调色、裁切衍生图同许可，作者未背书。评分只针对示例源图，作者意图和速度不由画面推断。参考单作已查看实际画面，因该馆未提供此图的开放下载许可，仅提供官方单图链接。","research_status":"Photography Coach 实验示例；不是专家认证、客观审美排名或学习效果证明。使用直接像素调色，无生成式重画。图像与页面逻辑核对不等于真实浏览器布局验收。","source_asset":"assets/source-preview.jpg","source_download":"assets/source.jpg","source_extension":"jpg","color_asset":"assets/color-preview.jpg","color_download":"assets/color.jpg","color_extension":"jpg","treatment_asset":"assets/treatment-preview.jpg","treatment_download":"assets/treatment.jpg","treatment_extension":"jpg"}</script>
   <script>
@@ -383,9 +408,10 @@
     text('#treatmentTab', treatmentLabel);
     text('#treatmentCaption', treatmentLabel);
     text('#downloadTreatment', `下载${treatmentLabel}`);
-    text('#versionHint', hasColor
+    const versionHint = hasColor
       ? '先切原图 / 仅调色，单看颜色和明暗。再看其他调整；下载为对应版本的完整文件。'
-      : hasTreatment ? '当前只有原图与调整后两版，未单独提供仅调色对照。' : '当前没有可交付的修图文件，下方为调整建议。');
+      : hasTreatment ? '当前只有原图与调整后两版，未单独提供仅调色对照。' : '当前没有可交付的修图文件，下方为调整建议。';
+    text('#versionHint', versionHint);
     const decisionLabels = {
       STRUCTURAL_BOTTLENECK: ['先改这一件事', '最值得先处理的地方'],
       CONDITIONAL_BRANCH: ['先选你更想表达什么', '两种取舍'],
@@ -414,11 +440,13 @@
     text('#editSummary', data.edit.summary);
     text('#editRecipe', `${data.edit.crop} ${data.edit.tone_color}`);
     text('#editLimit', data.edit.limit);
-    text('#referenceMeta', `${data.reference.photographer}, ${data.reference.year}`);
-    text('#referenceWork', data.reference.title);
-    text('#lookingTask', data.reference.looking_task);
-    text('#referenceMatch', data.reference.match);
-    text('#referenceDifference', data.reference.difference);
+    const reference = data.reference;
+    text('#referenceMeta', reference ? `${reference.photographer}, ${reference.year}` : '本次未提供作品');
+    text('#referenceWork', reference ? reference.title : '不拿不相关的名作填空');
+    text('#lookingTask', reference ? reference.looking_task : data.reference_status);
+    text('#referenceMatch', reference ? reference.match : '核验不足时，保留缺失状态。');
+    text('#referenceDifference', reference ? reference.difference : '你仍然可以按本次具体建议练习。');
+    document.querySelector('#referenceLink').hidden = !reference;
     text('#exerciseTitle', data.exercise.title);
     text('#exerciseInstructions', data.exercise.instructions);
     text('#boundaryNote', data.boundary_note);
@@ -448,7 +476,7 @@
     document.querySelector('#compareSource').src = source;
     document.querySelector('#downloadSource').href = data.source_download;
     document.querySelector('#downloadSource').download = `photography-coach-source.${data.source_extension}`;
-    document.querySelector('#referenceLink').href = data.reference.url;
+    if (reference) document.querySelector('#referenceLink').href = reference.url;
 
     for (const [kind, available] of [['color', hasColor], ['treatment', hasTreatment]]) {
       document.querySelectorAll(`.${kind}-only`).forEach(element => element.hidden = !available);
@@ -511,7 +539,7 @@
         const locate = document.createElement('button');
         locate.type = 'button';
         locate.textContent = `${index + 1}. 在照片上看`;
-        locate.setAttribute('aria-label', `在照片上看：${observation.label}`);
+        locate.setAttribute('aria-label', `${index + 1}. 在照片上看：${observation.label}`);
         locate.setAttribute('aria-pressed', 'false');
         locate.setAttribute('aria-controls', 'regionLayer');
         locate.addEventListener('click', () => {
@@ -552,8 +580,23 @@
 
     const stage = document.querySelector('#photoStage');
     const buttons = document.querySelectorAll('.tabs button');
+    const compareToggle = document.querySelector('#toggleCompare');
+    const comparisonRange = document.querySelector('#comparisonRange');
+    const showComparison = (active) => {
+      ['#comparisonControl', '#comparisonDivider', '#comparisonLabels'].forEach(selector => document.querySelector(selector).hidden = !active);
+      compareToggle.setAttribute('aria-pressed', String(active));
+      text('#toggleCompare', active ? '退出对照' : '滑动对照');
+      document.querySelector('#heroDownload').hidden = active || !hasEdit;
+      text('#versionHint', active ? '左边是仅调色，右边是原图。裁切版不参与这个对照；切回单个版本即可下载完整文件。' : versionHint);
+    };
+    const updateComparison = () => {
+      const split = Math.max(0, Math.min(100, Number(comparisonRange.value) || 0));
+      stage.style.setProperty('--split', `${split}%`);
+      comparisonRange.setAttribute('aria-valuetext', `左侧 ${split}% 为仅调色，右侧为原图`);
+    };
     const setMode = (mode) => {
       if (!data[`${mode}_asset`]) return;
+      showComparison(false);
       stage.dataset.mode = mode;
       buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
       for (const kind of ['source', 'color', 'treatment']) {
@@ -565,6 +608,18 @@
       download.download = `photography-coach-${mode}.${data[`${mode}_extension`]}`;
     };
     buttons.forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    compareToggle.addEventListener('click', () => {
+      if (!hasColor) return;
+      if (stage.dataset.mode === 'compare') { setMode('color'); return; }
+      stage.dataset.mode = 'compare';
+      showComparison(true);
+      buttons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+      document.querySelector('#heroSource').setAttribute('aria-hidden', 'false');
+      document.querySelector('#heroColor').setAttribute('aria-hidden', 'false');
+      document.querySelector('#heroTreatment').setAttribute('aria-hidden', 'true');
+      updateComparison();
+    });
+    comparisonRange.addEventListener('input', updateComparison);
     setMode(hasColor ? 'color' : hasTreatment ? 'treatment' : 'source');
     const practicePrompt = document.querySelector('#practicePrompt');
     practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;

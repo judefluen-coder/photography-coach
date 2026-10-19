@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Photography Coach 单张照片点评">
   <title>Photography Coach</title>
+  <link rel="icon" href="data:,">
   <style>
     :root {
       color-scheme: dark;
@@ -13,15 +14,15 @@
       --surface-strong: #1d211e;
       --text: #f0f1ed;
       --muted: #9da39d;
-      --faint: #737a74;
+      --faint: #a0a79f;
       --line: #2d332f;
       --accent: #e49a66;
       --accent-text: #1d120c;
-      --radius: 12px;
+      --radius: 6px;
       --sans: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 78px; }
     body {
       margin: 0;
       background: var(--bg);
@@ -46,6 +47,11 @@
     }
     .brand { font-size: 19px; font-weight: 720; letter-spacing: 0.04em; }
     .topbar span { color: var(--muted); font-size: 13px; }
+    .report-nav { position: sticky; top: 0; z-index: 5; display: flex; gap: 28px; overflow-x: auto; padding: 0 clamp(20px,4vw,56px); border-bottom: 1px solid var(--line); background: var(--bg); }
+    .report-nav a { flex: 0 0 auto; padding: 14px 0; color: var(--muted); text-decoration: none; font-size: 13px; }
+    .report-nav a:hover { color: var(--accent); }
+    .skip { position: absolute; left: 20px; top: -100px; background: var(--bg); padding: 12px; z-index: 6; }
+    .skip:focus { top: 12px; }
     .workspace {
       max-width: 1540px;
       margin: 0 auto;
@@ -53,16 +59,16 @@
     }
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(330px, 0.64fr);
+      grid-template-columns: minmax(0, 1.5fr) minmax(340px, 0.85fr);
       gap: clamp(28px, 4vw, 60px);
       align-items: center;
-      min-height: calc(100dvh - 152px);
+      min-height: 0;
     }
     .photo-shell { min-width: 0; }
     .photo-stage {
       position: relative;
       width: 100%;
-      aspect-ratio: 1.62;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
       border-radius: var(--radius);
       background: #090a09;
@@ -80,6 +86,18 @@
     .photo-stage[data-mode="source"] .source { opacity: 1; }
     .photo-stage[data-mode="color"] .color { opacity: 1; }
     .photo-stage[data-mode="treatment"] .treatment { opacity: 1; }
+    .photo-stage[data-mode="compare"] .source { opacity: 1; }
+    .photo-stage[data-mode="compare"] .color { opacity: 1; clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0); }
+    .comparison-labels { position: absolute; inset: 0; pointer-events: none; }
+    .comparison-labels span { position: absolute; top: 12px; padding: 4px 9px; font-size: 12px; background: #101210e8; color: #f0f1ed; }
+    .comparison-labels span:first-child { left: 12px; }
+    .comparison-labels span:last-child { right: 12px; }
+    .comparison-divider { position: absolute; inset-block: 0; left: var(--split, 50%); width: 2px; background: #f0f1ed; pointer-events: none; }
+    .comparison-control { padding: 12px 0 0; }
+    .comparison-control label { display: block; font-size: 12px; color: var(--muted); }
+    .comparison-control input { display: block; width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: ew-resize; }
+    #toggleCompare { cursor: pointer; }
+    #toggleCompare[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
     .photo-toolbar {
       display: flex;
       align-items: center;
@@ -126,12 +144,12 @@
     h1, h2, h3, p { margin-top: 0; }
     h1 {
       margin-bottom: 22px;
-      font-size: clamp(34px, 3.3vw, 52px);
-      line-height: 1.18;
+      font-size: clamp(30px, 2.8vw, 40px);
+      line-height: 1.4;
       letter-spacing: -0.035em;
       font-weight: 720;
     }
-    .lead { margin-bottom: 30px; color: #c9ccc7; font-size: 18px; line-height: 1.75; }
+    .lead { margin-bottom: 24px; color: #c9ccc7; font-size: 16px; line-height: 1.85; }
     .priority { padding: 20px 0 0; border-top: 1px solid var(--line); }
     .priority-label { display: block; margin-bottom: 6px; color: var(--accent); font-size: 12px; font-weight: 700; }
     .priority strong { display: block; margin-bottom: 8px; font-size: 20px; line-height: 1.5; }
@@ -245,12 +263,12 @@
       .topbar { min-height: 60px; padding: 0 16px; }
       .workspace { padding: 18px 14px 36px; }
       .hero { gap: 30px; }
-      .photo-stage { aspect-ratio: 1.25; }
+      .photo-stage { aspect-ratio: 4 / 3; }
       .photo-stage img { object-position: center; }
-      .photo-toolbar { align-items: stretch; flex-direction: column; }
-      .tabs { width: 100%; }
+      .photo-toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+      .tabs { width: 100%; grid-column: 1 / -1; }
       .button-primary { width: 100%; }
-      h1 { font-size: 34px; }
+      h1 { font-size: 30px; }
       .lead { font-size: 16px; }
       .report { margin-top: 0; padding: 0 16px 72px; }
       section { padding: 50px 0; }
@@ -267,7 +285,9 @@
   </style>
 </head>
 <body>
+  <a class="skip" href="#title">跳到点评结论</a>
   <header class="topbar"><div class="brand">见一张</div><span>单张照片点评</span></header>
+  <nav class="report-nav" aria-label="报告章节"><a href="#title">结论</a><a href="#readTitle">画面观察</a><a href="#scoreTitle">八维评分</a><a href="#editTitle">实际调整</a><a href="#referenceTitle">作品参考</a><a href="#practiceTitle">下次练习</a></nav>
   <main>
     <div class="workspace">
       <div class="hero">
@@ -276,13 +296,17 @@
             <img class="source" id="heroSource" alt="用户提交的原始照片">
             <img class="color" id="heroColor" alt="仅调整影调色彩，保留原图取景">
             <img class="treatment" id="heroTreatment" alt="调整后的照片，具体改动见下方说明">
+            <div class="comparison-divider" id="comparisonDivider" hidden></div>
+            <div class="comparison-labels" id="comparisonLabels" aria-hidden="true" hidden><span>仅调色</span><span>原图</span></div>
           </div>
+          <div class="comparison-control" id="comparisonControl" hidden><label for="comparisonRange">拖动滑块，比较同一取景的颜色和明暗。也可用左右方向键。</label><input id="comparisonRange" type="range" min="0" max="100" value="50" aria-label="调色版显示范围" aria-valuetext="左侧 50% 为仅调色，右侧为原图"></div>
           <div class="photo-toolbar">
             <div class="tabs edit-only" aria-label="照片版本">
               <button type="button" data-mode="source">看原图</button>
               <button class="color-only" type="button" data-mode="color">仅调色</button>
               <button class="treatment-only" type="button" data-mode="treatment" id="treatmentTab">看调整后</button>
             </div>
+            <button class="button-quiet color-only" id="toggleCompare" type="button" aria-pressed="false" aria-controls="comparisonControl">滑动对照</button>
             <a class="button-primary edit-only" id="heroDownload" download>下载当前版本</a>
           </div>
           <p class="version-hint" id="versionHint"></p>
@@ -368,6 +392,7 @@
   </main>
   <p class="source-credit" id="sourceCredit" hidden><span id="creditAuthor"></span> · <a id="creditSource" target="_blank" rel="noreferrer">原图出处</a> · <a id="creditLicense" target="_blank" rel="noreferrer"></a>。<span id="creditChanges"></span></p>
   <footer id="researchStatus"></footer>
+  <noscript><p class="source-credit">这个交互报告需要 JavaScript 才能显示点评与图片；不会在线上传照片或调用模型。</p></noscript>
 
   <script id="reportData" type="application/json">__REPORT_JSON__</script>
   <script>
@@ -383,9 +408,10 @@
     text('#treatmentTab', treatmentLabel);
     text('#treatmentCaption', treatmentLabel);
     text('#downloadTreatment', `下载${treatmentLabel}`);
-    text('#versionHint', hasColor
+    const versionHint = hasColor
       ? '先切原图 / 仅调色，单看颜色和明暗。再看其他调整；下载为对应版本的完整文件。'
-      : hasTreatment ? '当前只有原图与调整后两版，未单独提供仅调色对照。' : '当前没有可交付的修图文件，下方为调整建议。');
+      : hasTreatment ? '当前只有原图与调整后两版，未单独提供仅调色对照。' : '当前没有可交付的修图文件，下方为调整建议。';
+    text('#versionHint', versionHint);
     const decisionLabels = {
       STRUCTURAL_BOTTLENECK: ['先改这一件事', '最值得先处理的地方'],
       CONDITIONAL_BRANCH: ['先选你更想表达什么', '两种取舍'],
@@ -414,11 +440,13 @@
     text('#editSummary', data.edit.summary);
     text('#editRecipe', `${data.edit.crop} ${data.edit.tone_color}`);
     text('#editLimit', data.edit.limit);
-    text('#referenceMeta', `${data.reference.photographer}, ${data.reference.year}`);
-    text('#referenceWork', data.reference.title);
-    text('#lookingTask', data.reference.looking_task);
-    text('#referenceMatch', data.reference.match);
-    text('#referenceDifference', data.reference.difference);
+    const reference = data.reference;
+    text('#referenceMeta', reference ? `${reference.photographer}, ${reference.year}` : '本次未提供作品');
+    text('#referenceWork', reference ? reference.title : '不拿不相关的名作填空');
+    text('#lookingTask', reference ? reference.looking_task : data.reference_status);
+    text('#referenceMatch', reference ? reference.match : '核验不足时，保留缺失状态。');
+    text('#referenceDifference', reference ? reference.difference : '你仍然可以按本次具体建议练习。');
+    document.querySelector('#referenceLink').hidden = !reference;
     text('#exerciseTitle', data.exercise.title);
     text('#exerciseInstructions', data.exercise.instructions);
     text('#boundaryNote', data.boundary_note);
@@ -448,7 +476,7 @@
     document.querySelector('#compareSource').src = source;
     document.querySelector('#downloadSource').href = data.source_download;
     document.querySelector('#downloadSource').download = `photography-coach-source.${data.source_extension}`;
-    document.querySelector('#referenceLink').href = data.reference.url;
+    if (reference) document.querySelector('#referenceLink').href = reference.url;
 
     for (const [kind, available] of [['color', hasColor], ['treatment', hasTreatment]]) {
       document.querySelectorAll(`.${kind}-only`).forEach(element => element.hidden = !available);
@@ -511,7 +539,7 @@
         const locate = document.createElement('button');
         locate.type = 'button';
         locate.textContent = `${index + 1}. 在照片上看`;
-        locate.setAttribute('aria-label', `在照片上看：${observation.label}`);
+        locate.setAttribute('aria-label', `${index + 1}. 在照片上看：${observation.label}`);
         locate.setAttribute('aria-pressed', 'false');
         locate.setAttribute('aria-controls', 'regionLayer');
         locate.addEventListener('click', () => {
@@ -552,8 +580,23 @@
 
     const stage = document.querySelector('#photoStage');
     const buttons = document.querySelectorAll('.tabs button');
+    const compareToggle = document.querySelector('#toggleCompare');
+    const comparisonRange = document.querySelector('#comparisonRange');
+    const showComparison = (active) => {
+      ['#comparisonControl', '#comparisonDivider', '#comparisonLabels'].forEach(selector => document.querySelector(selector).hidden = !active);
+      compareToggle.setAttribute('aria-pressed', String(active));
+      text('#toggleCompare', active ? '退出对照' : '滑动对照');
+      document.querySelector('#heroDownload').hidden = active || !hasEdit;
+      text('#versionHint', active ? '左边是仅调色，右边是原图。裁切版不参与这个对照；切回单个版本即可下载完整文件。' : versionHint);
+    };
+    const updateComparison = () => {
+      const split = Math.max(0, Math.min(100, Number(comparisonRange.value) || 0));
+      stage.style.setProperty('--split', `${split}%`);
+      comparisonRange.setAttribute('aria-valuetext', `左侧 ${split}% 为仅调色，右侧为原图`);
+    };
     const setMode = (mode) => {
       if (!data[`${mode}_asset`]) return;
+      showComparison(false);
       stage.dataset.mode = mode;
       buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
       for (const kind of ['source', 'color', 'treatment']) {
@@ -565,6 +608,18 @@
       download.download = `photography-coach-${mode}.${data[`${mode}_extension`]}`;
     };
     buttons.forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    compareToggle.addEventListener('click', () => {
+      if (!hasColor) return;
+      if (stage.dataset.mode === 'compare') { setMode('color'); return; }
+      stage.dataset.mode = 'compare';
+      showComparison(true);
+      buttons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+      document.querySelector('#heroSource').setAttribute('aria-hidden', 'false');
+      document.querySelector('#heroColor').setAttribute('aria-hidden', 'false');
+      document.querySelector('#heroTreatment').setAttribute('aria-hidden', 'true');
+      updateComparison();
+    });
+    comparisonRange.addEventListener('input', updateComparison);
     setMode(hasColor ? 'color' : hasTreatment ? 'treatment' : 'source');
     const practicePrompt = document.querySelector('#practicePrompt');
     practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;

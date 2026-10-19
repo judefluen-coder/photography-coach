@@ -12,11 +12,13 @@
 cd ~/.codex/skills/photography-coach
 python3 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install Pillow
+python3 -m pip install -r app/requirements.txt
 node --version
 ```
 
 Node.js 需另行安装。缺少它时部分测试会跳过，不能把跳过当成通过。虚拟环境只用于开发，不需提交到 Git。
+
+`app/` 尚无可运行服务或界面。`core/` 的规则装配、传输和图像处理只是实验基础模块，状态与缺口见[工作台开发说明](../app/README.md)；安装依赖不会启动评图服务。
 
 ## 检查图像信号
 
@@ -51,15 +53,18 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/validate_knowledge.py
 ```
 
-截至 2026-09-14，156 项测试及知识结构校验通过。单独检查自己生成的页面：
+截至 2026-10-19，本地 171 项 Python 测试及知识结构校验通过。新底层模块的测试使用模拟传输和合成小图，不连接真实模型，不产生 API 费用，不验证实际摄影点评质量。单独检查自己生成的页面：
 
 ```bash
 node scripts/test_visual_report_ui.mjs /absolute/path/to/report-page/index.html
+node scripts/test_project_home.mjs
 ```
 
-该脚本在 DOM 测试替身中运行真实内联 JavaScript，覆盖版本状态、下载链接等逻辑；不是真实浏览器验收，不验证下载完成、响应式布局或摄影判断。
+第一组在 DOM 测试替身中运行报告的真实内联 JavaScript，覆盖四种图像组合、默认版本、滑动对照、下载链接、区域/裁切标记及复制失败路径；第二组检查首页三版本、复制后备、主题切换及本地链接。它们不是真实浏览器验收，不验证下载完成、响应式布局或摄影判断。
 
-GitHub Actions 在推送和拉取请求时运行上述单元测试与知识结构校验，并重新生成 [公开报告示例](demo/README.md)，核对生成的 HTML 与仓库版本一致，再执行该示例的 JavaScript 状态测试。示例的二进制图片文件与报告输入均保存在 `docs/demo/`，不需要私有照片。
+项目首页位于 `docs/index.html`，直接打开即可；若需本地 HTTP 预览，在仓库根目录运行 `python3 -m http.server 8769 --bind 127.0.0.1 --directory docs`，再打开 `http://127.0.0.1:8769/`。不用构建或安装前端依赖，预览结束后按 Ctrl-C 停止服务器。
+
+GitHub Actions 在推送和拉取请求时运行上述单元测试与知识结构校验，并重新生成 [公开报告示例](demo/README.md)，核对生成的 HTML 与仓库版本一致，再执行报告与首页的 JavaScript 状态测试。示例的二进制图片文件与报告输入均保存在 `docs/demo/`，不需要私有照片。
 
 一项 v5 冻结快照测试依赖未公开的 `.benchmark-runs/` 文件；公开 CI 会明确跳过它，本地存在这两份文件时仍会核对哈希与条目数。跳过不算摄影发布验收通过。
 

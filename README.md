@@ -1,24 +1,26 @@
 # Photography Coach · 摄影教练
 
-**让每次拍摄，都有一个具体的下一步。**
+**看懂这一张，拍好下一张。**
 
-一个在 Codex 中使用的摄影教练：从你的一张照片出发，指出值得保留的地方、最值得调整的问题，给出重拍方法、调色对照和真正相关的优秀作品参考。
+从你的一张照片出发，指出值得保留的地方、最值得调整的问题，给出重拍方法、调色对照和真正相关的优秀作品参考。项目提供两种使用入口的目标：在自己的 Codex 中调用 Skill，或在可视化工作台中直接上传照片、获得点评并继续讨论。
 
-[在线打开完整示例](https://judefluen-coder.github.io/photography-coach/demo/) · [界面预览](#界面预览) · [开始使用](#开始使用) · [验证进展](#验证进展) · [开发文档](docs/development.md)
+[可视化首页](https://judefluen-coder.github.io/photography-coach/) · [操作完整示例](https://judefluen-coder.github.io/photography-coach/demo/) · [开始使用](#开始使用) · [参与改进](CONTRIBUTING.md) · [English overview](#english-overview)
 
-> 当前为研究原型，交付形态是 **Codex 技能 + 本地视觉报告**，不是独立 App 或在线评图网站。评分用于辅助练习，不是客观审美排名；摄影质量仍在验证中。
+> 当前为研究原型。**已实现：Codex Skill、本地视觉报告和静态示例；尚未实现：可上传照片并真实评图的可视化工作台。** 双入口建设见[当前计划](docs/dual-entry-plan.md)，静态首页不是第二种使用方式，也不代表该目标已经完成。评分用于辅助练习，不是客观审美排名；摄影质量仍在验证中。
+
+当前快照：[v0.2.0-alpha.1 · 开发预览](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.1)。新增的 `core/` 和 `app/` 是未接通的开发基础，不是可运行的第二入口；详见[实现状态](app/README.md)。
 
 ## 界面预览
 
-先看照片和一句结论，再区分“可以调整什么”与“应该保住什么”。版本切换和下载紧挨照片，便于边看边对照。
+先在项目首页切换三种实际图片，了解教练怎么看片；再打开完整报告，看具体依据、评分和参考作品。
 
 想直接操作，可[打开完整报告示例](https://judefluen-coder.github.io/photography-coach/demo/)；它包含原图、实际处理的仅调色版与裁切＋调色版，以及完整点评和下载文件。[示例来源及限制](docs/demo/README.md)。这是静态报告，不提供在线上传或自动评图。
 
-![摄影教练点评首页示意：左侧为列车照片和三个版本按钮，右侧为具体判断，下方区分可选调整与要保留的关系](docs/images/report-overview.png)
+[![摄影教练项目首页真实截图：照片优先的浅色页面，含实际示例切换和 Skill 使用入口](docs/images/project-home-browser.jpg)](https://judefluen-coder.github.io/photography-coach/)
 
-*基于现有报告模板和列车示例内容绘制的静态界面示意，非浏览器截图；布局与文案作了摘录，不代表新的交互实测。图中的照片为已有实际调整文件，不是生成式重画。*
+*2026-10-19 实际浏览器截图，非界面概念图。README 里的图片不能操作；点击图片可进入可交互页面。*
 
-示例摄影：Reinhold Möller（Ermell），[原图来源](https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg)，[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。本页两张示意图同以 CC BY-SA 4.0 提供，改动与署名详见[图像说明](docs/images/README.md)；摄影师未背书此项目或调整。
+示例摄影：Reinhold Möller（Ermell），[原图来源](https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg)，[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。截图中的图片沿用实际调色文件，未生成式重画。本页截图同以 CC BY-SA 4.0 提供，详见[图像说明](docs/images/README.md)；摄影师未背书此项目或调整。
 
 ## 为什么做这个项目
 
@@ -94,15 +96,16 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 | 仅调色 | 保留原取景，只比较曝光、明暗层次和颜色 |
 | 裁切＋调色 | 在同一调色基础上，判断收紧边缘是否值得失去那些环境 |
 
-![调整对照界面示意：上方并排显示原图和保持相同取景的仅调色版，下方单独显示裁切加调色版](docs/images/report-color-comparison.png)
+[![真实报告截图：同一画面左侧显示仅调色版、右侧显示原图，下方滑块用于对照，右侧给出具体点评](docs/images/report-compare-browser.jpg)](https://judefluen-coder.github.io/photography-coach/demo/)
 
-*同一列车示例的实际三版本文件：仅调色轻提车头暗部、收敛外围亮绿；裁切版另去掉顶部和右侧少量环境。两张上方图片保持相同展示比例。此处为静态界面示意，点击图片可查看大图，按钮不能在 README 中操作。*
+*点击报告中的“滑动对照”，拖动滑块或使用方向键，比较同一取景的颜色与明暗。左边仅调色，右边原图；裁切版不混进这个对照。调色轻提车头暗部、收敛外围亮绿，变化保持克制。*
 
 页面只展示实际提供的版本，不强制裁切。旧报告只有“原图 / 调整后”时也可以查看，但会说明没有独立调色对照。
 
 你还可以：
 
 - **在原图上看点评位置**，对照物体间距、线条和明暗关系；
+- **用章节导航快速跳转**，按需看完整观察、八维评分、调整或参考；
 - **显示或隐藏裁切框**，看清建议保留的范围；
 - **下载当前版本的完整图片**，而非页面缩小预览；
 - **复制练习说明**，和新照片一起发回 Codex，继续复盘。
@@ -135,20 +138,20 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 
 ## 验证进展
 
-以下是 **2026-09-14** 的项目状态，不是实时 CI 徽章，也不是摄影准确率：
+**界面与工程检查更新于 2026-10-19；摄影评测仍为 2026-09-14 的证据。** 以下不是摄影准确率：
 
 | 验证对象 | 当前证据 | 不能证明什么 |
 |---|---|---|
-| 代码与数据流程 | 156 项自动化测试通过，知识结构校验通过 | 点评一定准确、修图一定好看 |
+| 代码与数据流程 | 171 项 Python 测试通过；报告与首页两组 JS 逻辑检查、知识结构校验通过；新底层模块只做离线测试 | 工作台已接通、点评一定准确、修图一定好看 |
 | 规则校准 | 24 张答案可见样本；其中 13 张复核 | 独立盲测通过率 |
 | 新图查错 | 12 张冻结答卷，72 条分项引用证据 | 代表所有摄影场景或证明修订后水平 |
-| 示例页面 | 项目使用者已确认本轮示例 | 跨浏览器、全屏幕和所有报告均已验证 |
+| 示例页面 | Chromium 桌面/手机宽度检查；版本、滑块键盘操作、定位、裁切框、复制失败路径通过 | 跨浏览器、全屏幕和所有报告均已验证 |
 
-**正式发布质量门槛尚未通过。** 旧 v4 / v5 结果因图像身份或评分证据问题已作废，不能作为宣传指标；修订后的行为尚未在另一批独立新图上验证。自动化交互检查使用 DOM 测试替身，定位、裁切框和复制练习还缺完整的点击回归覆盖。
+**正式发布质量门槛尚未通过。** 旧 v4 / v5 结果因图像身份或评分证据问题已作废，不能作为宣传指标；修订后的行为尚未在另一批独立新图上验证。JS 自动化检查使用 DOM 测试替身，本轮另做真实浏览器验收；二者不代替摄影质量验证。详细范围见[本轮验收记录](docs/visual-upgrade-verification.md)。
 
 进一步核对：[24 张校准](references/calibration-review-20260914.json) · [12 张查错](references/forward-review-20260914.json) · [阶段复核记录](references/gpt6-final-review-20260914.md) · [发布评测方法](references/benchmark-method.md)
 
-阶段复核记录保留了当时的 148 项测试和待页面验收状态；后续三版本实现增加 8 项测试，使用者随后确认示例。公开审查记录包含原句和哈希，但本轮完整图片、答卷及运行包未全部公开，不是下载仓库即可完整复现的实验。
+阶段复核记录保留了当时的 148 项测试和待页面验收状态；后续三版本实现增加 8 项测试，使用者随后确认示例；本次再增加 15 项空参考与底层模块测试。公开审查记录包含原句和哈希，但本轮完整图片、答卷及运行包未全部公开，不是下载仓库即可完整复现的实验。
 
 ## 常见问题
 
@@ -166,7 +169,7 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 
 ## 开发与参与
 
-想调整规则、生成报告或运行验证，请看[开发指南](docs/development.md)。核心入口：
+想参与，先看[贡献指南](CONTRIBUTING.md)：最有帮助的是一个能指到画面具体位置的错例。想调整规则、生成报告或运行验证，请看[开发指南](docs/development.md)。核心入口：
 
 - [技能工作流](SKILL.md)
 - [完整性六检](references/integrity-preflight.md)
@@ -180,4 +183,10 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 
 ## 许可证
 
-除[两张界面示意图的单独许可](docs/images/README.md)外，仓库目前尚未指定开源许可证。公开可见不代表已提供开源授权；使用、修改或再分发的许可事宜，请先与维护者确认。第三方摄影作品另受各自的许可证或版权条件约束。
+除[界面截图与示意图的单独许可](docs/images/README.md)及[公共样例图像许可](docs/demo/README.md)外，仓库目前尚未指定开源许可证。公开可见不代表已提供开源授权；使用、修改或再分发的许可事宜，请先与维护者确认。第三方摄影作品另受各自的许可证或版权条件约束。
+
+## English overview
+
+Photography Coach is a photo-coaching project with **two intended entry points: a Codex Skill and a visual workbench**. The Skill and portable reports exist today; the upload-to-critique workbench is not implemented yet. Start with your own photo: inspect image-specific observations, eight evidence-backed score ranges (no overall ranking), faithful color/crop comparisons, an exact relevant reference work, and one practical exercise. See the [current implementation plan](docs/dual-entry-plan.md).
+
+[Try the static demo](https://judefluen-coder.github.io/photography-coach/demo/) or install the Skill using the command above and attach a photo in Codex with `$photography-coach`. The website does not accept uploads or run AI. Model access and editing tools are supplied by your environment; local reports do not mean all AI processing is offline. This is a research prototype, not an expert-certified evaluator. The code license is still pending; third-party images retain their own licenses.

@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install image test dependency
-        run: python -m pip install 'Pillow>=11,<13'
+        run: python -m pip install -r app/requirements.txt
       - name: Run unit tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Validate knowledge structure
@@ -27,3 +27,5 @@ jobs:
           python scripts/render_visual_report.py --input docs/demo/report.json --output "$RUNNER_TEMP/photography-coach-demo"
           cmp docs/demo/index.html "$RUNNER_TEMP/photography-coach-demo/index.html"
           node scripts/test_visual_report_ui.mjs docs/demo/index.html
+      - name: Check project home interactions and local links
+        run: node scripts/test_project_home.mjs

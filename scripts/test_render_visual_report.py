@@ -81,6 +81,37 @@ def report_payload(source: Path, treatment: Path | None = None) -> dict:
 
 
 class RenderVisualReportTest(unittest.TestCase):
+    def test_unverified_reference_is_explicitly_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'source.png'
+            source.write_bytes(PNG_1X1)
+            payload = report_payload(source)
+            payload.update(reference=None, reference_status='尚未找到可靠的具体作品。')
+            result = self.run_renderer(payload, root)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            data = self.embedded_data(root)
+            self.assertIsNone(data['reference'])
+            self.assertEqual(data['reference_status'], payload['reference_status'])
+            if shutil.which('node'):
+                ui = subprocess.run(['node', str(SCRIPT.with_name('test_visual_report_ui.mjs')),
+                                     str(root / 'output' / 'index.html')], capture_output=True, text=True)
+                self.assertEqual(ui.returncode, 0, ui.stdout + ui.stderr)
+
+    def test_absent_reference_requires_a_nonempty_status(self) -> None:
+        from render_visual_report import ReportError, validate_report
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'source.png'
+            source.write_bytes(PNG_1X1)
+            for status in (None, ''):
+                payload = report_payload(source)
+                payload['reference'] = None
+                if status is not None:
+                    payload['reference_status'] = status
+                with self.subTest(status=status), self.assertRaisesRegex(ReportError, 'reference_status'):
+                    validate_report(payload, root)
+
     def embedded_data(self, root: Path) -> dict:
         html = (root / 'output' / 'index.html').read_text(encoding='utf-8')
         return json.loads(re.search(r'<script id="reportData" type="application/json">(.*?)</script>', html, re.S)[1])

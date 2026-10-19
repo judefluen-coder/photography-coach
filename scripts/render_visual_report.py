@@ -111,6 +111,9 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
 
     for section, required in NESTED_FIELDS.items():
         value = data.get(section)
+        if section == "reference" and value is None:
+            data["reference_status"] = nonempty_text(data.get("reference_status"), "reference_status")
+            continue
         if not isinstance(value, dict):
             raise ReportError(f"{section} must be an object")
         section_missing = sorted(required - value.keys())
@@ -119,7 +122,8 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
         for field in required:
             value[field] = nonempty_text(value[field], f"{section}.{field}")
 
-    data["reference"]["url"] = validate_url(data["reference"]["url"], "reference.url")
+    if data["reference"] is not None:
+        data["reference"]["url"] = validate_url(data["reference"]["url"], "reference.url")
     # Preserve the six-check summary and attribution when supplied by newer reports.
     if "integrity" in data:
         checks = data["integrity"]

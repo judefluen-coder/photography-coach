@@ -1,0 +1,39 @@
+name: 具体错例或页面问题
+description: 指出看错的地方、无关参考，或复现一个界面问题。
+title: "[反馈] "
+body:
+  - type: markdown
+    attributes:
+      value: "谢谢你帮助改进。不要上传私人照片、未获公开授权的图片、密钥或敏感信息；可以用仓库列车示例复现。"
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 问题类型
+      options:
+        - 点评与画面不符
+        - 调整图或调色对照
+        - 参考作品不相关
+        - 页面或安装问题
+        - 表达或使用体验
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 具体哪里有问题？
+      description: 贴出相关原话或操作步骤，再说明可见证据与预期。照片可用有授权的公开链接代替上传。
+      placeholder: "例：点击仅调色后下载到的是裁切版。页面版本……浏览器……复现步骤……"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 版本与来源
+      description: 可选：commit、模型、浏览器、屏幕宽度、作品官方链接与许可。删去私人路径和身份信息。
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: 公开材料检查
+      options:
+        - label: 我没有附加密钥或私人敏感信息；附图（如有）具有明确公开授权。
+          required: true
