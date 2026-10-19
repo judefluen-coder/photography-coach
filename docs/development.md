@@ -9,7 +9,7 @@
 以下命令在仓库目录执行。Python 用于脚本；Pillow 用于图像探针和评测图像物化；Node.js 用于报告内联 JavaScript 的测试。纯报告渲染和知识结构校验使用 Python 标准库。
 
 ```bash
-cd ~/.codex/skills/photography-coach
+cd ~/photography-coach
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -r app/requirements.txt
@@ -17,6 +17,8 @@ node --version
 ```
 
 Node.js 需另行安装。缺少它时部分测试会跳过，不能把跳过当成通过。虚拟环境只用于开发，不需提交到 Git。
+
+上面假设按 README 把唯一主仓库放在用户目录；旧的技能目录安装方式仍兼容，进入实际仓库即可。维护者本机的旧 Skill 路径是指向主仓库的符号链接。完整目录职责见[版本地图](versions.md)和[迁移记录](repository-organization.md)。
 
 `app/` 尚无可运行服务或界面。`core/` 的规则装配、传输和图像处理只是实验基础模块，状态与缺口见[工作台开发说明](../app/README.md)；安装依赖不会启动评图服务。
 
@@ -53,7 +55,7 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/validate_knowledge.py
 ```
 
-截至 2026-10-19，本地 171 项 Python 测试及知识结构校验通过。新底层模块的测试使用模拟传输和合成小图，不连接真实模型，不产生 API 费用，不验证实际摄影点评质量。单独检查自己生成的页面：
+截至 2026-10-19，本地 177 项 Python 测试及知识结构校验通过。新底层模块的测试使用模拟传输和合成小图，不连接真实模型，不产生 API 费用，不验证实际摄影点评质量。目录检查验证公开归档链接、当前入口，以及忽略规则和 Git 索引不包含私人资料。单独检查自己生成的页面：
 
 ```bash
 node scripts/test_visual_report_ui.mjs /absolute/path/to/report-page/index.html
@@ -67,6 +69,8 @@ node scripts/test_project_home.mjs
 GitHub Actions 在推送和拉取请求时运行上述单元测试与知识结构校验，并重新生成 [公开报告示例](demo/README.md)，核对生成的 HTML 与仓库版本一致，再执行报告与首页的 JavaScript 状态测试。示例的二进制图片文件与报告输入均保存在 `docs/demo/`，不需要私有照片。
 
 一项 v5 冻结快照测试依赖未公开的 `.benchmark-runs/` 文件；公开 CI 会明确跳过它，本地存在这两份文件时仍会核对哈希与条目数。跳过不算摄影发布验收通过。
+
+维护者本机的 `.benchmark-runs` 与 `.benchmark-cache` 现在只是指向 `.local-data/` 的忽略链接，保留旧脚本默认路径；不要把链接或其目标加入 Git。历史报告集中到 `.local-data/reports/` 仅用于归档，本轮没有放宽渲染器“新报告输出在仓库外”的保护。静态预览仅监听 `127.0.0.1`；本机 `docs/archive/` 还可能有旧图兼容链接，不要把整个工作目录作为公网服务目录。线上 Pages 仅使用 Git 跟踪文件，不含这些忽略链接。
 
 正式发布另有质量门槛：
 

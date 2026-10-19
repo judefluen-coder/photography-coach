@@ -23,6 +23,9 @@
 | 报告字段或安全约束 | `scripts/render_visual_report.py`、`references/visual-report.md` |
 | 点评与参考作品规则 | `SKILL.md` 及其直接引用的规范 |
 | 质量评测 | `references/benchmark-method.md`，保留失败与冻结证据 |
+| 历史研究与原型 | `research/README.md`、`docs/archive/README.md`；历史规范不替换当前规则 |
+
+同一个项目只维护这一份仓库；发行版本使用标签和 Release，历史规范归档在 `research/`，不新建 `-v2` 仓库。`.local-data/`、兼容链接、原始图片、评论缓存、第三方完整检出和工具缓存不提交；不要使用 `git add -f` 绕过保护。修改目录时先记录文件清单与哈希，再验证旧入口和相对链接。
 
 ## 最小验证
 

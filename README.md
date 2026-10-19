@@ -8,7 +8,26 @@
 
 > 当前为研究原型。**已实现：Codex Skill、本地视觉报告和静态示例；尚未实现：可上传照片并真实评图的可视化工作台。** 双入口建设见[当前计划](docs/dual-entry-plan.md)，静态首页不是第二种使用方式，也不代表该目标已经完成。评分用于辅助练习，不是客观审美排名；摄影质量仍在验证中。
 
-当前快照：[v0.2.0-alpha.1 · 开发预览](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.1)。新增的 `core/` 和 `app/` 是未接通的开发基础，不是可运行的第二入口；详见[实现状态](app/README.md)。
+当前快照：[v0.2.0-alpha.2 · 单仓库整理](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.2)。`core/` 和 `app/` 仍是未接通的开发基础，不是可运行的第二入口；详见[实现状态](app/README.md)。历史规范、旧原型和研究资料已经统一分类，见[版本地图](docs/versions.md)。
+
+## 一个项目，两种入口
+
+这里维护的是摄影教练整个项目，Skill 不是另一个项目，可视化界面也不另开版本仓库。
+
+```text
+photography-coach/
+├── SKILL.md                Codex Skill 入口（可用）
+├── app/                    独立可视化工作台（建设中）
+├── core/                   共用规则装配、模型与图像处理基础
+├── references/             当前摄影标准和知识索引
+├── scripts/                工具与自动化测试
+├── docs/demo/              当前完整公开示例
+├── docs/archive/           早期界面源码归档
+├── research/               历史规范、研究协议与资料索引
+└── .local-data/            本机原始数据与历史报告，不进入 Git
+```
+
+当前使用看 `SKILL.md` 与 `docs/demo/`；开发新界面看 `app/`；研究历史看 [research/](research/README.md)。旧六维规范和早期原型不覆盖当前八维点评要求。源码与版本只在一个 GitHub 仓库维护，私人数据不随仓库分发。
 
 ## 界面预览
 
@@ -55,16 +74,17 @@
 
 ## 开始使用
 
-### 1. 安装技能
+### 1. 获取项目并连接 Skill
 
-需要能查看图片的 Codex 环境和 Git。以下命令适用于 macOS / Linux 的默认技能目录：
+Skill 入口需要能查看图片的 Codex 环境和 Git。macOS / Linux 推荐只克隆一份项目，再让 Codex 技能目录指向它：
 
 ```bash
-git clone https://github.com/judefluen-coder/photography-coach.git \
-  ~/.codex/skills/photography-coach
+git clone https://github.com/judefluen-coder/photography-coach.git ~/photography-coach
+mkdir -p ~/.codex/skills
+ln -s ~/photography-coach ~/.codex/skills/photography-coach
 ```
 
-已有同名目录时，不要直接覆盖本地改动。安装后重新打开一个 Codex 任务。
+已有同名目录时，不要覆盖或重复克隆；先确认原仓库的位置和本地改动。此前直接安装在 `~/.codex/skills/photography-coach` 的方式仍兼容，不要求所有使用者立即迁移。符号链接只是另一个入口，不占用第二份源码。安装后重新打开一个 Codex 任务；工作台尚不可启动，不要把 clone 成功理解为 Web 入口已完成。
 
 ### 2. 附一张照片，发出请求
 
@@ -142,7 +162,7 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 
 | 验证对象 | 当前证据 | 不能证明什么 |
 |---|---|---|
-| 代码与数据流程 | 171 项 Python 测试通过；报告与首页两组 JS 逻辑检查、知识结构校验通过；新底层模块只做离线测试 | 工作台已接通、点评一定准确、修图一定好看 |
+| 代码与数据流程 | 177 项 Python 测试通过；报告与首页两组 JS 逻辑检查、知识结构校验通过；新底层模块只做离线测试 | 工作台已接通、点评一定准确、修图一定好看 |
 | 规则校准 | 24 张答案可见样本；其中 13 张复核 | 独立盲测通过率 |
 | 新图查错 | 12 张冻结答卷，72 条分项引用证据 | 代表所有摄影场景或证明修订后水平 |
 | 示例页面 | Chromium 桌面/手机宽度检查；版本、滑块键盘操作、定位、裁切框、复制失败路径通过 | 跨浏览器、全屏幕和所有报告均已验证 |
@@ -151,7 +171,7 @@ git clone https://github.com/judefluen-coder/photography-coach.git \
 
 进一步核对：[24 张校准](references/calibration-review-20260914.json) · [12 张查错](references/forward-review-20260914.json) · [阶段复核记录](references/gpt6-final-review-20260914.md) · [发布评测方法](references/benchmark-method.md)
 
-阶段复核记录保留了当时的 148 项测试和待页面验收状态；后续三版本实现增加 8 项测试，使用者随后确认示例；本次再增加 15 项空参考与底层模块测试。公开审查记录包含原句和哈希，但本轮完整图片、答卷及运行包未全部公开，不是下载仓库即可完整复现的实验。
+阶段复核记录保留了当时的 148 项测试和待页面验收状态；后续三版本实现增加 8 项测试，使用者随后确认示例；alpha.1 增加 15 项空参考与底层模块测试，alpha.2 再增加 6 项目录、公开链接和私人数据边界检查。公开审查记录包含原句和哈希，但完整图片、答卷及运行包未全部公开，不是下载仓库即可完整复现的实验。
 
 ## 常见问题
 

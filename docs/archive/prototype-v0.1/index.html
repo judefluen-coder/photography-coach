@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="摄影教练研究原型：从画面证据到下一次可验证练习。"
+    />
+    <title>摄影教练｜研究原型 v0.1</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <aside role="note" style="padding:12px 24px;background:#fff2cc;color:#332800">历史原型 v0.1：这里没有自动评图，研究图片仅在本地保留。<a href="../../demo/index.html">打开当前完整公开示例</a> · <a href="RUN.md">查看归档说明</a></aside>
+    <a class="skip-link" href="#feedback">跳到反馈</a>
+
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="摄影教练首页">
+        <span class="brand-mark" aria-hidden="true">◫</span>
+        <span>摄影教练</span>
+        <span class="edition">看片练习室</span>
+      </a>
+      <div class="research-note">
+        <span class="status-dot" aria-hidden="true"></span>
+        不替你定义好照片，只帮你把画面看清楚
+      </div>
+    </header>
+
+    <main id="top" class="workspace">
+      <section class="photo-stage" aria-labelledby="photo-heading">
+        <div class="stage-header">
+          <div>
+            <p class="eyebrow">先看照片</p>
+            <h1 id="photo-heading">先看画面，再谈意图</h1>
+          </div>
+          <button id="zoom-button" class="icon-button" type="button" aria-label="放大照片">
+            <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+
+        <nav class="case-switcher" aria-label="示范案例">
+          <button type="button" data-case="station" aria-pressed="false"><span>01</span>这张已经成立</button>
+          <button type="button" data-case="dance" aria-pressed="false"><span>02</span>两种拍法都行</button>
+          <button class="is-active" type="button" data-case="ferry" aria-pressed="true"><span>03</span>先改这一处</button>
+        </nav>
+
+        <figure class="photo-frame">
+          <img
+            id="photo-preview"
+            src="../photography-benchmark/pilot-12/originals/p12-amsterdam-ferry-2025.jpg"
+            alt="灰天的渡轮码头，人群从船上离开，前景有行人和固定设施"
+          />
+          <figcaption id="photo-caption">
+            <span>示范样本 · 街头 / 纪实</span>
+            <a
+              href="https://commons.wikimedia.org/wiki/File:2025_-_free_download_CC0_photo_Amsterdam_-_people_are_leaving_the_ferry_boat_near_IJ_river_on_a_grey_day_-_street_photography_in_free_image_by_Fons_Heijnsbroek,_Netherlands.tif"
+              target="_blank"
+              rel="noreferrer"
+            >Fons Heijnsbroek，2025 · CC0 1.0 ↗</a>
+          </figcaption>
+        </figure>
+
+        <div class="photo-actions" aria-label="照片操作">
+          <button id="upload-button" class="primary-button" type="button">
+            <span aria-hidden="true">＋</span>
+            换成我的照片
+          </button>
+          <input id="photo-input" type="file" accept="image/*" hidden />
+          <button id="reset-button" class="text-button" type="button" hidden>返回示范</button>
+          <p class="privacy-copy">照片只在本地预览，不会从这个网页上传。</p>
+        </div>
+      </section>
+
+      <section id="feedback" class="feedback-panel" aria-labelledby="feedback-heading">
+        <div class="feedback-header">
+          <div>
+            <p class="eyebrow">一起看片</p>
+            <h2 id="feedback-heading">这一次，只说最值得留意的一件事</h2>
+          </div>
+          <span class="confidence">这次判断比较有把握</span>
+        </div>
+
+        <nav id="feedback-tabs" class="tabs" role="tablist" aria-label="反馈内容">
+          <button id="tab-quick" class="tab is-active" type="button" role="tab" data-tab="quick" aria-controls="panel-quick" aria-selected="true" tabindex="0">先听我说</button>
+          <button id="tab-evidence" class="tab" type="button" role="tab" data-tab="evidence" aria-controls="panel-evidence" aria-selected="false" tabindex="-1">看画面依据</button>
+          <button id="tab-practice" class="tab" type="button" role="tab" data-tab="practice" aria-controls="panel-practice" aria-selected="false" tabindex="-1">下次去拍</button>
+        </nav>
+
+        <div id="custom-state" class="custom-state" hidden>
+          <div class="empty-index" aria-hidden="true">02</div>
+          <p class="eyebrow">照片准备好了</p>
+          <h3>现在，把它发给摄影教练</h3>
+          <p>
+            这个页面现在只负责看图，真正的看片反馈由
+            <code>$photography-coach</code> 完成。把照片发到 Codex，再把下面这句话一起贴过去就行。
+          </p>
+          <ol class="handoff-steps">
+            <li><span>1</span>把这张照片发到当前 Codex 对话</li>
+            <li><span>2</span>复制下面的看片请求</li>
+            <li><span>3</span>先听第一遍；想聊拍摄意图时再补充</li>
+          </ol>
+          <button id="copy-prompt" class="primary-button copy-button" type="button">复制看片请求</button>
+          <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
+          <details>
+            <summary>预览请求内容</summary>
+            <pre id="prompt-preview"></pre>
+          </details>
+        </div>
+
+        <div id="analysis-content">
+          <div id="panel-quick" class="tab-panel" data-panel="quick" role="tabpanel" aria-labelledby="tab-quick">
+            <article class="reading-card">
+              <div class="card-kicker">
+                <span class="number">01</span>
+                <span>我的第一眼</span>
+              </div>
+              <p>
+                我先看到的是渡轮和迎面下来的人，接着视线却被正中央的柱子和垃圾桶拦住了。你拍到了下船的忙乱感，只是这股人流还没在画面里连起来。
+              </p>
+            </article>
+
+            <article class="strength-card">
+              <div class="card-kicker">
+                <span class="number">02</span>
+                <span>先说拍到的</span>
+              </div>
+              <h3>左边的人往外走，船上的人迎面涌来——现场是动的</h3>
+              <p>这两股相反的人流很重要。它让人感觉到“船刚靠岸”，而不是只看到一艘停着的渡轮。这个瞬间你抓到了。</p>
+            </article>
+
+            <article class="decision-card">
+              <div class="decision-label">
+                <span>先改这一处</span>
+                <span>让人流连起来</span>
+              </div>
+              <h3>可惜正中间这根柱子，比人更抢眼</h3>
+              <p>
+                柱子把船口和左边行人从中间劈开，下面的垃圾桶又占了一块最显眼的位置。结果是人明明很多，第一眼却不知道该跟着谁走。
+              </p>
+              <p class="runner-up"><strong>灰天不是最要紧的。</strong> 灰色反而符合通勤的日常感。先把人物关系理顺，比加颜色更有用。</p>
+            </article>
+
+            <article class="action-card">
+              <div class="action-meta">
+                <span class="number">03</span>
+                <span class="availability">相似场景</span>
+              </div>
+              <p class="eyebrow">如果我在你旁边，我会这样提醒</p>
+              <h3>先别急着按，往右挪两三步</h3>
+              <dl>
+                <div><dt>怎么做</dt><dd>让柱子避开船口，再等一个近处的人走进左边空处时按下快门。</dd></div>
+                <div><dt>会怎样</dt><dd>近处的人离开、远处的人涌来，两层动作能一口气读出来。</dd></div>
+                <div><dt>会失去</dt><dd>船身可能拍不全，码头设施也会少一些；但这张照片真正有意思的是人流，不是船的全貌。</dd></div>
+              </dl>
+            </article>
+
+            <article class="post-card">
+              <div>
+                <span class="mini-label can">这张现在还能做</span>
+                <p>把柱子和垃圾桶稍微压暗一点，让它们别那么跳。</p>
+              </div>
+              <div>
+                <span class="mini-label cannot">但别指望后期做到</span>
+                <p>压暗只能减轻干扰，没法把被柱子隔开的两股人流重新接上。</p>
+              </div>
+            </article>
+          </div>
+
+          <div id="panel-evidence" class="tab-panel" data-panel="evidence" role="tabpanel" aria-labelledby="tab-evidence" hidden>
+            <article class="evidence-ledger">
+              <div class="card-kicker"><span class="number">01</span><span>我为什么这么说</span></div>
+              <ol>
+                <li><strong>看正中间：</strong>柱子从上贯到底，刚好挡在船口人群前面。</li>
+                <li><strong>再看下面：</strong>垃圾桶又大又完整，比远处的人更容易先被看见。</li>
+                <li><strong>最后看左边：</strong>近处的人向左走，和船口迎面下来的人本来可以形成很好的一来一往。</li>
+                <li><strong>换句话说：</strong>问题不是画面里东西多，而是最显眼的东西没有帮你讲“人群下船”这件事。</li>
+              </ol>
+            </article>
+
+            <article class="score-card">
+              <div class="card-kicker"><span class="number">02</span><span>把判断摊开看 · 不算总分</span></div>
+              <div class="score-list" aria-label="六维评价区间">
+                <div class="score-row"><span>画面是否看得清</span><span>3–4 / 5</span><i style="--from: 60%; --to: 80%"></i></div>
+                <div class="score-row"><span>视线有没有落点</span><span>2–3 / 5</span><i style="--from: 40%; --to: 60%"></i></div>
+                <div class="score-row"><span>光和颜色是否帮忙</span><span>3–4 / 5</span><i style="--from: 60%; --to: 80%"></i></div>
+                <div class="score-row"><span>人物与物件的关系</span><span>2–3 / 5</span><i style="--from: 40%; --to: 60%"></i></div>
+                <div class="score-row"><span>有没有值得多看一眼</span><span>3–4 / 5</span><i style="--from: 60%; --to: 80%"></i></div>
+                <div class="score-row"><span>整张照片是否说到一起</span><span>2–3 / 5</span><i style="--from: 40%; --to: 60%"></i></div>
+              </div>
+            </article>
+
+            <article class="boundary-card">
+              <div class="card-kicker"><span class="number">03</span><span>哪些是看到的，哪些还不知道</span></div>
+              <p><strong>我能看到：</strong>人物站在哪里、往哪儿走，以及谁挡住了谁。</p>
+              <p><strong>我由此判断：</strong>大多数人可能会先注意到柱子和垃圾桶，再去找人群。</p>
+              <p><strong>单凭照片不知道：</strong>你当时为什么拍、能不能换位置，也不知道你用了什么器材和参数。</p>
+            </article>
+          </div>
+
+          <div id="panel-practice" class="tab-panel" data-panel="practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+            <article class="practice-card">
+              <p class="eyebrow">找半小时，拍 20 张</p>
+              <h3>去拍一次“一近一远”</h3>
+              <p>找一个车站、路口或出入口，先站到柱子不会挡人的位置。每张都同时留一个近处的人和一组远处的人；机位别动，只等不同的时机。</p>
+              <div class="pass-rule">
+                <span>回来看什么</span>
+                <p>把照片缩小。如果你还能一眼看出近处和远处的人各自往哪里走，这张就留下。</p>
+              </div>
+            </article>
+
+            <article class="reference-card">
+              <img
+                src="../photography-benchmark/ordinary-12-v0.2/references/R01-station-stairs.jpg"
+                alt="阿姆斯特丹中央车站楼梯，近景与远景行人沿不同方向移动"
+                loading="lazy"
+              />
+              <div>
+                <p class="eyebrow">看一个相近的处理</p>
+                <h3>这里也有柱子，但人流没有被截断</h3>
+                <p>不用模仿地点和颜色，只看近处、远处的人怎么同时留在画面里。障碍物不必全清掉，关键是它有没有挡住最重要的动作。</p>
+                <a
+                  href="https://commons.wikimedia.org/wiki/File:Free_photo_of_people,_entering_and_leaving_Central_station_Amsterdam_on_the_outdoor_staircases_with_in_the_background_the_city_center_and_the_street_Prins_Hendrikkade;_-_street_photography_by_Fons_Heijnsbroek,_2026_-_free_image.tif"
+                  target="_blank"
+                  rel="noreferrer"
+                >Fons Heijnsbroek，2026 · CC0 1.0 ↗</a>
+              </div>
+            </article>
+
+            <article class="direction-card">
+              <p class="eyebrow">如果想继续看</p>
+              <h3>可以去看 Joel Meyerowitz 怎么处理复杂街景</h3>
+              <p>看的时候先别学色调，只问一件事：画面里每一层为什么要留下？边缘的人又是怎么和中间发生关系的？</p>
+              <a href="https://www.joelmeyerowitz.com/street-photography" target="_blank" rel="noreferrer">访问摄影师官方页面 ↗</a>
+            </article>
+          </div>
+
+          <footer class="feedback-footer">
+            <p>这是仍在测试的看片方法。它给的是有依据的建议，不是审美判决。</p>
+            <button id="context-button" class="text-button" type="button">我想说说当时为什么拍</button>
+          </footer>
+          <div id="context-note" class="context-note" hidden>
+            当然可以。第一遍我只看照片；知道你的想法以后，我们再看这张照片有没有把它传出来。你不需要为照片“答辩”。
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="image-dialog" class="image-dialog" aria-label="照片大图">
+      <button id="dialog-close" class="dialog-close" type="button" aria-label="关闭大图">×</button>
+      <img id="dialog-image" alt="" />
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
