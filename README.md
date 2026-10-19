@@ -203,10 +203,10 @@ ln -s ~/photography-coach ~/.codex/skills/photography-coach
 
 ## 许可证
 
-除[界面截图与示意图的单独许可](docs/images/README.md)及[公共样例图像许可](docs/demo/README.md)外，仓库目前尚未指定开源许可证。公开可见不代表已提供开源授权；使用、修改或再分发的许可事宜，请先与维护者确认。第三方摄影作品另受各自的许可证或版权条件约束。
+本项目原创的软件代码及随附使用文档采用 [MIT 许可证](LICENSE)。第三方摄影作品、其衍生图及包含照片的截图**不属于 MIT 授权范围**，各文件的来源、改动和适用许可见[第三方素材清单](THIRD_PARTY_NOTICES.md)。外部参考作品仅提供链接，不因本仓库的 MIT 许可证而改变权利归属。
 
 ## English overview
 
 Photography Coach is a photo-coaching project with **two intended entry points: a Codex Skill and a visual workbench**. The Skill and portable reports exist today; the upload-to-critique workbench is not implemented yet. Start with your own photo: inspect image-specific observations, eight evidence-backed score ranges (no overall ranking), faithful color/crop comparisons, an exact relevant reference work, and one practical exercise. See the [current implementation plan](docs/dual-entry-plan.md).
 
-[Try the static demo](https://judefluen-coder.github.io/photography-coach/demo/) or install the Skill using the command above and attach a photo in Codex with `$photography-coach`. The website does not accept uploads or run AI. Model access and editing tools are supplied by your environment; local reports do not mean all AI processing is offline. This is a research prototype, not an expert-certified evaluator. The code license is still pending; third-party images retain their own licenses.
+[Try the static demo](https://judefluen-coder.github.io/photography-coach/demo/) or install the Skill using the command above and attach a photo in Codex with `$photography-coach`. The website does not accept uploads or run AI. Model access and editing tools are supplied by your environment; local reports do not mean all AI processing is offline. This is a research prototype, not an expert-certified evaluator. Project-authored software and accompanying usage documentation use the [MIT License](LICENSE); third-party images and derivatives are excluded and listed in the [asset notices](THIRD_PARTY_NOTICES.md).
