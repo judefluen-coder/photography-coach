@@ -8,7 +8,7 @@
 
 > 当前为研究原型。**已实现：Codex Skill、本地视觉报告和静态示例；尚未实现：可上传照片并真实评图的可视化工作台。** 双入口建设见[当前计划](docs/dual-entry-plan.md)，静态首页不是第二种使用方式，也不代表该目标已经完成。评分用于辅助练习，不是客观审美排名；摄影质量仍在验证中。
 
-当前快照：[v0.2.0-alpha.2 · 单仓库整理](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.2)。`core/` 和 `app/` 仍是未接通的开发基础，不是可运行的第二入口；详见[实现状态](app/README.md)。历史规范、旧原型和研究资料已经统一分类，见[版本地图](docs/versions.md)。
+当前快照：[v0.2.0-alpha.3 · MIT 授权与素材边界](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.3)。`core/` 和 `app/` 仍是未接通的开发基础，不是可运行的第二入口；详见[实现状态](app/README.md)。历史规范、旧原型和研究资料已经统一分类，见[版本地图](docs/versions.md)。
 
 ## 一个项目，两种入口
 

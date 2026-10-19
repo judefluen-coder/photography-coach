@@ -7,6 +7,7 @@
 | 项目发行版 | [v0.1.0](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.1.0) | 首次研究预览，保留原标签 |
 | 项目发行版 | [v0.2.0-alpha.1](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.1) | 视觉展示与实验底层模块快照；工作台未接通 |
 | 项目发行版 | [v0.2.0-alpha.2](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.2) | 同一仓库内整理历史原型与研究资料，隔离本地数据；不是新增自动评图能力 |
+| 项目发行版 | [v0.2.0-alpha.3](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.3) | 为原创软件增加 MIT 许可证并逐项注明第三方图片许可；没有新增工作台功能 |
 | 摄影规范 | [v0.2–v0.6 归档](../research/archive/README.md)及当前 `references/` | 规范演变，与项目发行号不同；当前使用以根 Skill 引用为准 |
 | 历史界面 | [prototype-v0.1](archive/prototype-v0.1/RUN.md)、当前 [demo](demo/index.html) | 旧界面源码与现行静态报告示例，不是独立仓库或可用 AI 服务 |
 
