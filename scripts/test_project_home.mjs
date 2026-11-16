@@ -44,9 +44,10 @@ vm.runInNewContext(fs.readFileSync(path.join(root, 'site.js'), 'utf8'), {
 });
 assert.equal(byId.get('sampleControls').hidden, false);
 assert.equal(versionButtons.length, 3);
+const screenshotPaths = {workbench:'images/workbench-browser.jpg',annotation:'images/report-annotation-browser.jpg',scores:'images/report-scores-browser.jpg'};
 for (const button of versionButtons) {
   button.events.click();
-  assert.equal(byId.get('sampleImage').src, `demo/assets/${button.dataset.version}-preview.jpg`);
+  assert.equal(byId.get('sampleImage').src, screenshotPaths[button.dataset.version]);
   assert.ok(fs.existsSync(path.join(root, byId.get('sampleImage').src)));
   assert.equal(versionButtons.filter(b => b.attrs['aria-pressed'] === 'true').length, 1);
   assert.ok(byId.get('sampleImage').alt);
@@ -66,10 +67,10 @@ assert.equal(byId.get('copyFallback').value, byId.get('installCommand').textCont
 const theme = byId.get('themeToggle');
 assert.equal(theme.hidden, false);
 theme.events.click();
-assert.equal(document.documentElement.dataset.theme, 'dark');
-assert.equal(theme.attrs['aria-label'], '切换为浅色主题');
-theme.events.click();
 assert.equal(document.documentElement.dataset.theme, 'light');
+assert.equal(theme.attrs['aria-label'], '切换为深色主题');
+theme.events.click();
+assert.equal(document.documentElement.dataset.theme, 'dark');
 delete document.documentElement.dataset.theme;
 systemDark = true; onThemeChange();
 assert.equal(theme.attrs['aria-label'], '切换为浅色主题');
@@ -85,4 +86,6 @@ for (const [, value] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
 }
 assert.ok(!html.includes('http-equiv="refresh"'), 'Home should not auto-redirect');
 assert.ok(!html.includes('type="file"'), 'Static sample must not pretend to upload for critique');
-console.log('PASS: home versions, copy/fallback, themes, local links and assets. Layout not tested.');
+assert.ok(!html.includes('代码许可证待选'), 'Current license copy must match MIT');
+assert.ok(!html.includes('demo/assets/'), 'Current home shows the street workbench, not the legacy train images');
+console.log('PASS: home screenshot views, copy/fallback, dark default/themes, local links and assets. Layout not tested.');

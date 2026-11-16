@@ -1,23 +1,23 @@
 # Photography Coach · 摄影教练
 
-**看懂这一张，拍好下一张。**
+**照片点评、调整对照与拍摄练习。**
 
-从你的一张照片出发，指出值得保留的地方、最值得调整的问题，给出重拍方法、调色对照和真正相关的优秀作品参考。项目提供两种使用入口的目标：在自己的 Codex 中调用 Skill，或在可视化工作台中直接上传照片、获得点评并继续讨论。
+Photography Coach 分析照片中的构图、光线、色彩和空间关系，给出八维评分、调整建议及拍摄练习。可以在独立工作台里上传照片，也可以在 Codex 中使用 Skill。两种方式共用摄影规则。
 
-[可视化首页](https://judefluen-coder.github.io/photography-coach/) · [操作完整示例](https://judefluen-coder.github.io/photography-coach/demo/) · [开始使用](#开始使用) · [参与改进](CONTRIBUTING.md) · [English overview](#english-overview)
+[项目首页](https://judefluen-coder.github.io/photography-coach/) · [查看完整示例](https://judefluen-coder.github.io/photography-coach/demo-street/) · [开始使用](#开始使用) · [参与改进](CONTRIBUTING.md) · [English overview](#english-overview)
 
-> 当前为研究原型。**已实现：Codex Skill、本地视觉报告和静态示例；尚未实现：可上传照片并真实评图的可视化工作台。** 双入口建设见[当前计划](docs/dual-entry-plan.md)，静态首页不是第二种使用方式，也不代表该目标已经完成。评分用于辅助练习，不是客观审美排名；摄影质量仍在验证中。
+> 当前为实验版本。**Skill 和本机工作台已实现，工作台尚未使用真实 API 完成测试。** 实时参考作品检索、独立修图复核还未接入工作台，两种使用方式的功能暂不完全相同。评分只供练习参考，点评质量仍在验证中。
 
-当前快照：[v0.2.0-alpha.3 · MIT 授权与素材边界](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.3)。`core/` 和 `app/` 仍是未接通的开发基础，不是可运行的第二入口；详见[实现状态](app/README.md)。历史规范、旧原型和研究资料已经统一分类，见[版本地图](docs/versions.md)。
+当前 `main` 提供独立暗房工作台与 Skill 共用报告的**开发实验快照**。最近带标签的 Release 仍为 [v0.2.0-alpha.3 · MIT 授权与素材边界](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.3)，该标签不包含新工作台；使用新界面请获取 `main`。启动方法和限制见[工作台说明](app/README.md)，历史内容见[版本地图](docs/versions.md)。
 
 ## 一个项目，两种入口
 
-这里维护的是摄影教练整个项目，Skill 不是另一个项目，可视化界面也不另开版本仓库。
+工作台和 Skill 都在这个仓库中维护，不需要分别下载两份项目。
 
 ```text
 photography-coach/
 ├── SKILL.md                Codex Skill 入口（可用）
-├── app/                    独立可视化工作台（建设中）
+├── app/                    独立本机 Web 工作台（实验版）
 ├── core/                   共用规则装配、模型与图像处理基础
 ├── references/             当前摄影标准和知识索引
 ├── scripts/                工具与自动化测试
@@ -27,54 +27,77 @@ photography-coach/
 └── .local-data/            本机原始数据与历史报告，不进入 Git
 ```
 
-当前使用看 `SKILL.md` 与 `docs/demo/`；开发新界面看 `app/`；研究历史看 [research/](research/README.md)。旧六维规范和早期原型不覆盖当前八维点评要求。源码与版本只在一个 GitHub 仓库维护，私人数据不随仓库分发。
+独立界面使用看 [app/README.md](app/README.md)，Skill 使用看 `SKILL.md`；研究历史看 [research/](research/README.md)。旧六维规范和早期原型不覆盖当前八维点评要求。源码与版本只在一个 GitHub 仓库维护，私人照片和工作台记录保存在仓库外，不随项目分发。
 
 ## 界面预览
 
-先在项目首页切换三种实际图片，了解教练怎么看片；再打开完整报告，看具体依据、评分和参考作品。
+暗房工作台：桌面左侧看大图，右侧看主要建议、八维评分及对应理由；手机自动改为上下排列。下图为免密钥公开案例的实际运行截图，不是一次新模型点评。
 
-想直接操作，可[打开完整报告示例](https://judefluen-coder.github.io/photography-coach/demo/)；它包含原图、实际处理的仅调色版与裁切＋调色版，以及完整点评和下载文件。[示例来源及限制](docs/demo/README.md)。这是静态报告，不提供在线上传或自动评图。
+[![暗房工作台真实截图：骑行街拍主画布、八维评分和具体建议](docs/images/workbench-browser.jpg)](app/README.md)
 
-[![摄影教练项目首页真实截图：照片优先的浅色页面，含实际示例切换和 Skill 使用入口](docs/images/project-home-browser.jpg)](https://judefluen-coder.github.io/photography-coach/)
+*不依赖 Codex，启动后即可看演示；真实点评需要自己的模型 API。[启动工作台](app/README.md)。照片保持完整取景，点标记展开点评；“局部放大”只改变浏览视图，不保存裁切。*
 
-*2026-10-19 实际浏览器截图，非界面概念图。README 里的图片不能操作；点击图片可进入可交互页面。*
+项目首页可切换工作台、图上点评和八维评分的真实截图；点击“完整示例”进入可操作的报告。README 图片本身不能操作。
 
-示例摄影：Reinhold Möller（Ermell），[原图来源](https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg)，[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。截图中的图片沿用实际调色文件，未生成式重画。本页截图同以 CC BY-SA 4.0 提供，详见[图像说明](docs/images/README.md)；摄影师未背书此项目或调整。
+想直接操作，可[打开街拍完整示例](https://judefluen-coder.github.io/photography-coach/demo-street/)；包含图上点评、八维区间与具体作品参考。[示例来源及限制](docs/demo-street/README.md)。它没有调色成品，因此不会显示前后对照或混合导出。这是静态报告，不提供在线上传或自动评图。
+
+[![摄影教练项目首页真实截图：暗房风格、工作台界面和两种使用入口](docs/images/project-home-browser.jpg)](https://judefluen-coder.github.io/photography-coach/)
+
+*2026-11-16 实际浏览器截图，非界面概念图。项目首页与静态示例随 `main` 更新；工作台仍需在本机启动，不是在线 AI 服务。*
+
+当前截图摄影：Fons Heijnsbroek，[原图来源](https://commons.wikimedia.org/wiki/File:A_small_familie_is_biking_through_the_bicycle_tunnel,_in_the_city;_free_photo_Amsterdam_by_Fons_Heijnsbroek,_04-2022.jpg)，[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。照片未裁切、未调色、未生成式重画，截图加入界面与点评；截图同以 CC BY-SA 4.0 提供，详见[图像说明](docs/images/README.md)。摄影师未背书此项目。
 
 ## 为什么做这个项目
 
 看了很多摄影视频，轮到自己的照片，还是不知道哪里不对。
 
-“构图不错”“故事感不够”“主体再突出一点”都像点评，却很难变成下一次按快门时能做的事。Photography Coach 希望把这一步讲清楚：**在哪里、为什么、怎么改，以及改完会失去什么。**
+仅仅说“构图不错”或“主体不够突出”，并不能解释该怎么调整。这个项目希望让每条建议对应到具体的画面位置，说明判断理由、调整方法，以及可能损失的内容。
 
-它适合想通过自己的照片练习的摄影爱好者。你不需要先选出大师作品，不需要邀请专家，也不必先解释“我想表达什么”。从一张可查看的照片开始就可以。
+适合希望通过实际拍摄改进作品的摄影爱好者。提供一张照片即可；拍摄背景和想讨论的问题可以补充，但不必填写。
 
 ## 反馈长什么样
 
 以下是表达方式的示意，不是某张照片的完整评测或效果证明：
 
-> 先别裁。人物旁边的亮墙更抢眼，但左边那条走道也交代了他站在哪里。
+> 保留左边的走道，只压一点人物旁边亮墙的亮度。
 >
-> 可以先只压一点墙面的亮度，让视线回到脸上。停在墙仍然比衣服亮的时候，不要把它压成灰色。这样会少一点原来的明快感，但不用牺牲环境。
+> 亮墙比脸更抢眼，走道则交代了人站在哪里。压暗墙面能让脸更容易被看见；墙仍然比衣服亮时就停。这样会少一点原来的明快感，但保住了环境。
 >
 > 下次在类似场景里，固定位置和取景，等人物转头，让脸与墙的明暗边界更清楚，再拍一张对照。
 
 完整反馈还包括：
 
-| 你会看到 | 帮你解决什么 |
+| 内容 | 说明 |
 |---|---|
-| 第一判断与一个重点 | 先做哪件事；如果画面已经成立，也会明确说不必硬改 |
-| 全画面看片地图 | 不只看人物，还看周围物体、边缘、线条、明暗、虚实、大小远近和关系 |
-| 八维评分与理由 | 用分数区间定位短板，每项对应画面证据，不合成一个总分 |
-| 重拍动作与后期方案 | 区分现场能解决的事和当前文件能调整的事，说明效果与代价 |
+| 点评概要与主要问题 | 说明是否需要调整，以及优先考虑哪一处 |
+| 画面分析与位置标注 | 检查人物、周围物体、边缘、线条、明暗、虚实和远近关系 |
+| 八维评分与理由 | 每项给出评分区间和画面依据，不计算总分 |
+| 重拍建议与后期方案 | 分别说明现场拍摄和当前文件可以怎么改，以及相应的取舍 |
 | 一张具体作品参考 | 给出直达链接，说明看哪里、学什么、哪些地方不能照搬 |
-| 一次小练习 | 用 20–40 分钟只练一个变量，再带着新照片回来复盘 |
+| 拍摄练习 | 通常用 20-40 分钟练习一个问题，再比较新旧照片 |
 
-观察范围不限于一套固定清单。风景、街拍、人像、静物中的关键关系不同；教练先检查全画面，再选择最值得讲清楚的部分。**重点要突出，观察不能只剩一个点。**
+风景、街拍、人像和静物的点评重点不同。分析会覆盖全画面，再优先解释影响较大的问题，不会只检查人物或构图。
 
 ## 开始使用
 
-### 1. 获取项目并连接 Skill
+### 入口 A：独立工作台，不需要 Codex
+
+需要 Python 3.11+。在现有仓库根目录执行（macOS / Linux）：
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r app/requirements.txt
+python -m app.server
+```
+
+打开 **http://127.0.0.1:8768/**。点“演示案例”可直接体验已有完整报告，不需要密钥、不产生 API 费用。用自己的照片时，先在“连接模型”中填写支持图片和结构化输出的 Responses API 配置；选图、确认数据去向与费用后开始点评。可继续追问、在本机生成试调版、恢复记录并导出报告。
+
+上传本身不会调用模型；密钥只保存在本机服务内存。此版本不提供公网托管，第三方端点与真实模型质量尚未验证。[完整启动说明、Windows 用法和限制](app/README.md)。
+
+### 入口 B：在 Codex 中使用 Skill
+
+#### 1. 获取项目并连接 Skill
 
 Skill 入口需要能查看图片的 Codex 环境和 Git。macOS / Linux 推荐只克隆一份项目，再让 Codex 技能目录指向它：
 
@@ -84,19 +107,19 @@ mkdir -p ~/.codex/skills
 ln -s ~/photography-coach ~/.codex/skills/photography-coach
 ```
 
-已有同名目录时，不要覆盖或重复克隆；先确认原仓库的位置和本地改动。此前直接安装在 `~/.codex/skills/photography-coach` 的方式仍兼容，不要求所有使用者立即迁移。符号链接只是另一个入口，不占用第二份源码。安装后重新打开一个 Codex 任务；工作台尚不可启动，不要把 clone 成功理解为 Web 入口已完成。
+已有同名目录时，不要覆盖或重复克隆；先确认原仓库的位置和本地改动。此前直接安装在 `~/.codex/skills/photography-coach` 的方式仍兼容，不要求所有使用者立即迁移。符号链接只是另一个入口，不占用第二份源码。安装后重新打开一个 Codex 任务。无需为另一种入口再克隆一份。
 
-### 2. 附一张照片，发出请求
+#### 2. 附一张照片，发出请求
 
 ```text
 请使用 $photography-coach 点评这张照片。
-看完整个画面，保留评分，但把重点讲清楚：哪里已经成立，最值得改什么，下一次怎么拍。
-请用通俗的话，并给一张真正相关的优秀作品参考。
+请分析整个画面并保留评分，说明哪些地方值得保留、最需要调整什么，以及重拍时可以怎么做。
+请用通俗的话解释，并给出一张与建议相关的优秀作品参考。
 ```
 
 标题、EXIF、拍摄经过、按快门的理由都不是必填项。只有截图或低清图片时，细节判断会受限，教练应明确说明。
 
-### 3. 想看成片，就要求输出对照
+#### 3. 生成调整图片与对照报告
 
 ```text
 请直接做出调整后的图片，并生成可打开的视觉报告。
@@ -116,9 +139,11 @@ ln -s ~/photography-coach ~/.codex/skills/photography-coach
 | 仅调色 | 保留原取景，只比较曝光、明暗层次和颜色 |
 | 裁切＋调色 | 在同一调色基础上，判断收紧边缘是否值得失去那些环境 |
 
-[![真实报告截图：同一画面左侧显示仅调色版、右侧显示原图，下方滑块用于对照，右侧给出具体点评](docs/images/report-compare-browser.jpg)](https://judefluen-coder.github.io/photography-coach/demo/)
+[![真实报告截图：人物远近关系的说明直接展开在照片上，并用框与连线定位](docs/images/report-annotation-browser.jpg)](https://judefluen-coder.github.io/photography-coach/demo-street/)
 
-*点击报告中的“滑动对照”，拖动滑块或使用方向键，比较同一取景的颜色与明暗。左边仅调色，右边原图；裁切版不混进这个对照。调色轻提车头暗部、收敛外围亮绿，变化保持克制。*
+*点图上的标记，展开或收起对应位置的分析；可按 Escape 关闭。只有提供真实同取景调色文件时，报告才显示“滑动对照”：左边原图，右边调色版。裁切版不参与此对照。*
+
+有调色文件时，还可调节“影调强度”并下载当前混合结果；这不是新的模型调用，也不是局部曝光滑杆。实际处理的颜色／明暗与裁切文件可在[后期对照案例](https://judefluen-coder.github.io/photography-coach/demo/)中查看；该历史案例不再作为首页主视觉。
 
 页面只展示实际提供的版本，不强制裁切。旧报告只有“原图 / 调整后”时也可以查看，但会说明没有独立调色对照。
 
@@ -134,40 +159,44 @@ ln -s ~/photography-coach ~/.codex/skills/photography-coach
 
 ## 参考作品为什么值得看
 
-“也是街拍”“颜色很像”“出自大师”都不足以构成推荐理由。
+参考作品应能帮助理解本次建议，而不只是题材、颜色相似，或者出自名家。
 
-教练先判断你的照片需要解决或保留什么，再找具体作品：例如背景怎样衬托暗色主体、多人之间怎样形成分组、边缘遮挡怎样保留空间。每个参考都应说明：
+例如，点评提到暗色主体不清楚，参考就应展示背景如何衬托暗色主体；点评涉及多人关系，参考应能说明人物如何分组。每个参考都应说明：
 
 1. **共同之处**：两张图的哪一处关系可以拿来比较。
-2. **观看任务**：花几十秒，具体看哪里。
+2. **观察位置**：具体看哪里。
 3. **不能照搬的地方**：场景、光线或表达目的有什么差别。
-4. **可迁移的练习**：下次如何试一次。
+4. **练习方法**：如何在自己的拍摄中尝试。
 
-本地 150 张单图卡是检索起点，**不是推荐上限**。没有合适的本地作品时，可继续检索外部来源并核验。默认给一张；找不到可靠匹配就说明缺失，不用不相关的名作填空。受版权限制的作品只提供核验后的链接。
+本地收录了 150 张作品卡片，检索不限于这些作品。没有合适的本地参考时，Skill 可使用运行环境中的检索工具查找并核验其他来源。默认推荐一张；没有可靠匹配时会说明原因。受版权限制的作品只提供核验后的链接。**独立工作台暂未接入实时检索，会显示未检索状态。**
 
 ## 判断依据与边界
 
-教练结合可追溯的摄影课程、博物馆与档案、摄影师经验、教育者内容及技术资料，按照片中的证据作判断。资料规模不等于权威性，模型也可能看错物体、方向或人物关系。
+评价规则参考了有来源记录的摄影课程、馆藏资料、摄影师经验和技术文档。资料数量不能证明点评准确，模型仍可能看错物体、方向或人物关系。
 
-- **先保护，再调整。** 暗、虚、斜、留白和遮挡不自动等于错误；建议应说明实际损失和修复代价。
-- **有分数，但不排名。** 八维采用 0–5 的整数区间，每项给理由；不生成总分，不拿不同题材排高低。
-- **后期要忠实。** 允许摄影后期中的裁切、曝光、颜色与局部明暗等调整；不凭空增删、替换或重排人物和物体。
-- **不知道就说不知道。** 不靠外貌或画面猜身份、关系、地点、拍摄意图和因果。补充背景可以改变表达判断，不能改写像素事实。
+- 暗、虚、倾斜、留白和遮挡不一定是问题。建议调整时，需要说明理由和可能的损失。
+- 八维采用 0-5 的整数区间，每项给出理由；不生成总分，不对不同题材排名。
+- 后期可调整裁切、曝光、颜色与局部明暗，不增删、替换或重排人物和物体。
+- 无法从照片确认的身份、关系、地点和意图，应注明不确定。补充背景可帮助理解表达，但不能改变画面中实际可见的内容。
 
 八个评分维度及具体规则见[评价标准](references/evaluation-standard.md)；完整输出要求见[点评格式](references/response-card.md)。
 
 ## 验证进展
 
-**界面与工程检查更新于 2026-10-19；摄影评测仍为 2026-09-14 的证据。** 以下不是摄影准确率：
+**界面与工程检查更新于 2026-11-15；摄影评测仍为 2026-09-14 的证据。** 以下不是摄影准确率：
 
 | 验证对象 | 当前证据 | 不能证明什么 |
 |---|---|---|
-| 代码与数据流程 | 177 项 Python 测试通过；报告与首页两组 JS 逻辑检查、知识结构校验通过；新底层模块只做离线测试 | 工作台已接通、点评一定准确、修图一定好看 |
+| 代码与数据流程 | 205 项 Python 测试通过；两份报告与首页 JS 检查、工作台语法及知识结构检查通过 | 真实 API 兼容、点评一定准确、修图一定好看 |
 | 规则校准 | 24 张答案可见样本；其中 13 张复核 | 独立盲测通过率 |
 | 新图查错 | 12 张冻结答卷，72 条分项引用证据 | 代表所有摄影场景或证明修订后水平 |
 | 示例页面 | Chromium 桌面/手机宽度检查；版本、滑块键盘操作、定位、裁切框、复制失败路径通过 | 跨浏览器、全屏幕和所有报告均已验证 |
 
 **正式发布质量门槛尚未通过。** 旧 v4 / v5 结果因图像身份或评分证据问题已作废，不能作为宣传指标；修订后的行为尚未在另一批独立新图上验证。JS 自动化检查使用 DOM 测试替身，本轮另做真实浏览器验收；二者不代替摄影质量验证。详细范围见[本轮验收记录](docs/visual-upgrade-verification.md)。
+
+当前采用暗房工作台：深灰底与荧黄绿重点色，主画布承载完整照片、可开关标注和真实影调对照；桌面右侧集中呈现建议、区间评分和理由，不再预留空的调色栏。Skill 与独立工作台共用模板，不改摄影标准或历史评分。[布局修正](docs/layout-density-20261116.md) · [工程验收](docs/darkroom-verification-20261115.md) · [设计验收](design-qa.md)。
+
+本轮检查桌面及 390／320 像素窄屏、照片记录入口、标注边界、评分跳转、键盘对照与真实混合图片导出。前一轮的上传、刷新恢复和模拟服务流程见[工作台工程记录](docs/workbench-verification-20261109.md)；实际付费调用仍未测试。
 
 进一步核对：[24 张校准](references/calibration-review-20260914.json) · [12 张查错](references/forward-review-20260914.json) · [阶段复核记录](references/gpt6-final-review-20260914.md) · [发布评测方法](references/benchmark-method.md)
 
@@ -189,7 +218,7 @@ ln -s ~/photography-coach ~/.codex/skills/photography-coach
 
 ## 开发与参与
 
-想参与，先看[贡献指南](CONTRIBUTING.md)：最有帮助的是一个能指到画面具体位置的错例。想调整规则、生成报告或运行验证，请看[开发指南](docs/development.md)。核心入口：
+提交问题或修改代码前，请看[贡献指南](CONTRIBUTING.md)。调整规则、生成报告和运行测试的方法见[开发指南](docs/development.md)；修改界面文字请遵循[文案规范](docs/writing-style.md)。相关文件：
 
 - [技能工作流](SKILL.md)
 - [完整性六检](references/integrity-preflight.md)
@@ -199,7 +228,7 @@ ln -s ~/photography-coach ~/.codex/skills/photography-coach
 
 项目还提供[可再生成的完整示例](docs/demo/README.md)、[版本记录](CHANGELOG.md)和[有来源的相邻产品对比](docs/alternatives.md)。GitHub Actions 会运行代码与结构检查；它的绿色状态不代表摄影点评已经通过独立盲测。
 
-最有帮助的反馈是具体错例：**原话是什么、图中哪里与它矛盾、建议执行后会损失什么。** 欢迎在 [Issues](https://github.com/judefluen-coder/photography-coach/issues) 提交错误点评、参考图匹配问题、中文表达建议或可复现的页面问题。图片请只使用有明确公开授权的材料；修改评测时需保留原答卷与证据，不把已参与调参的样本继续称为独立盲测。
+可在 [Issues](https://github.com/judefluen-coder/photography-coach/issues) 提交点评错误、参考图匹配问题、文案建议或页面故障。点评问题请附原话、对应画面位置，以及建议可能造成的损失。图片请只使用有明确公开授权的材料；修改评测时需保留原答卷与证据，不把已参与调参的样本继续称为独立盲测。
 
 ## 许可证
 
@@ -207,6 +236,6 @@ ln -s ~/photography-coach ~/.codex/skills/photography-coach
 
 ## English overview
 
-Photography Coach is a photo-coaching project with **two intended entry points: a Codex Skill and a visual workbench**. The Skill and portable reports exist today; the upload-to-critique workbench is not implemented yet. Start with your own photo: inspect image-specific observations, eight evidence-backed score ranges (no overall ranking), faithful color/crop comparisons, an exact relevant reference work, and one practical exercise. See the [current implementation plan](docs/dual-entry-plan.md).
+Photography Coach has **two entry points: a Codex Skill and an experimental standalone local web workbench**. Run `python -m app.server` from the repository, then open `http://127.0.0.1:8768/`. No Codex installation is needed for the workbench. Try the labeled example without a key, or configure your own vision-capable Responses API for photo feedback, follow-up questions, local color/crop previews, history and portable reports. See the [setup and limitations](app/README.md).
 
-[Try the static demo](https://judefluen-coder.github.io/photography-coach/demo/) or install the Skill using the command above and attach a photo in Codex with `$photography-coach`. The website does not accept uploads or run AI. Model access and editing tools are supplied by your environment; local reports do not mean all AI processing is offline. This is a research prototype, not an expert-certified evaluator. Project-authored software and accompanying usage documentation use the [MIT License](LICENSE); third-party images and derivatives are excluded and listed in the [asset notices](THIRD_PARTY_NOTICES.md).
+[Try the static demo](https://judefluen-coder.github.io/photography-coach/demo-street/) or install the Skill and attach a photo in Codex with `$photography-coach`. The GitHub Pages site remains a showcase, not a hosted AI service. The workbench is available on `main` as an experimental development snapshot, not in the older alpha.3 release; live API compatibility, reference retrieval and independent edit review remain unverified or unimplemented. Local storage does not mean offline AI processing. This is a research prototype, not an expert-certified evaluator. Project-authored software and accompanying usage documentation use the [MIT License](LICENSE); third-party images and derivatives are excluded and listed in the [asset notices](THIRD_PARTY_NOTICES.md).

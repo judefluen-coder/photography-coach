@@ -1,0 +1,113 @@
+<!doctype html>
+<!--
+Phosphor Icons (image / arrows-horizontal), https://github.com/phosphor-icons/core
+MIT License
+
+Copyright (c) 2023 Phosphor Icons
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>见一张 · 摄影教练工作台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="app.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">跳到工作区</a>
+  <header class="topbar">
+    <a class="brand" href="/">见一张<small>摄影教练</small></a>
+    <nav aria-label="工作台导航"><button id="workbenchHome" type="button" aria-current="page">工作台</button><button id="jumpReference" type="button" disabled>作品参考</button><button id="jumpPractice" type="button" disabled>下次练习</button></nav>
+    <div class="header-actions"><button id="toggleHistory" type="button" aria-controls="historySidebar" aria-expanded="false">照片记录</button><button id="showDemo" type="button">演示案例</button><button id="connectModel" type="button">连接模型</button><button id="newPhoto" type="button" class="new-photo">上传照片</button><button id="themeToggle" type="button" aria-label="切换深浅主题">浅色</button></div>
+  </header>
+  <div class="app-layout">
+    <aside class="sidebar" id="historySidebar" aria-label="本机照片记录" hidden>
+      <div class="sidebar-heading"><h2>照片记录 <span id="sessionCount">0</span></h2><button id="closeHistory" type="button" aria-label="收起照片记录">收起</button></div>
+      <p class="aside-note">照片和点评保存在这台电脑。</p>
+      <p id="emptyHistory" class="empty-history">还没有上传照片。</p>
+      <div id="historyList" class="history-list"></div>
+      <div class="sidebar-foot"><p>其他使用方式</p><a href="https://github.com/judefluen-coder/photography-coach#开始使用" target="_blank" rel="noreferrer">在 Codex 中使用 Skill ↗</a></div>
+    </aside>
+    <main id="workspace">
+      <p id="notice" class="notice" role="alert" hidden></p>
+      <section id="uploadView" aria-labelledby="uploadTitle">
+        <div class="workspace-heading"><p class="eyebrow">照片点评</p><h1 id="uploadTitle">上传照片，获取点评</h1><p>查看构图、光线、色彩等方面的分析，以及具体的调整建议。</p></div>
+        <div class="upload-layout">
+          <div>
+            <div class="drop-area" id="dropArea">
+              <div id="emptyPhoto"><svg class="empty-photo-icon" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z"/></svg><h2>拖入照片</h2><p>或点击下方按钮选择文件</p></div>
+              <img id="photoPreview" alt="当前选择的照片预览" hidden>
+              <label class="choose-photo" for="photoInput" id="chooseLabel">选择照片 <span aria-hidden="true">↗</span></label>
+              <input id="photoInput" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" disabled>
+            </div>
+            <div class="photo-meta"><span id="photoName">JPG / PNG / WebP</span><span id="photoSize">小于 16 MB，最多 3000 万像素</span></div>
+            <p class="caption-note">选图只保存到本机。点击“开始点评”并确认后，才会把去掉元数据的预览发送给你配置的模型。</p>
+          </div>
+          <form id="critiqueForm" class="brief">
+            <label for="context">想重点看什么？<span>选填</span></label>
+            <textarea id="context" maxlength="2000" rows="4" placeholder="例如：构图是不是太满了？颜色需要调整吗？"></textarea>
+            <div class="connection-note"><span id="connectionState">尚未连接模型</span><button id="editConnection" type="button">设置连接 ↗</button></div>
+            <label class="consent"><input id="consent" type="checkbox"><span id="consentText">我确认将照片预览和补充文字发给所选模型，并承担该服务的 API 费用。</span></label>
+            <button id="startCritique" class="primary" type="submit" disabled>开始点评 <span aria-hidden="true">↗</span></button>
+            <p class="fine-print">点评含八维评分和练习建议。每次点评只发出一次请求，失败后不会自动重试。</p>
+            <button id="tryDemo" class="text-button" type="button">查看完整示例 ↗</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="taskPanel" class="task-panel" aria-live="polite" hidden><div><p class="eyebrow">处理进度</p><h2 id="taskTitle">正在生成点评</h2><p id="taskHint">可以离开或刷新页面，返回后查看结果。不会自动重复调用模型。</p></div><button id="cancelTask" class="quiet" type="button">停止等待</button></section>
+
+      <section id="resultView" hidden aria-labelledby="resultTitle">
+        <div class="result-heading"><div><p class="eyebrow" id="resultMode">本机记录</p><h1 id="resultTitle">照片点评</h1></div><details class="record-tools"><summary>记录与导出</summary><div class="result-tools"><a id="openReport" target="_blank" rel="noreferrer">单独打开点评 ↗</a><a id="trainDemo" href="/demo/index.html" target="_blank" rel="noreferrer" hidden>其他调色案例 ↗</a><a id="exportReport" download>下载离线报告</a><a id="originalDownload" download>下载原始上传文件</a><button id="archivePhoto" class="text-button" type="button">移入回收区</button></div><p id="resultBoundary" class="result-boundary"></p></details><button id="makePreview" type="button" hidden>生成试调版（本机）</button></div>
+        <p id="previewBoundary" class="fine-print" hidden>试调按模型参数在本机处理，不另调用模型；不增删物体，保留原图。尚未做独立视觉复核，请对照决定是否保留。</p>
+        <iframe id="reportFrame" title="当前照片的完整摄影点评" class="report-frame" hidden></iframe>
+        <div id="conversation" class="conversation" hidden>
+          <div class="conversation-heading"><h2>继续提问</h2><p>可以补充拍摄情况，或指出点评中的错误。追问不会更改原评分。</p></div>
+          <div id="messages" class="messages" aria-live="polite"></div>
+          <form id="questionForm"><label for="question">问题</label><textarea id="question" maxlength="2000" rows="3" placeholder="例如：保留现在的暗部，会有什么影响？" required></textarea><label class="consent"><input id="questionConsent" type="checkbox"><span id="questionConsentText">本次追问会再次发送照片预览和当前点评，产生一次 API 调用费用。</span></label><button id="askQuestion" class="primary" type="submit">发送问题 ↗</button></form>
+          <p id="usage" class="fine-print"></p>
+        </div>
+      </section>
+      <footer>私人记录只保存在本机；使用模型时会向所选服务发送内容。此版本不提供公网账号或托管服务。</footer>
+    </main>
+  </div>
+
+  <dialog id="configDialog" aria-labelledby="configTitle">
+    <form id="configForm">
+      <div class="dialog-heading"><p class="eyebrow">模型设置</p><button id="closeConfig" type="button" aria-label="关闭模型设置">关闭</button></div>
+      <h2 id="configTitle">配置 API 连接</h2>
+      <p class="dialog-intro">不需要 Codex。使用你自己的 API 密钥，费用由模型服务收取。保存设置不会发起付费调用。</p>
+      <label for="baseUrl">API 基地址</label><input id="baseUrl" type="url" value="https://api.openai.com/v1" required spellcheck="false" autocomplete="off">
+      <p class="field-hint">需支持 Responses 协议、图片输入与结构化输出。第三方兼容性需自行验证；只允许公开 HTTPS 443 地址。</p>
+      <label for="model">模型名称</label><input id="model" type="text" placeholder="填写你的服务中可用的视觉模型名称" maxlength="160" required spellcheck="false" autocomplete="off">
+      <label for="apiKey">API 密钥</label><input id="apiKey" type="password" maxlength="4096" required autocomplete="off" spellcheck="false">
+      <p class="field-hint">仅存在本机服务内存里，不写入仓库或浏览器存储。关闭服务后需重新配置。</p>
+      <label for="tokenLimit">单次输出 token 上限</label><input id="tokenLimit" type="number" value="10000" min="4000" max="16000" step="1000" required>
+      <p class="field-hint">不是金额上限，也不包含输入 token。达到上限可能无法生成完整点评。</p>
+      <p id="configError" class="notice" role="alert" hidden></p>
+      <div class="dialog-actions"><button id="saveConfig" class="primary" type="submit">保存设置</button><button id="clearConfig" class="text-button" type="button">清除当前密钥</button></div>
+    </form>
+  </dialog>
+  <noscript>工作台需要 JavaScript 才能选图和调用本机服务。你仍可在 demo/index.html 查看已生成示例。</noscript>
+</body>
+</html>

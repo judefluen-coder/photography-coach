@@ -1,6 +1,16 @@
 {
   "title":"弯道已经拍出来了，先让车头更好读。",
   "decision":"NO_STRUCTURAL_BOTTLENECK",
+  "visual_guides":[],
+  "learning_check":{
+    "observation_index":0,
+    "question":"车头不够显眼时，你会先试哪种调法？",
+    "options":[
+      {"title":"整张增加对比和饱和度","effect":"绿叶和红色零件会更鲜艳，明暗也更强烈。","cost":"绿叶可能更抢眼，车头黑面却更难分辨；颜色更浓不等于车头更清楚。"},
+      {"title":"提车头暗部，收外围绿叶","effect":"让号码下方的黑面稍清楚，同时让右侧亮绿叶不那么突出。","cost":"会少一点原图的鲜亮和硬朗。车头提过头会发灰，叶子收太多会失去层次。"}
+    ],
+    "takeaway":"先比较号码下方黑面的层次，再看右侧绿叶有没有抢过车头。两处关系都改善才保留，不必把整张图调得更浓。"
+  },
   "source_image":"assets/source.jpg",
   "color_image":"assets/color.jpg",
   "source_preview_image":"assets/source-preview.jpg",

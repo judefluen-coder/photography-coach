@@ -27,5 +27,10 @@ jobs:
           python scripts/render_visual_report.py --input docs/demo/report.json --output "$RUNNER_TEMP/photography-coach-demo"
           cmp docs/demo/index.html "$RUNNER_TEMP/photography-coach-demo/index.html"
           node scripts/test_visual_report_ui.mjs docs/demo/index.html
+          python scripts/render_visual_report.py --input docs/demo-street/report.json --output "$RUNNER_TEMP/photography-coach-demo-street"
+          cmp docs/demo-street/index.html "$RUNNER_TEMP/photography-coach-demo-street/index.html"
+          node scripts/test_visual_report_ui.mjs docs/demo-street/index.html
       - name: Check project home interactions and local links
         run: node scripts/test_project_home.mjs
+      - name: Check workbench JavaScript syntax
+        run: node --check app/static/app.js

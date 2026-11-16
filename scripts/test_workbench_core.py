@@ -75,6 +75,8 @@ class WorkbenchContractsTest(unittest.TestCase):
             report = report_payload(source)
             del report['source_image'], report['reference']
             report['decision'] = 'CONDITIONAL_BRANCH'
+            report['visual_guides'] = []
+            report['learning_check'] = None
             report['integrity'] = [{'family': f, 'verdict': '观察', 'basis': '仍需回看原图。'} for f in FAMILIES]
             for observation in report['observations']:
                 observation['regions'] = []

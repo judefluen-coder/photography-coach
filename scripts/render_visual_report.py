@@ -144,6 +144,8 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
             credit[field] = nonempty_text(credit.get(field), f"source_credit.{field}")
         for field in ("url", "license_url"):
             credit[field] = validate_url(credit.get(field), f"source_credit.{field}")
+    if "visual_guides" in data:
+        validate_visual_guides(data["visual_guides"])
 
     observations = data.get("observations")
     if not isinstance(observations, list) or not 6 <= len(observations) <= 9:
@@ -169,6 +171,8 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
         raise ReportError("observations must contain 2 to 5 次要 items")
     if priority_counts["要保护"] < 1:
         raise ReportError("observations must contain at least one 要保护")
+    if data.get("learning_check") is not None:
+        validate_learning_check(data["learning_check"], len(observations))
 
     scores = data.get("scores")
     if not isinstance(scores, list) or len(scores) != 8:
@@ -206,6 +210,83 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
         validate_rectangle(data["edit"]["crop_region"], "edit.crop_region")
 
     return data, source_path, treatment_path
+
+
+def validate_learning_check(check: Any, observation_count: int) -> None:
+    """An optional, photo-specific comparison, never an aesthetic exam or gate."""
+    if not isinstance(check, dict):
+        raise ReportError("learning_check must be an object or null")
+    index = check.get("observation_index")
+    if isinstance(index, bool) or not isinstance(index, (int, float)) or not math.isfinite(index) or int(index) != index or not 0 <= index < observation_count:
+        raise ReportError("learning_check.observation_index must refer to an existing observation")
+    for field, limit in (("question", 80), ("takeaway", 160)):
+        check[field] = nonempty_text(check.get(field), f"learning_check.{field}")
+        if len(check[field]) > limit:
+            raise ReportError(f"learning_check.{field} is too long")
+    options = check.get("options")
+    if not isinstance(options, list) or len(options) != 2:
+        raise ReportError("learning_check.options must contain two approaches")
+    for option in options:
+        if not isinstance(option, dict):
+            raise ReportError("learning_check option must be an object")
+        for field, limit in (("title", 24), ("effect", 120), ("cost", 120)):
+            option[field] = nonempty_text(option.get(field), f"learning_check.option.{field}")
+            if len(option[field]) > limit:
+                raise ReportError(f"learning_check.option.{field} is too long")
+    if options[0]["title"] == options[1]["title"]:
+        raise ReportError("learning_check options must describe different approaches")
+
+
+def validate_visual_guides(guides: Any) -> None:
+    """Validate optional teaching geometry, never an edit or a measured scene model."""
+    if not isinstance(guides, list) or len(guides) > 3:
+        raise ReportError("visual_guides must contain at most three diagrams")
+    tones = {"accent", "secondary", "dark", "light", "warm", "cool"}
+
+    def point(value: Any) -> None:
+        if not isinstance(value, dict):
+            raise ReportError("visual_guides point must be an object")
+        for key in ("x", "y"):
+            number = value.get(key)
+            if isinstance(number, bool) or not isinstance(number, (int, float)) or not math.isfinite(number) or not 0 <= number <= 1:
+                raise ReportError("visual_guides coordinates must be finite numbers within 0 to 1")
+
+    for guide in guides:
+        if not isinstance(guide, dict):
+            raise ReportError("visual_guides item must be an object")
+        for field, limit in (("title", 24), ("takeaway", 240), ("boundary", 240)):
+            guide[field] = nonempty_text(guide.get(field), f"visual_guides.{field}")
+            if len(guide[field]) > limit:
+                raise ReportError(f"visual_guides.{field} is too long")
+        for group, maximum in (("areas", 6), ("lines", 8), ("labels", 6)):
+            values = guide.get(group)
+            if not isinstance(values, list) or len(values) > maximum:
+                raise ReportError(f"visual_guides.{group} has an invalid item count")
+            for item in values:
+                if not isinstance(item, dict):
+                    raise ReportError(f"visual_guides.{group} item must be an object")
+                if group == "labels":
+                    point(item)
+                    item["text"] = nonempty_text(item.get("text"), "visual_guides.label")
+                    if len(item["text"]) > 24:
+                        raise ReportError("visual_guides label is too long")
+                    if "explanation" in item:
+                        item["explanation"] = nonempty_text(item["explanation"], "visual_guides.label.explanation")
+                        if len(item["explanation"]) > 160:
+                            raise ReportError("visual_guides label explanation is too long")
+                    continue
+                if not isinstance(item.get("tone"), str) or item["tone"] not in tones:
+                    raise ReportError("visual_guides tone is invalid")
+                points = item.get("points")
+                minimum = 3 if group == "areas" else 2
+                if not isinstance(points, list) or not minimum <= len(points) <= 24:
+                    raise ReportError("visual_guides path has an invalid point count")
+                for value in points:
+                    point(value)
+                if group == "lines" and not isinstance(item.get("arrow"), bool):
+                    raise ReportError("visual_guides arrow must be boolean")
+        if not guide["areas"] and not guide["lines"]:
+            raise ReportError("visual_guides must show at least one area or line")
 
 
 def validate_rectangle(value: Any, field: str) -> None:

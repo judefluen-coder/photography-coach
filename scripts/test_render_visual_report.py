@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import copy
 import json
 import re
 import shutil
@@ -81,6 +82,132 @@ def report_payload(source: Path, treatment: Path | None = None) -> dict:
 
 
 class RenderVisualReportTest(unittest.TestCase):
+    def learning_payload(self) -> dict:
+        return {
+            'observation_index': 2, 'question': '想让手更清楚，先调哪里？',
+            'options': [{'title': '只提中间暗部', 'effect': '手的轮廓可能更清楚。', 'cost': '提多会发灰。'},
+                        {'title': '整张提亮', 'effect': '全图都会变亮。', 'cost': '浅墙可能太亮。'}],
+            'takeaway': '看清已有的轮廓就停。',
+        }
+
+    def test_learning_check_validates_existing_observation_and_bounded_text(self) -> None:
+        from render_visual_report import ReportError, validate_learning_check
+        validate_learning_check(self.learning_payload(), 6)
+        for index in (-1, 6, .5, True, None, '2', float('nan'), float('inf')):
+            with self.subTest(index=index), self.assertRaisesRegex(ReportError, 'observation_index'):
+                validate_learning_check({**self.learning_payload(), 'observation_index': index}, 6)
+        cases = [None, [], {}, {**self.learning_payload(), 'options': []},
+                 {**self.learning_payload(), 'options': [self.learning_payload()['options'][0]] * 2}]
+        for field, value in [('question', 'x' * 81), ('takeaway', ''), ('takeaway', 'x' * 161)]:
+            cases.append({**self.learning_payload(), field: value})
+        for field, value in [('title', 'x' * 25), ('effect', 'x' * 121), ('cost', ''), ('effect', None)]:
+            invalid = self.learning_payload(); invalid['options'][0][field] = value; cases.append(invalid)
+        for check in cases:
+            with self.subTest(check=check), self.assertRaisesRegex(ReportError, 'learning_check'):
+                validate_learning_check(check, 6)
+
+    def test_learning_check_roundtrips_as_safe_optional_content(self) -> None:
+        for mode in ('absent', 'null', 'localized', 'unlocalized'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); source = root / 'source.png'; source.write_bytes(PNG_1X1)
+                payload = report_payload(source)
+                if mode != 'absent':
+                    payload['learning_check'] = None if mode == 'null' else self.learning_payload()
+                if mode in ('localized', 'unlocalized'):
+                    payload['learning_check']['question'] = '</script><script>notExecutable()</script>'
+                    if mode == 'localized':
+                        payload['observations'][2]['regions'] = [{'x': .2, 'y': .2, 'width': .3, 'height': .3}]
+                result = self.run_renderer(payload, root)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(self.embedded_data(root).get('learning_check'), payload.get('learning_check'))
+                html = (root / 'output' / 'index.html').read_text()
+                self.assertNotIn('</script><script>notExecutable()</script>', html)
+                if shutil.which('node'):
+                    ui = subprocess.run(['node', str(SCRIPT.with_name('test_visual_report_ui.mjs')),
+                                         str(root / 'output' / 'index.html')], capture_output=True, text=True)
+                    self.assertEqual(ui.returncode, 0, ui.stdout + ui.stderr)
+
+    def guide_payload(self) -> dict:
+        return {
+            'title': '人物与空间', 'takeaway': '近处较大，远处较小。', 'boundary': '简图不表示实际距离。',
+            'areas': [{'tone': 'accent', 'points': [{'x': .1, 'y': .2}, {'x': .3, 'y': .2}, {'x': .2, 'y': .5}]}],
+            'lines': [{'tone': 'secondary', 'arrow': True, 'points': [{'x': .3, 'y': .6}, {'x': .7, 'y': .3}]}],
+            'labels': [{'x': .1, 'y': .1, 'text': '</script><b>标记</b>'}],
+        }
+
+    def test_optional_guides_render_safely_without_observation_regions(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'source.png'
+            source.write_bytes(PNG_1X1)
+            payload = report_payload(source)
+            payload['visual_guides'] = [self.guide_payload()]
+            result = self.run_renderer(payload, root)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(self.embedded_data(root)['visual_guides'], payload['visual_guides'])
+            html = (root / 'output' / 'index.html').read_text()
+            self.assertNotIn('</script><b>标记</b>', html)
+            if shutil.which('node'):
+                ui = subprocess.run(['node', str(SCRIPT.with_name('test_visual_report_ui.mjs')),
+                                     str(root / 'output' / 'index.html')], capture_output=True, text=True)
+                self.assertEqual(ui.returncode, 0, ui.stdout + ui.stderr)
+
+    def test_guides_reject_invalid_geometry(self) -> None:
+        from render_visual_report import ReportError, validate_visual_guides
+        for value in (-.01, 1.01, float('nan'), float('inf'), True, '0.5', None):
+            for kind in ('areas', 'lines', 'labels'):
+                guide = self.guide_payload()
+                point = guide[kind][0] if kind == 'labels' else guide[kind][0]['points'][0]
+                point['x'] = value
+                with self.subTest(value=value, kind=kind), self.assertRaisesRegex(ReportError, 'visual_guides'):
+                    validate_visual_guides([guide])
+
+    def test_guide_label_explanations_validate_and_escape_as_text(self) -> None:
+        from render_visual_report import ReportError, validate_visual_guides
+        for explanation in ('', None, 7, 'x' * 161):
+            guide = self.guide_payload()
+            guide['labels'][0]['explanation'] = explanation
+            with self.subTest(explanation=explanation), self.assertRaisesRegex(ReportError, 'explanation'):
+                validate_visual_guides([guide])
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'source.png'
+            source.write_bytes(PNG_1X1)
+            payload = report_payload(source)
+            guide = self.guide_payload()
+            guide['labels'][0]['explanation'] = '</script><script>notExecutable()</script>'
+            payload['visual_guides'] = [guide, {**self.guide_payload(), 'labels': []}]
+            result = self.run_renderer(payload, root)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            html = (root / 'output' / 'index.html').read_text()
+            self.assertNotIn(guide['labels'][0]['explanation'], html)
+            self.assertEqual(self.embedded_data(root)['visual_guides'], payload['visual_guides'])
+            if shutil.which('node'):
+                ui = subprocess.run(['node', str(SCRIPT.with_name('test_visual_report_ui.mjs')),
+                                     str(root / 'output' / 'index.html')], capture_output=True, text=True)
+                self.assertEqual(ui.returncode, 0, ui.stdout + ui.stderr)
+
+    def test_guides_reject_unbounded_or_empty_content(self) -> None:
+        from render_visual_report import ReportError, validate_visual_guides
+        guide = self.guide_payload()
+        invalid = [None, {}, [guide] * 4]
+        for key, value in [('title', 'x' * 25), ('takeaway', 'x' * 241), ('boundary', ''),
+                           ('areas', [guide['areas'][0]] * 7), ('lines', [guide['lines'][0]] * 9),
+                           ('labels', [guide['labels'][0]] * 7)]:
+            invalid.append([{**guide, key: value}])
+        for key, value in [('tone', []), ('tone', 'url(x)'), ('points', []), ('points', [{'x': 0, 'y': 0}] * 25)]:
+            item = copy.deepcopy(guide)
+            item['areas'][0][key] = value
+            invalid.append([item])
+        invalid.append([{**guide, 'areas': [], 'lines': []}])
+        item = copy.deepcopy(guide)
+        item['lines'][0]['arrow'] = 'true'
+        invalid.append([item])
+        for payload in invalid:
+            with self.subTest(payload=payload), self.assertRaisesRegex(ReportError, 'visual_guides'):
+                validate_visual_guides(payload)
+        validate_visual_guides([])
+
     def test_unverified_reference_is_explicitly_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -221,6 +348,25 @@ class RenderVisualReportTest(unittest.TestCase):
                 payload['integrity'] = checks
                 with self.subTest(checks=checks), self.assertRaisesRegex(ReportError, 'six'):
                     validate_report(payload, root)
+
+    @unittest.skipUnless(shutil.which('node'), 'Node is required for inline-JS unit checks')
+    def test_interval_charts_handle_endpoints_and_unrated_dimensions(self) -> None:
+        for interval in ('0-0 / 5', '0-5 / 5', '5-5/5', 'N/A', 'all-unrated'):
+            with self.subTest(interval=interval), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source = root / 'source.png'
+                source.write_bytes(PNG_1X1)
+                payload = report_payload(source)
+                if interval == 'all-unrated':
+                    for score in payload['scores']:
+                        score['interval'] = 'N/A'
+                else:
+                    payload['scores'][0]['interval'] = interval
+                result = self.run_renderer(payload, root)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                ui = subprocess.run(['node', str(SCRIPT.with_name('test_visual_report_ui.mjs')),
+                                     str(root / 'output' / 'index.html')], capture_output=True, text=True)
+                self.assertEqual(ui.returncode, 0, ui.stdout + ui.stderr)
 
     @unittest.skipUnless(shutil.which('node'), 'Node is required for inline-JS unit checks')
     def test_inline_ui_handles_all_four_version_combinations(self) -> None:

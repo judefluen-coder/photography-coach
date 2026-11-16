@@ -89,6 +89,8 @@ Give one prioritized reshoot action and distinguish what post-processing can and
 
 Treat the response structure as a silent quality check, not a visible report-writing style. Do not render the formal numbered audit in ordinary chat. Use the human voice rules in `references/response-card.md`: concrete nouns before jargon, one judgment at a time, scene-ready directions, natural uncertainty, and no generic praise.
 
+Lead the useful feedback with the conclusion or next action, then the visible reason and tradeoff. Prefer `只提右侧脸部，左侧肖像略压暗` to an indirect invitation such as `想想怎样让两边建立联系`. Preserve uncertainty and purpose branches when they change the decision; direct language must not turn an optional experiment into an obligatory correction. For visual output, short photo labels name the place or action; the click-open note carries the explanation rather than repeating it under the image.
+
 ### 5. Always show scores without false ranking
 
 Always show the eight score intervals in the ordinary first response; do not hide them in expandable detail and do not drop them to make the voice feel conversational. Give 0–5 integer intervals for each applicable dimension: technical readability; framing/edge control; attention/formal organization; light/tone/color; space/layering; moment/key relationship; information/story/emotional response; expressive consistency/finish. Pair every interval with one short image-specific reason. Do not compute a total, percentile, “master score,” or rank across genres. Mark non-applicable dimensions `N/A`. Do not score presumed consent, ethics, authenticity, or factual accuracy. When comparable earlier critiques exist in the same genre and rubric version, mention a dimension trend; otherwise do not imply that one score proves progress.
@@ -121,6 +123,8 @@ For a requested crop/color comparison, retain a full-frame color-only master sep
 When the user asks for a visual page or has chosen the Codex-native visual workflow, map the completed critique to `references/visual-report.md` and run `scripts/render_visual_report.py`. Treat the page as a presentation layer, not a second diagnosis: its judgment, priority, scores, edit limits, and reference must match the chat critique.
 
 Write report JSON and rendered files to a task-specific directory outside this skill repository. Never add a user photograph, treatment, report JSON, or rendered report to Git. Default to the inspected color-only version when present, otherwise to an inspected combined treatment; show the source beside it later and provide each master download. If no treatment passed source comparison, omit treatment controls instead of showing a simulated result.
+
+The shared renderer uses a darkroom workspace: one main photo canvas, click-open on-photo notes, an eight-axis interval radar, and a compact edit/decision dock. Keep the full critique, integrity checks, references and exercise available below it. Default to the complete photograph; explicitly label a local enlarged view, preserve the source aspect ratio, and never stretch or generate missing margins to fit the UI. This presentation is shared with the independent Web app, not a separate scoring system. Only actual supplied assets enable adjustment controls; an interface screenshot is not proof that an edit was executed.
 
 Open the rendered page and inspect one desktop and one narrow layout before delivery. Keep the chat response self-contained and concise because the page is an optional durable view, not a substitute for the answer.
 

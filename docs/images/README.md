@@ -1,15 +1,23 @@
 # README 界面截图、历史示意图与署名
 
-## 当前真实截图 · 2026-10-19
+## 当前真实截图 · 2026-11-16
 
-- `project-home-browser.jpg`：项目首页，浅色主题、默认仅调色预览。
-- `report-compare-browser.jpg`：完整报告首屏，滑动对照状态。左侧仅调色，右侧原图；不是两张不同的构图。
+- `project-home-browser.jpg`：暗房风格的项目首页，工作台真实截图和两种使用入口。
+- `workbench-browser.jpg`：独立本机工作台的免密钥公开案例；左侧完整照片、右侧建议与区间评分，已选择取景维度查看理由。
+- `report-annotation-browser.jpg`：同一工作台，展开“人物的远近”点评；矩形和连线表示讨论位置，不是对照片像素的修改。
+- `report-scores-browser.jpg`：选择“取景与边缘控制”，展开全部分数与理由的实际状态。
 
-两张均从实际 Chromium 页面截图，视口 1440×960、设备像素比 2。只将截图编码为 JPEG 以控制文件大小，没有重新绘制界面、改写照片或拼接虚构状态。README 显示的是静态截图；实际页面支持交互，仍不提供在线评图。
+四张均为实际浏览器页面的 JPEG 截图，视口及输出图片均为 1600×1000。截图仅从 PNG 转为 JPEG，没有重新绘制界面、改写照片或拼接状态。工作台显示预先写好的演示点评，未使用真实 API。README 图片不能操作；独立工作台需启动本机服务，GitHub Pages 首页不在线评图。[本轮验收](../darkroom-verification-20261115.md)另列检查范围。
 
-这两张新截图沿用下述摄影来源，**包括界面排版与文案在内以 CC BY-SA 4.0 提供**。此项许可仅适用于指定截图与下述历史示意图，不扩展到仓库代码或其他材料。摄影师未背书本项目。
+`layout-before-after.jpg` 为 2026-11-16 本轮实拍的并排对照：左旧布局、右修正后；每一侧都在 1280×720、同一张照片、完整取景和暗色状态下捕获，合成图 2560×720。仅将两张真实截图并排放置，没有重绘界面。两侧均使用下述 Fons 摄影，同按 CC BY-SA 4.0 提供。[布局修正记录](../layout-density-20261116.md)。
+
+当前截图的照片来自 **Fons Heijnsbroek** 的[骑行街拍](https://commons.wikimedia.org/wiki/File:A_small_familie_is_biking_through_the_bicycle_tunnel,_in_the_city;_free_photo_Amsterdam_by_Fons_Heijnsbroek,_04-2022.jpg)，按 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)使用。照片未裁切、未调色、未生成式重画；本项目加入了界面、图表和点评标记。作者未背书本项目。截图（包括界面与文案）同按 CC BY-SA 4.0 提供；此许可不扩展到仓库代码。来源详见[街拍示例](../demo-street/README.md)。
+
+下述历史截图和示意图使用另一张摄影作品，与当前四张截图分开署名。私人照片、黑白设计稿及其验收截图不随仓库分发。
 
 ## 保留的历史示意图
+
+`report-compare-browser.jpg` 是保留的旧版浅色报告真实截图，1440×960，左侧仅调色、右侧原图；它不代表当前暗房界面。当前模板的滑动对照改为左原图、右调色。
 
 本目录中的 `report-overview.png` 与 `report-color-comparison.png` 是按现有 `assets/visual-report-template.html` 和 2026-09-14 列车示例绘制的静态界面摘录。使用代码绘制文字、容器和按钮，并置入已存在的照片预览，不是浏览器截图，不是新的设计方案，也不构成交互测试证据。部分排版与文字为适应 README 作了简化。
 

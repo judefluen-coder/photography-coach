@@ -1,0 +1,1431 @@
+<!doctype html>
+<!--
+Phosphor Icons (image / arrows-horizontal), https://github.com/phosphor-icons/core
+MIT License
+
+Copyright (c) 2023 Phosphor Icons
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Photography Coach 单张照片点评">
+  <title>Photography Coach</title>
+  <link rel="icon" href="data:,">
+  <style>
+    /* Darkroom layout, shared palette with the local workbench. Standalone and offline.
+       Full-frame fit by default; actual tone assets only. Layers: photo 1, nav 5, skip 6. */
+    :root {
+      color-scheme: dark;
+      --bg: #141517; --surface: #1d1f21; --surface-strong: #242729;
+      --text: #f0f1ed; --muted: #a9ada9; --faint: #a9ada9; --line: #363a3b;
+      --accent: #d6f36a; --accent-text: #1a200c; --accent-soft: #2c3420;
+      --photo-bg: #0d0f10; --radius: 5px;
+      --serif: "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #141517; --surface: #1d1f21; --surface-strong: #242729;
+        --text: #f0f1ed; --muted: #a9ada9; --faint: #a9ada9; --line: #363a3b;
+        --accent: #d6f36a; --accent-text: #1a200c; --accent-soft: #2c3420; --photo-bg: #0d0f10;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #141517; --surface: #1d1f21; --surface-strong: #242729;
+      --text: #f0f1ed; --muted: #a9ada9; --faint: #a9ada9; --line: #363a3b;
+      --accent: #d6f36a; --accent-text: #1a200c; --accent-soft: #2c3420; --photo-bg: #0d0f10;
+    }
+    :root[data-theme="light"] { color-scheme: light; --bg:#f5f5f0; --surface:#e9ebe3; --surface-strong:#fafbf7; --text:#252a24; --muted:#62695e; --faint:#62695e; --line:#d5d9ce; --accent:#526c18; --accent-text:#ffffff; --accent-soft:#e4edcf; --photo-bg:#e3e6de; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+    button, a, textarea { font: inherit; }
+    button, .button-primary, .button-quiet { touch-action: manipulation; }
+    button { cursor: pointer; }
+    a { color: inherit; text-underline-offset: 5px; }
+    img { display: block; max-width: 100%; }
+    [hidden] { display: none !important; }
+    h1, h2, h3, p { margin-top: 0; }
+    .topbar { min-height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 24px; max-width: 1440px; margin: auto; padding: 0 clamp(20px, 4.5vw, 64px); }
+    .brand { font-size: 24px; font-weight: 750; letter-spacing: .04em; line-height: 1.3; }
+    .brand small { display: block; font-size: 9px; letter-spacing: .09em; font-weight: 550; margin-top: 5px; text-transform: uppercase; }
+    .topbar-actions { display: flex; align-items: center; gap: 20px; }
+    .topbar-actions span { color: var(--muted); font-size: 12px; }
+    .theme-button { min-width: 48px; height: 44px; padding: 0 8px; border: 0; border-bottom: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--muted); font-size: 12px; }
+    .report-nav { position: sticky; top: 0; z-index: 5; display: flex; gap: 32px; overflow-x: auto; padding-inline: max(clamp(20px, 4.5vw, 64px), calc((100vw - 1312px) / 2)); border-bottom: 1px solid var(--line); background: var(--bg); }
+    .report-nav a { flex: 0 0 auto; padding: 14px 0; color: var(--muted); text-decoration: none; font-size: 13px; }
+    .report-nav a:hover, .report-nav a:focus-visible { color: var(--accent); }
+    .skip { position: absolute; left: 20px; top: -100px; background: var(--bg); padding: 12px; z-index: 6; }
+    .skip:focus { top: 12px; }
+    .workspace { max-width: 1440px; margin: auto; padding: 42px clamp(20px, 4.5vw, 64px) 64px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .8fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+    .photo-shell { min-width: 0; }
+    .photo-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: var(--muted); font-size: 12px; }
+    .photo-heading span:last-child { color: var(--accent); }
+    .photo-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: min(58dvh, 620px); overflow: hidden; background: var(--photo-bg); }
+    .photo-stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 160ms ease; opacity: 0; }
+    .photo-stage[data-mode="source"] .source { opacity: 1; }
+    .photo-stage[data-mode="color"] .color { opacity: 1; }
+    .photo-stage[data-mode="treatment"] .treatment { opacity: 1; }
+    .photo-stage[data-mode="compare"] .source { opacity: 1; }
+    .photo-stage[data-mode="compare"] .color { opacity: 1; clip-path: inset(0 0 0 var(--split, 50%)); }
+    .comparison-labels { display: flex; justify-content: space-between; padding-top: 10px; color: var(--muted); font-size: 12px; }
+    .comparison-divider { position: absolute; inset-block: 0; left: var(--split, 50%); width: 2px; background: #f7f5f0; box-shadow: 0 0 0 1px rgb(23 25 22 / 20%); pointer-events: none; }
+    .comparison-divider::after { content: "↔"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 30px; height: 40px; border: 1px solid #deded5; border-radius: 4px; background: #f7f5f0; color: #292b27; font-size: 17px; }
+    .comparison-control { padding-top: 4px; }
+    .comparison-control label { display: block; font-size: 12px; color: var(--muted); }
+    .comparison-control input { display: block; width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: ew-resize; }
+    #toggleCompare[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+    .photo-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .tabs { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 16px; }
+    .tabs button { min-height: 44px; padding: 6px 0; border: 0; border-bottom: 1px solid transparent; border-radius: 2px; background: transparent; color: var(--muted); font-size: 12px; }
+    .tabs button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+    button:active, .button-primary:active, .button-quiet:active { transform: translateY(1px); }
+    .button-primary, .button-quiet { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 2px; font-size: 12px; font-weight: 500; text-decoration: none; }
+    .button-primary { background: var(--text); color: var(--bg); border: 1px solid var(--text); }
+    .button-quiet { border: 1px solid var(--line); background: transparent; color: var(--text); }
+    .button-quiet:hover, .theme-button:hover { border-color: var(--accent); color: var(--accent); }
+    .hero-copy { padding: 0; }
+    .kicker { margin: 0 0 24px; color: var(--accent); font-size: 12px; font-weight: 500; letter-spacing: .08em; }
+    h1 { margin-bottom: 28px; font-family: var(--serif); font-size: clamp(30px, 2.9vw, 42px); line-height: 1.5; letter-spacing: -.04em; font-weight: 400; text-wrap: balance; }
+    .lead { margin-bottom: 32px; color: var(--muted); font-size: 14px; line-height: 2; }
+    .priority { padding: 24px 0 0; border-top: 1px solid var(--line); }
+    .priority-label { display: block; margin-bottom: 12px; color: var(--accent); font-size: 12px; font-weight: 500; }
+    .priority strong { display: block; margin-bottom: 12px; font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.65; }
+    .priority p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.9; }
+    .report { max-width: 1440px; margin: auto; padding: 0 clamp(20px, 4.5vw, 64px) 64px; }
+    section { padding: 42px 0; border-top: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: minmax(220px, .75fr) minmax(0, 1.25fr); gap: 48px; align-items: start; margin-bottom: 30px; }
+    h2 { margin-bottom: 0; font-family: var(--serif); font-size: clamp(28px, 2.7vw, 38px); line-height: 1.5; letter-spacing: -.04em; font-weight: 400; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 14px; }
+    .read-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; padding-block: 14px 24px; }
+    .main-read, .keep-read { padding-left: 20px; border-left: 1px solid var(--line); }
+    .main-read { border-color: var(--accent); }
+    .read-grid small { display: block; margin-bottom: 10px; color: var(--accent); font-size: 12px; font-weight: 650; }
+    .read-grid h3 { margin-bottom: 12px; font-family: var(--serif); font-size: 22px; font-weight: 500; line-height: 1.7; }
+    .read-grid p { margin: 0; color: var(--muted); font-size: 14px; }
+    .observation-workspace { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 36px; margin-top: 36px; align-items: start; }
+    .guide-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .guide-controls button { min-height: 44px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 3px; background: transparent; color: var(--muted); font-size: 13px; }
+    .guide-controls button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .guide-controls:not([hidden]) + .observation-workspace { margin-top: 20px; }
+    .guide-panel { min-width: 0; }
+    .guide-panel > small { display: block; color: var(--muted); margin: 0 0 10px; font-size: 12px; }
+    .guide-sketch { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #eeeae1; border: 1px solid var(--line); }
+    .guide-overlay { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .guide-overlay, .pin-layer { z-index: 2; }
+    .note-connector { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+    .note-connector svg { display: block; width: 100%; height: 100%; }
+    .note-connector line { stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+    .guide-canvas { width: 100%; height: 100%; display: block; }
+    .guide-shape { vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+    .guide-area { fill: var(--guide-tone); stroke: var(--guide-tone); stroke-width: 1.5; }
+    .guide-overlay .guide-area { fill-opacity: .10; stroke-width: 2; }
+    .guide-sketch .guide-area { fill-opacity: .9; }
+    .guide-line { fill: none; stroke: var(--guide-tone); stroke-width: 2.5; }
+    .guide-arrow { fill: var(--guide-tone); }
+    .guide-label { position: absolute; transform: translate(-50%, -50%); width: max-content; max-width: 112px; padding: 3px 6px; border-radius: 2px; background: rgb(255 252 245 / 94%); color: #303934; font-size: 11px; line-height: 1.5; text-align: center; box-shadow: 0 1px 4px rgb(0 0 0 / 10%); }
+    button.guide-label { pointer-events: auto; min-height: 44px; max-width: 128px; padding: 6px 9px; border: 1px solid #fffaf2; font-size: 12px; }
+    button.guide-label::after { content: ' +'; color: #94452e; font-weight: 700; }
+    button.guide-label[aria-expanded="true"] { border-color: #94452e; outline: 2px solid #fffaf2; }
+    button.guide-label[aria-expanded="true"]::after { content: ' −'; }
+    button.guide-label:active { transform: translate(-50%, -50%); }
+    .photo-note { position: absolute; z-index: 4; width: min(290px, calc(100% - 16px)); max-height: calc(100% - 16px); overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px 16px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface-strong); color: var(--text); box-shadow: 0 5px 22px rgb(0 0 0 / 18%); }
+    .photo-note-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .photo-note h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.6; }
+    .photo-note-close { flex: 0 0 44px; width: 44px; height: 44px; margin-right: -10px; border: 0; background: transparent; color: var(--muted); font-size: 12px; }
+    .photo-note p { margin: 6px 0 0; font-size: 13px; line-height: 1.85; overflow-wrap: anywhere; }
+    .photo-note details { margin-top: 10px; padding: 0; border: 0; }
+    .photo-note summary { min-height: 32px; padding: 3px 0; font-size: 12px; color: var(--muted); }
+    .photo-note details p { font-size: 12px; color: var(--muted); }
+    .photo-note .button-quiet { margin-top: 12px; }
+    .inspection { position: sticky; top: 80px; z-index: 1; min-width: 0; }
+    .annotated-photo { position: relative; background: var(--photo-bg); }
+    .annotated-photo img { width: 100%; height: auto; }
+    .region-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .region { position: absolute; border: 2px solid var(--accent); background: rgb(228 154 102 / 12%); }
+    .region.crop { border-style: dashed; background: transparent; box-shadow: 0 0 0 2000px rgb(0 0 0 / 45%); }
+    .inspection-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .inspection-toolbar button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+    .inspection-caption { min-height: 3em; color: var(--muted); font-size: 13px; }
+    .pin-layer { position: absolute; inset: 0; pointer-events: none; }
+    .photo-pin { position: absolute; transform: translate(-50%, -50%); pointer-events: auto; width: 44px; height: 44px; border: 2px solid #fffaf2; border-radius: 50%; background: #94452e; color: #fffaf2; box-shadow: 0 2px 8px rgb(0 0 0 / 30%); font: 600 13px/1 var(--sans); }
+    .photo-pin:active { transform: translate(-50%, -50%); }
+    .photo-pin[aria-current="true"] { outline: 3px solid #94452e; outline-offset: 3px; }
+    .map { display: grid; gap: 0; }
+    .map-item { padding-left: 18px; border-left: 2px solid var(--line); }
+    .map-item.primary, .map-item.selected { border-color: var(--accent); }
+    .map-label { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+    .map-item strong { font-size: 15px; }
+    .map-item small { color: var(--faint); font-size: 11px; white-space: nowrap; }
+    .map-item.primary small { color: var(--accent); }
+    .map-item { padding-block: 12px; }
+    .map-item p { display: none; margin: 10px 0; color: var(--muted); font-size: 13px; line-height: 1.85; }
+    .map-item.selected p { display: block; }
+    .map-item button { width: 100%; margin-top: 0; padding: 0; text-align: left; min-height: 44px; border: 0; background: transparent; color: var(--text); border-radius: 2px; font-size: 14px; }
+    .map-item button .map-number { display: inline-block; color: var(--accent); font: 14px Georgia, serif; width: 30px; }
+    .map-item.selected button { border-color: var(--accent); }
+    .observation-workspace.text-only { display: block; }
+    .text-only .map { grid-template-columns: 1fr 1fr; gap: 28px; }
+    .integrity { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 36px; margin-top: 24px; }
+    .integrity p { margin: 0; color: var(--muted); font-size: 13px; }
+    .integrity strong { display: block; color: var(--text); margin-bottom: 6px; font-size: 14px; }
+    /* Figma 5:134: dynamic radar geometry follows each report's 0–5 intervals. */
+    .score-visual { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr); align-items: center; gap: clamp(28px, 5vw, 72px); }
+    .radar-figure { margin: 0; min-width: 0; }
+    .radar-plot { position: relative; width: 100%; max-width: 560px; aspect-ratio: 500 / 460; margin: auto; }
+    .radar-plot svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .radar-grid, .radar-axis { fill: none; stroke: var(--line); stroke-width: 1; }
+    .radar-axis[data-selected="true"] { stroke: var(--accent); stroke-width: 1.5; }
+    .radar-band { fill: var(--accent); fill-opacity: .16; fill-rule: evenodd; }
+    .radar-upper, .radar-lower { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+    .radar-lower { stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .radar-interval { stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+    .radar-dot { fill: var(--accent); stroke: var(--bg); stroke-width: 1.5; }
+    .radar-choice { position: absolute; transform: translate(-50%, -50%); width: 104px; min-height: 44px; padding: 3px; border: 1px solid transparent; border-radius: 2px; background: transparent; color: var(--text); font-size: 13px; line-height: 1.5; text-align: center; }
+    .radar-choice span { display: block; color: var(--accent); font-size: 12px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .radar-choice:hover, .radar-choice[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+    .radar-choice:active { transform: translate(-50%, -50%); }
+    .radar-legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: 11px; }
+    .radar-legend span::before { content: ''; display: inline-block; width: 22px; vertical-align: middle; margin-right: 7px; border-top: 2px solid var(--accent); }
+    .radar-legend .lower::before { border-top-style: dashed; }
+    .radar-note { margin: 12px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
+    .selected-score { padding: 28px; background: var(--surface); min-width: 0; }
+    .selected-score .score-instruction { margin: 0 0 24px; color: var(--muted); font-size: 12px; }
+    .selected-score h3 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+    .selected-score .selected-value { display: block; color: var(--accent); font-size: 38px; font-weight: 400; font-variant-numeric: tabular-nums; line-height: 1.5; margin-bottom: 18px; }
+    .selected-score p { margin: 0; font-size: 14px; line-height: 1.9; }
+    .score-details .scores { margin-top: 24px; }
+    @media (max-width: 767px) { .score-visual { grid-template-columns: 1fr; gap: 24px; } .radar-choice { width: 82px; font-size: 12px; } .selected-score { padding: 22px; } .selected-score .score-instruction { margin-bottom: 12px; } }
+    .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; }
+    .score { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 0; }
+    .score-title { display: flex; flex-direction: row; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; }
+    .score-value { color: var(--accent); font-size: 13px; font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .score-track { position: relative; height: 10px; margin: 5px 0; overflow: hidden; background: var(--line); }
+    .score-band { position: absolute; left: var(--low); width: var(--range); top: 0; height: 10px; min-width: 3px; background: var(--accent); }
+    .score p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+    .score-legend { margin: 18px 0 0; color: var(--muted); font-size: 11px; }
+    .check-strip { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 24px; }
+    .check-badge { font-size: 11px; color: var(--muted); }
+    .check-badge::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; background: currentColor; }
+    .check-badge[data-verdict="观察"], .check-badge[data-verdict="问题"] { color: var(--accent); }
+    .inline-detail { margin-top: 12px; padding-top: 10px; border-top: 0; }
+    .inline-detail summary { color: var(--muted); font-size: 12px; font-weight: 400; }
+    .keep-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin-bottom: 20px; }
+    .keep-summary small { color: var(--accent); font-size: 11px; }
+    .keep-summary h3 { margin: 0; font: 400 19px/1.6 var(--serif); }
+    .uncertainty { display: block; margin-top: 6px; color: var(--accent); }
+    .shoot { display: grid; grid-template-columns: 1.2fr .8fr; gap: 36px; align-items: start; }
+    .instruction { padding: 28px 32px; background: var(--surface); }
+    .instruction small { font-weight: 650; color: var(--accent); font-size: 12px; }
+    .instruction h3 { margin: 16px 0; font-family: var(--serif); font-size: 23px; line-height: 1.85; font-weight: 400; }
+    .instruction p { margin: 0; color: var(--muted); font-size: 14px; }
+    .shoot-notes { padding: 12px 0; }
+    .shoot-notes h3 { margin-bottom: 8px; font-size: 15px; }
+    .shoot-notes p { margin-bottom: 24px; color: var(--muted); font-size: 14px; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .compare.single { grid-template-columns: 1fr; max-width: 720px; }
+    .compare figure { margin: 0; min-width: 0; }
+    .compare .combined { grid-column: 1 / -1; width: min(100%, 720px); margin: 16px auto 0; }
+    .compare img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--photo-bg); }
+    .compare figcaption { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .compare figcaption strong { color: var(--text); }
+    .version-hint { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .edit-status { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 24px; color: var(--muted); font-size: 12px; }
+    .edit-status > span { padding: 4px 10px; border-left: 2px solid var(--accent); background: var(--surface); }
+    .edit-notes { display: grid; grid-template-columns: 1.2fr .8fr; gap: 36px; margin-top: 30px; }
+    .edit-notes h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 16px; }
+    .edit-notes svg { width: 22px; height: 22px; flex: 0 0 auto; color: var(--accent); }
+    .edit-notes p { margin: 0; color: var(--muted); font-size: 14px; }
+    .edit-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .learning-check > summary { min-height: 44px; }
+    .learning-layout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 32px; align-items: start; margin-top: 20px; }
+    .learning-photo { margin: 0; min-width: 0; }
+    .learning-photo .annotated-photo img { width: 100%; }
+    .learning-photo .region { background: transparent; }
+    .learning-photo figcaption { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .learning-photo figcaption button { flex-shrink: 0; }
+    .learning-copy h3 { margin-bottom: 18px; font-family: var(--serif); font-size: 23px; font-weight: 400; line-height: 1.65; }
+    .learning-options, .learning-feedback { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .learning-option { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 68px; padding: 12px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--text); text-align: left; font-size: 13px; line-height: 1.6; }
+    .learning-option > span:first-child { color: var(--accent); font: 24px Georgia, serif; }
+    .learning-option[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+    .learning-feedback { margin-top: 18px; }
+    .learning-feedback article { border-top: 2px solid var(--line); padding-top: 12px; }
+    .learning-feedback article[data-selected="true"] { border-color: var(--accent); }
+    .learning-feedback h4 { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+    .learning-feedback p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.85; }
+    .learning-feedback p:last-child { margin-bottom: 0; }
+    .learning-feedback b { color: var(--text); font-weight: 500; }
+    .learning-takeaway { margin: 20px 0 0; padding: 14px 0 0 16px; border-top: 1px solid var(--line); border-left: 2px solid var(--accent); font-size: 14px; line-height: 1.9; }
+    .learning-state { min-height: 1.8em; margin: 12px 0; color: var(--muted); font-size: 12px; }
+    .reference { display: grid; grid-template-columns: .75fr 1.25fr; gap: 48px; align-items: start; }
+    .reference-title { display: flex; flex-direction: column; gap: 24px; padding-right: 32px; }
+    .reference-title small { color: var(--muted); font-size: 12px; }
+    .reference-title strong { font-family: Georgia, var(--serif); font-size: clamp(32px, 4vw, 54px); font-weight: 400; letter-spacing: -.035em; line-height: 1.2; overflow-wrap: anywhere; }
+    .reference-copy h3 { margin-bottom: 14px; font-size: 18px; font-weight: 550; line-height: 1.8; }
+    .reference-copy p { color: var(--muted); font-size: 14px; }
+    .practice { max-width: 840px; font-family: var(--serif); font-size: 22px; line-height: 1.95; }
+    .practice strong { color: var(--accent); }
+    .practice-return { margin-top: 22px; color: var(--muted); font-size: 14px; max-width: 840px; }
+    #practicePrompt { width: 100%; min-height: 130px; padding: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+    details { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+    summary { cursor: pointer; font-size: 14px; font-weight: 600; min-height: 32px; }
+    summary span { margin-left: 12px; color: var(--muted); font-size: 12px; font-weight: 400; }
+    details > p { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
+    .source-credit, footer { max-width: 1440px; margin: auto; padding: 24px clamp(20px, 4.5vw, 64px); color: var(--faint); font-size: 12px; }
+    footer { padding-bottom: 36px; border-top: 1px solid var(--line); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: 28px; }
+      .photo-toolbar { display: grid; grid-template-columns: 1fr 1fr; }
+      .tabs { grid-column: 1 / -1; width: 100%; }
+      .scores { gap: 16px; }
+      .score { grid-template-columns: 1fr; gap: 12px; }
+      .score-title { flex-direction: row; justify-content: space-between; align-items: baseline; }
+      .score-value { white-space: nowrap; }
+    }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 28px; }
+      .photo-stage { max-height: none; }
+      .hero-copy { padding: 0; }
+      .observation-workspace { grid-template-columns: 1fr; gap: 20px; }
+      .inspection { position: static; }
+      .map { grid-template-columns: 1fr 1fr; }
+      .section-head, .reference { grid-template-columns: 1fr; gap: 16px; }
+      .reference-title { padding: 0; gap: 16px; }
+    }
+    @media (max-width: 767px) {
+      .topbar { min-height: 76px; padding-inline: 20px; gap: 12px; }
+      .topbar-actions { gap: 12px; }
+      .topbar-actions span { font-size: 11px; }
+      .report-nav { padding-inline: 20px; gap: 24px; }
+      .workspace { padding: 24px 20px 36px; }
+      .photo-shell { padding: 0; }
+      .photo-toolbar { display: grid; grid-template-columns: 1fr 1fr; }
+      .tabs { width: 100%; grid-column: 1 / -1; }
+      .tabs button { padding-inline: 8px; }
+      h1 { font-size: 30px; }
+      .priority { padding: 22px 0 0; }
+      .report { padding: 0 20px 36px; }
+      section { padding: 40px 0; }
+      .read-grid, .map, .text-only .map, .scores, .shoot, .compare, .edit-notes, .integrity { grid-template-columns: 1fr; gap: 20px; }
+      .learning-layout { grid-template-columns: 1fr; gap: 24px; }
+      .learning-options, .learning-feedback { gap: 12px; }
+      .learning-copy h3 { font-size: 21px; }
+      .main-read, .keep-read { padding: 0 0 0 18px; }
+      .instruction { padding: 22px; }
+      .score { grid-template-columns: 1fr; }
+      .compare { gap: 28px; }
+      .compare .combined { margin-top: 0; }
+      .edit-actions { gap: 10px; }
+      summary span { display: block; margin-left: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+    /* Darkroom workbench. Functional charts/marks use report data, not generated UI images. */
+    html, body { overflow-x: clip; }
+    .topbar, .workspace, .report, .source-credit, footer { max-width: 1760px; }
+    .topbar { min-height: 68px; padding-inline: clamp(20px,3vw,48px); border-bottom:1px solid var(--line); }
+    .brand { display:flex; align-items:center; gap:20px; letter-spacing:0; font-size:25px; }
+    .brand small { display:inline; margin:0; padding-left:20px; border-left:1px solid var(--line); font-size:13px; font-weight:400; letter-spacing:0; text-transform:none; }
+    .report-nav { padding-inline:max(24px,calc((100% - 1664px)/2)); gap:28px; background:var(--bg); }
+    .report-nav a { padding-block:10px; font-size:12px; }
+    .workspace { padding:16px clamp(16px,2.5vw,48px) 0; }
+    .hero { display:block; }
+    .photo-heading { margin:0 0 8px; font-size:12px; }
+    .photo-stage { height:var(--workbench-stage-height,clamp(240px,calc(100dvh - 410px),540px)); max-height:none; aspect-ratio:auto; border:1px solid var(--line); overflow:hidden; }
+    .photo-canvas { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:100%; height:100%; }
+    .photo-canvas > img { transition:none; }
+    .photo-canvas > .source { z-index:0; }
+    .photo-canvas > .color, .photo-canvas > .treatment { z-index:1; }
+    .photo-stage[data-mode="color"] .source { opacity:1; }
+    .photo-stage[data-mode="color"] .color, .photo-stage[data-mode="compare"] .color { opacity:var(--tone-opacity,1); }
+    .stage-tools { position:absolute; z-index:4; top:12px; left:12px; right:12px; display:flex; align-items:start; justify-content:space-between; gap:8px; pointer-events:none; }
+    .stage-tools button, .stage-tools a { pointer-events:auto; min-height:36px; font-size:12px; padding:6px 12px; background:var(--surface-strong); border:1px solid var(--line); border-radius:5px; color:var(--text); }
+    .stage-tools button[aria-pressed="true"] { color:var(--accent); border-color:var(--accent); }
+    #stageAnnotationTools { flex:1; min-width:0; }
+    .stage-tools .inspection-toolbar { max-width:100%; }
+    .stage-tools button { white-space:nowrap; }
+    .stage-tools .inspection-toolbar { display:flex; gap:6px; margin:0; flex-wrap:wrap; max-width:70%; }
+    .photo-stage #inspection { position:absolute; inset:0; z-index:3; background:transparent; pointer-events:none; }
+    .photo-stage #annotatedPhoto { height:100%; width:100%; background:transparent; }
+    .photo-stage #inspectionSource { width:100%; height:100%; visibility:hidden; pointer-events:none; }
+    .photo-stage #photoNote { pointer-events:auto; }
+    .photo-stage[data-mode="treatment"] #inspection { visibility:hidden; }
+    .photo-stage .guide-overlay { background:transparent; }
+    .photo-pin { width:34px; height:34px; border:1px solid var(--accent); color:var(--accent-text); background:var(--accent); box-shadow:0 2px 8px #0005; }
+    .photo-pin[aria-current="true"] { outline:2px solid var(--accent); }
+    .photo-note { background:var(--surface-strong); border-color:var(--accent); border-radius:5px; }
+    button.guide-label { background:var(--surface-strong); color:var(--text); border-color:var(--accent); min-height:36px; }
+    button.guide-label::after { color:var(--accent); }
+    button.guide-label[aria-expanded="true"] { border-color:var(--accent); outline-color:var(--surface-strong); }
+    .comparison-divider { z-index:2; background:#f1f2ec; }
+    .comparison-divider::after { content:none; }
+    .comparison-handle { position:absolute; display:grid; place-items:center; width:34px; height:34px; border-radius:50%; left:50%; top:50%; transform:translate(-50%,-50%); background:#f1f2ec; color:#232823; }
+    .icon { width:20px; height:20px; display:inline-block; flex:none; vertical-align:middle; fill:currentColor; }
+    .photo-toolbar { margin-top:0; padding-block:8px; border-bottom:1px solid var(--line); gap:12px; }
+    .tabs { gap:4px; }
+    .tabs button { min-height:36px; padding:6px 14px; border-radius:5px; font-size:12px; }
+    .tabs button[aria-pressed="true"] { background:var(--accent-soft); border-color:transparent; }
+    .photo-toolbar .button-primary, .photo-toolbar .button-quiet { min-height:36px; }
+    .button-primary { background:var(--accent); border-color:var(--accent); color:var(--accent-text); border-radius:5px; }
+    .button-quiet { border-radius:5px; }
+    .comparison-control { position:absolute; inset:0; z-index:2; padding:0; pointer-events:none; }
+    .comparison-control input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; pointer-events:auto; }
+    .comparison-control:focus-within { outline:2px solid var(--accent); outline-offset:-3px; }
+    .comparison-control label { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:max-content; max-width:90%; padding:3px 8px; border-radius:4px; background:var(--surface-strong); color:var(--muted); font-size:11px; z-index:3; }
+    .comparison-labels { position:absolute; z-index:2; inset:12px 20% auto; padding:0; pointer-events:none; gap:20px; }
+    .comparison-labels span { color:var(--text); border:1px solid var(--line); border-radius:16px; padding:3px 12px; background:var(--surface-strong); font-size:12px; }
+    .version-hint { display:none; }
+    .darkroom-dock { display:grid; grid-template-columns:285px minmax(240px,.85fr) minmax(260px,1fr); gap:24px; padding-block:10px 14px; border-bottom:1px solid var(--line); }
+    .dock-group { min-width:0; }
+    .dock-group + .dock-group { border-left:1px solid var(--line); padding-left:24px; }
+    .dock-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:4px; font-size:13px; }
+    .dock-heading a { text-decoration:none; font-size:13px; }
+    .dock-heading small { color:var(--muted); font-size:10px; }
+    .darkroom-dock .radar-plot { width:210px; max-width:100%; margin:0 auto; }
+    .darkroom-dock .radar-choice { width:82px; min-height:34px; font-size:10px; line-height:1.4; }
+    .darkroom-dock .radar-choice span { font-size:10px; }
+    .darkroom-dock .radar-legend, .darkroom-dock .radar-note { display:none; }
+    .detail-pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; margin:8px 0; }
+    .detail-pair figure { margin:0; min-width:0; }
+    .detail-pair canvas { width:100%; height:80px; display:block; object-fit:contain; background:var(--photo-bg); }
+    .detail-pair figcaption { color:var(--muted); font-size:10px; margin-top:4px; }
+    .tone-control { display:grid; grid-template-columns:auto minmax(80px,1fr) 36px; gap:12px; align-items:center; font-size:12px; margin-top:12px; }
+    input[type="range"] { accent-color:var(--accent); min-height:32px; width:100%; margin:0; }
+    .tone-control output { color:var(--accent); text-align:right; font-variant-numeric:tabular-nums; }
+    .dock-status { color:var(--muted); font-size:11px; line-height:1.7; margin:8px 0; }
+    #mixStatus:empty { display:none; }
+    .dock-help { margin:0; padding:0; border:0; font-size:11px; }
+    .dock-help summary { min-height:30px; padding:5px 0; font-size:11px; color:var(--muted); font-weight:400; }
+    .dock-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .dock-actions .button-primary, .dock-actions .button-quiet { min-height:34px; padding:5px 12px; font-size:11px; }
+    .hero-copy .kicker { display:none; }
+    h1,h2,h3,.priority strong,.practice,.reference-title strong,.keep-summary h3 { font-family:var(--sans); letter-spacing:0; }
+    h1 { font-size:16px; font-weight:500; line-height:1.65; margin-bottom:8px; text-wrap:initial; }
+    .hero-copy .priority { padding:12px 0 0; border-top:0; }
+    .hero-copy .priority-label { margin-bottom:4px; font-size:10px; }
+    .hero-copy .priority strong { font-size:19px; line-height:1.6; margin-bottom:6px; }
+    .hero-copy .lead { font-size:12px; line-height:1.8; margin:8px 0; }
+    .hero-copy .inline-detail { margin-top:8px; padding-top:0; }
+    .hero-copy details>p { font-size:12px; line-height:1.8; }
+    .hero-copy .inline-detail summary { min-height:28px; font-size:11px; }
+    #regionCaption { margin:8px 0 0; min-height:0; font-size:11px; }
+    .report { max-width:1320px; padding-top:24px; }
+    .report section { padding-block:36px; }
+    h2 { font-size:25px; font-weight:500; line-height:1.5; }
+    .read-grid h3,.instruction h3,.learning-copy h3 { font-size:19px; }
+    .section-head { gap:28px; margin-bottom:22px; }
+    .score-visual { display:block; }
+    .selected-score { padding:18px 0; border-bottom:1px solid var(--line); background:transparent; }
+    .selected-score .score-instruction { margin-bottom:10px; }
+    .selected-score .selected-value { font-size:25px; margin-bottom:8px; }
+    .observation-workspace { display:block; margin-top:20px; }
+    .map { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 30px; }
+    .guide-panel { margin-top:24px; max-width:600px; }
+    .guide-sketch { background:var(--surface); }
+    .guide-controls { margin-top:18px; }
+    .guide-controls button { min-height:36px; padding:6px 12px; font-size:12px; }
+    .reference-title strong { font-size:32px; line-height:1.35; }
+    .practice { font-size:19px; }
+    .topbar { position:sticky; top:0; z-index:5; background:var(--bg); gap:24px; }
+    .brand { order:1; }
+    .topbar-actions { order:3; }
+    .topbar .report-nav { order:2; position:static; margin-inline:auto; padding:0; border:0; gap:24px; }
+    @media(min-width:1500px) { .darkroom-dock { grid-template-columns:330px minmax(300px,1fr) minmax(300px,1fr); gap:28px; } }
+    @media(max-width:1050px) { .darkroom-dock { grid-template-columns:255px minmax(0,1fr); } #dockDecision { grid-column:1 / -1; border-left:0; padding-left:0; padding-top:16px; border-top:1px solid var(--line); } .hero-copy .priority { padding-top:0; } .photo-stage { height:440px; } }
+    @media(max-width:650px) { .topbar { min-height:64px; flex-wrap:wrap; padding-block:10px; gap:8px 16px; } .brand { font-size:22px; gap:12px; } .brand small { padding-left:12px; font-size:11px; } .topbar-actions { margin-left:auto; } .topbar-actions span { display:none; } .topbar .report-nav { order:4; flex-basis:100%; gap:22px; justify-content:space-between; } .topbar .report-nav a { font-size:11px; } .workspace { padding:12px 12px 0; } .photo-stage { height:360px; } .stage-tools { left:8px; right:8px; top:8px; } .stage-tools button { padding:5px 8px; font-size:11px; } .stage-tools .inspection-toolbar { max-width:100%; gap:4px; } .photo-toolbar { display:flex; } .tabs { display:flex; flex:1 1 100%; } .tabs button { flex:1; padding-inline:6px; } .darkroom-dock { display:flex; flex-direction:column; gap:18px; } .dock-group + .dock-group { border-left:0; padding:18px 0 0; border-top:1px solid var(--line); } .darkroom-dock .radar-plot { width:280px; } .darkroom-dock .radar-choice { font-size:11px; } .darkroom-dock .radar-choice span { font-size:11px; } .detail-pair canvas { height:138px; } .comparison-labels { inset:60px 12px auto; } .comparison-control label { font-size:10px; } .report { padding-inline:16px; } .map { grid-template-columns:1fr; } .photo-pin { width:34px; height:34px; } .hero-copy .priority strong { font-size:19px; } }
+    /* Space follows the photo and its feedback, not a full-width empty canvas. */
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) clamp(340px,27vw,400px); gap:28px; align-items:start; }
+    .photo-stage { height:auto; aspect-ratio:var(--photo-aspect,4/3); max-height:var(--workbench-stage-height,clamp(360px,calc(100dvh - 190px),820px)); }
+    .darkroom-dock { display:flex; flex-direction:column; gap:20px; padding:0 0 0 24px; border:0; border-left:1px solid var(--line); min-width:0; }
+    .dock-group + .dock-group, #dockDecision { border-left:0; padding:0; }
+    #dockDecision { border-top:0; }
+    .dock-group + .dock-group { padding-top:18px; border-top:1px solid var(--line); }
+    .hero-copy h1 { font-size:21px; line-height:1.5; margin-bottom:12px; }
+    .hero-copy .priority { padding-top:12px; }
+    .hero-copy .priority-label { font-size:12px; margin-bottom:6px; }
+    .hero-copy .priority strong { font-size:22px; line-height:1.5; }
+    .hero-copy details>p, .hero-copy .lead { font-size:14px; line-height:1.8; }
+    .hero-copy .inline-detail summary { font-size:12px; min-height:32px; }
+    .dock-heading, .dock-heading a { font-size:15px; }
+    .dock-heading h2 { font-size:16px; }
+    .dock-heading small { font-size:11px; }
+    .darkroom-dock .radar-plot { width:260px; }
+    .darkroom-dock .radar-choice { width:100px; min-height:40px; font-size:12px; }
+    .darkroom-dock .radar-choice span { font-size:12px; }
+    .darkroom-dock .selected-score { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 12px; padding:12px 14px; margin-top:8px; background:var(--surface); border:1px solid var(--line); border-radius:5px; }
+    .darkroom-dock .score-instruction { display:none; }
+    .darkroom-dock .selected-score h3 { font-size:14px; margin:0; }
+    .darkroom-dock .selected-value { font-size:17px; line-height:1.5; margin:0; }
+    .darkroom-dock .selected-score>p:not(.score-instruction) { grid-column:1 / -1; margin:0; font-size:13px; line-height:1.8; }
+    .darkroom-dock .score-details { margin-top:8px; padding:0; border:0; }
+    .darkroom-dock .score-details summary { min-height:36px; font-size:12px; padding:4px 0; }
+    .darkroom-dock .scores { grid-template-columns:1fr; margin-top:12px; gap:16px; }
+    .detail-pair canvas { height:120px; }
+    .detail-pair figcaption, .dock-status, .tone-control { font-size:13px; }
+    .dock-status { line-height:1.8; }
+    .dock-actions .button-primary, .dock-actions .button-quiet { font-size:12px; min-height:38px; }
+    .darkroom-dock[data-state="advice"] .dock-actions { display:none; }
+    .photo-heading { gap:12px; min-height:32px; }
+    .photo-heading h1 { order:-1; flex:1; min-width:0; font-size:18px; line-height:1.5; margin:0; }
+    .photo-heading>span { flex:none; }
+    .hero-copy .priority { padding-top:0; }
+    .priority-preview { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; color:var(--muted); font-size:14px; line-height:1.8; margin:8px 0 0; }
+    .priority:has(details[open]) .priority-preview { display:none; }
+    :root[data-compact="true"] .priority-preview { -webkit-line-clamp:2; }
+    @media(min-width:1000px) and (max-height:800px) { .priority-preview { -webkit-line-clamp:2; } }
+    .report { max-width:1760px; padding-top:24px; }
+    .report section { padding-block:28px; }
+    .map { gap:8px 24px; }
+    .map-item { padding-block:6px; }
+    @media(max-width:999px) {
+      .hero { display:block; }
+      .photo-stage { max-height:min(70dvh,700px); }
+      .darkroom-dock { margin-top:12px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); padding:16px 0 0; border:0; border-top:1px solid var(--line); gap:20px 28px; }
+      #dockDecision { grid-column:1 / -1; }
+      #dockScores, #dockEdits { padding-top:0; border:0; }
+    }
+    @media(max-width:650px) {
+      .photo-heading { flex-wrap:wrap; gap:4px 12px; }
+      .photo-heading h1 { flex-basis:100%; }
+      .photo-stage { max-height:60dvh; }
+      .darkroom-dock { display:flex; gap:18px; }
+      .dock-group + .dock-group { padding-top:18px; border-top:1px solid var(--line); }
+      .hero-copy h1 { font-size:20px; }
+      .darkroom-dock .radar-plot { width:280px; }
+      .darkroom-dock .radar-choice { width:88px; font-size:11px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#title">跳到点评结论</a>
+  <header class="topbar" id="reportHeader"><div class="brand">见一张<small>摄影教练</small></div><div class="topbar-actions"><span>暗房工作台</span><button class="theme-button" id="reportThemeToggle" type="button" hidden aria-label="切换深浅主题">切换主题</button></div></header>
+  <nav class="report-nav" id="reportNavigation" aria-label="报告章节"><a href="#photoStage">工作台</a><a href="#readTitle">完整分析</a><a href="#referenceTitle">作品参考</a><a href="#practiceTitle">下次练习</a></nav>
+  <main>
+    <div class="workspace">
+      <div class="hero" id="heroLayout">
+        <div class="photo-shell">
+          <div class="photo-heading" id="photoHeading"><span id="zoomState">完整取景</span><span id="currentVersion" aria-live="polite"></span></div>
+          <div class="photo-stage" id="photoStage">
+            <div class="photo-canvas" id="photoCanvas">
+            <img class="source" id="heroSource" fetchpriority="high" alt="点评照片的原图">
+            <img class="color" id="heroColor" fetchpriority="high" alt="仅调整影调色彩，保留原图取景">
+            <img class="treatment" id="heroTreatment" alt="调整后的照片，具体改动见下方说明">
+            <div class="comparison-divider" id="comparisonDivider" hidden><span class="comparison-handle"><svg class="icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M237.66,133.66l-32,32a8,8,0,0,1-11.32-11.32L212.69,136H43.31l18.35,18.34a8,8,0,0,1-11.32,11.32l-32-32a8,8,0,0,1,0-11.32l32-32a8,8,0,0,1,11.32,11.32L43.31,120H212.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,237.66,133.66Z"/></svg></span></div>
+            </div>
+            <div class="stage-tools"><div id="stageAnnotationTools"></div><button type="button" id="toggleZoom" aria-pressed="false">局部放大</button></div>
+          </div>
+          <div class="comparison-labels" id="comparisonLabels" aria-hidden="true" hidden><span>原图</span><span>调整后</span></div>
+          <div class="comparison-control" id="comparisonControl" hidden><label for="comparisonRange">拖动对照，也可用左右方向键。</label><input id="comparisonRange" type="range" min="0" max="100" value="50" aria-label="调色版显示范围" aria-valuetext="左侧 50% 为原图，右侧为仅调色"></div>
+          <div class="photo-toolbar" id="photoToolbar">
+            <div class="tabs edit-only" aria-label="照片版本">
+              <button type="button" data-mode="source">看原图</button>
+              <button class="color-only" type="button" data-mode="color">仅调色</button>
+              <button class="treatment-only" type="button" data-mode="treatment" id="treatmentTab">看调整后</button>
+            </div>
+            <button class="button-quiet color-only" id="toggleCompare" type="button" aria-pressed="false" aria-controls="comparisonControl">滑动对照</button>
+            <a class="button-primary edit-only" id="heroDownload" download>下载当前版本</a>
+          </div>
+          <p class="version-hint" id="versionHint"></p>
+        </div>
+        <div class="hero-copy" id="judgmentPanel">
+          <p class="kicker">点评概要</p>
+          <h1 id="title"></h1>
+          <div class="priority">
+            <span class="priority-label" id="decisionLabel">主要问题</span>
+            <strong id="priorityTitle"></strong>
+            <p class="priority-preview" id="priorityPreview"></p>
+            <details class="inline-detail"><summary>展开完整理由</summary><p id="priorityBody"></p></details>
+          </div>
+          <details class="inline-detail"><summary>看片结论</summary><p class="lead" id="summary"></p></details>
+        </div>
+      </div>
+      <div class="darkroom-dock" id="darkroomDock">
+        <div class="dock-group" id="dockDecision"></div>
+        <div class="dock-group" id="dockScores"><div class="dock-heading" id="scoreHeading"><small id="scoreInstruction">点维度看理由</small></div></div>
+        <div class="dock-group" id="dockEdits">
+          <div class="dock-heading"><span id="detailLabel">局部对照</span><a href="#editTitle">调整方案</a></div>
+          <div class="detail-pair" id="detailPair" hidden><figure><canvas id="detailBefore" aria-label="讨论区域的原图细节"></canvas><figcaption>调整前</figcaption></figure><figure><canvas id="detailAfter" aria-label="相同区域的调色细节"></canvas><figcaption>调整后</figcaption></figure></div>
+          <p class="dock-status" id="dockEditStatus"></p>
+          <div id="toneControls" hidden><label class="tone-control" for="toneMix"><span>影调强度</span><input id="toneMix" type="range" min="0" max="100" value="100"><output id="toneMixValue" for="toneMix">100%</output></label></div>
+          <div class="dock-actions"><button type="button" class="button-primary" id="downloadMix" hidden>下载当前影调</button><a class="button-quiet" href="#editTitle">改动与限制</a><details class="dock-help" id="mixHelp" hidden><summary>强度说明</summary><p class="dock-status">混合原图与已生成调色版，不是曝光档位。只影响当前浏览器预览与混合导出，不修改原文件。</p></details></div>
+          <p class="dock-status" id="mixStatus" role="status"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="report">
+      <section aria-labelledby="scoreTitle" id="scoreSection">
+        <div class="section-head"><h2 id="scoreTitle">八维评分</h2><p>先看整体，再点一项看理由。</p></div>
+        <div class="score-visual">
+          <figure class="radar-figure" id="radarFigure">
+            <div class="radar-plot" id="radarPlot"><svg id="scoreRadar" viewBox="0 0 500 460" role="img" aria-label="八维区间雷达图：中心为 0，外圈为 5；实线为区间上限，虚线为下限。图形面积不代表总分。"></svg><div id="radarChoices" role="group" aria-label="选择评分维度"></div></div>
+            <figcaption class="radar-legend"><span>实线：区间上限</span><span class="lower">虚线：区间下限</span></figcaption>
+            <p class="radar-note">中心 0，外圈 5。图形面积不代表总分。</p>
+            <p class="radar-note" id="radarCoverage" hidden></p>
+          </figure>
+          <aside class="selected-score" id="selectedScore" aria-live="polite" aria-atomic="true">
+            <p class="score-instruction">点图周围的名称，查看这一项。</p>
+            <h3 id="selectedDimension"></h3><strong class="selected-value" id="selectedInterval"></strong>
+            <p id="selectedReason"></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
+          </aside>
+        </div>
+        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。</p></details>
+      </section>
+
+      <section aria-labelledby="readTitle">
+        <div class="section-head">
+          <h2 id="readTitle">在照片上看</h2>
+          <p id="readHint">点照片上的标记展开说明，再点收起。标记表示讨论区域。</p>
+        </div>
+        <div id="inspectionMessage"></div>
+        <div class="keep-summary"><small>建议保留</small><h3 id="strengthTitle"></h3></div>
+        <details class="inline-detail"><summary>为什么保留</summary><p id="strengthBody"></p></details>
+        <div class="guide-controls" id="guideControls" role="group" aria-label="选择照片图解" hidden></div>
+        <div class="observation-workspace" id="observationWorkspace">
+        <div class="inspection" id="inspection" hidden>
+          <div class="annotated-photo" id="annotatedPhoto"><img id="inspectionSource" loading="lazy" alt="原图：点击标记可展开或收起对应说明"><div class="region-layer" id="regionLayer" aria-hidden="true"></div><div class="pin-layer" id="pinLayer"></div><div class="guide-overlay" id="guideOverlay" hidden></div>
+            <div class="note-connector" id="noteConnector" aria-hidden="true" hidden><svg id="noteConnectorSvg"><line id="noteLeader"></line></svg></div>
+            <div class="photo-note" id="photoNote" role="region" aria-labelledby="photoNoteTitle" tabindex="-1" hidden>
+              <div class="photo-note-head"><h3 id="photoNoteTitle"></h3><button class="photo-note-close" id="closePhotoNote" type="button" aria-label="收起标注说明">收起</button></div>
+              <p id="photoNoteText" aria-live="polite"></p>
+              <button class="button-quiet" id="photoNoteEdit" type="button" hidden>看看怎么调 ↗</button>
+              <details id="photoNoteLimits" hidden><summary>简图说明</summary><p id="photoNoteBoundary"></p></details>
+            </div>
+          </div>
+          <div class="inspection-toolbar" id="inspectionToolbar"><button class="button-quiet" id="clearRegions" type="button">隐藏标记</button><button class="button-quiet" id="showCrop" type="button" aria-pressed="false" hidden>裁切范围</button><button class="button-quiet" id="toggleGuide" type="button" aria-pressed="true" hidden>隐藏图解</button></div>
+          <p class="inspection-caption" id="regionCaption">点标记展开，再点收起；也可按 Esc 关闭。</p>
+        </div>
+        <div class="map" id="observationMap"></div>
+        <div class="guide-panel" id="guidePanel" hidden>
+          <small>结构简图 · 与原图位置对应</small>
+          <div class="guide-sketch" id="guideSketch" role="img"></div>
+        </div>
+        </div>
+        <div class="check-strip" id="integritySummary" aria-label="六项图像检查概览"></div>
+        <details id="integritySection" hidden><summary>图像检查<span>边缘、暗部、高光、色彩、透视、细节</span></summary><div class="integrity" id="integrityChecks"></div></details>
+      </section>
+
+      <section aria-labelledby="shootTitle">
+        <div class="section-head"><h2 id="shootTitle">重拍建议</h2><p>如果再拍一次，可以尝试以下机位、时机或取景调整。</p></div>
+        <div class="shoot">
+          <div class="instruction"><small>01 · 动作</small><h3 id="reshootAction"></h3><details class="inline-detail"><summary>预期变化</summary><p id="reshootEffect"></p></details></div>
+          <div class="shoot-notes"><h3>02 · 留意代价</h3><p id="reshootCost"></p><details class="inline-detail"><summary>适用场景</summary><p id="reshootAvailability"></p></details></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="editTitle">
+        <div class="section-head"><h2 id="editTitle" tabindex="-1"></h2><p id="editSummary"></p></div>
+        <div class="edit-status"><span id="editStatus"></span><button class="button-quiet color-only" id="openEditCompare" type="button">滑动看调色前后 ↗</button></div>
+        <div class="compare" id="compare">
+          <figure><img id="compareSource" loading="lazy" alt="调整前的原始照片"><figcaption><strong>原图</strong><span>保留文件</span></figcaption></figure>
+          <figure class="color-only"><img id="compareColor" loading="lazy" alt="仅调色，保留原图取景"><figcaption><strong>仅调色</strong><span>同一取景，单看颜色和明暗</span></figcaption></figure>
+          <figure class="treatment-only" id="treatmentFigure"><img id="compareTreatment" loading="lazy" alt="调整后的照片"><figcaption><strong id="treatmentCaption">调整后</strong><span>可下载</span></figcaption></figure>
+        </div>
+        <div class="edit-notes">
+          <div><h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>明暗与颜色</h3><p id="editToneColor"></p></div>
+          <div><h3><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2v15h15M2 7h15v15"/></svg>裁切与取景</h3><p id="editCrop"></p></div>
+        </div>
+        <details class="inline-detail"><summary>后期的限度与代价</summary><p id="editLimit"></p></details>
+        <details class="learning-check" id="learningCheck" hidden>
+          <summary>两种调法，你会先试哪种？<span>可跳过 · 不计分</span></summary>
+          <div class="learning-layout">
+            <figure class="learning-photo"><div class="annotated-photo"><img id="learningSource" loading="lazy" alt="本次比较使用的原图"><div class="region-layer" id="learningRegions" aria-hidden="true"></div></div><figcaption><span id="learningPhotoCaption"></span><button class="button-quiet" id="learningBack" type="button">回到这处点评 ↗</button></figcaption></figure>
+            <div class="learning-copy">
+              <h3 id="learningQuestion" tabindex="-1"></h3>
+              <div class="learning-options" id="learningOptions" role="group" aria-labelledby="learningQuestion"></div>
+              <p class="learning-state" id="learningState" role="status">这里只比较方法，不是两张已完成的修图。</p>
+              <button class="button-quiet" id="skipLearning" type="button" aria-controls="learningAnswer" aria-expanded="false">跳过选择，直接看解释</button>
+              <div id="learningAnswer" hidden><div class="learning-feedback" id="learningFeedback"></div><p class="learning-takeaway" id="learningTakeaway"></p></div>
+            </div>
+          </div>
+        </details>
+        <div class="edit-actions">
+          <a class="button-primary color-only" id="downloadColor" download>下载仅调色</a>
+          <a class="button-primary treatment-only" id="downloadTreatment" download>下载调整后</a>
+          <a class="button-quiet" id="downloadSource" download>下载原图</a>
+        </div>
+      </section>
+
+      <section aria-labelledby="referenceTitle">
+        <div class="section-head"><h2 id="referenceTitle">参考作品</h2><p id="referenceMatch"></p></div>
+        <div class="reference">
+          <div class="reference-title"><small id="referenceMeta"></small><strong id="referenceWork"></strong></div>
+          <div class="reference-copy"><h3 id="lookingTask"></h3><a class="button-quiet" id="referenceLink" target="_blank" rel="noreferrer">打开这张参考照片 ↗</a><details class="inline-detail"><summary>哪里能学，哪里不能照搬</summary><p id="referenceDifference"></p></details></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="practiceTitle">
+        <div class="section-head"><h2 id="practiceTitle">拍摄练习</h2><p>按下面的方法做一组对照，检查建议是否有效。</p></div>
+        <p class="practice"><strong id="exerciseTitle"></strong> <span id="exerciseInstructions"></span></p>
+        <div class="practice-return"><p>复制练习说明，下次上传新照片时一并提供，便于比较前后的变化。这个报告页本身不接收上传。</p><button type="button" class="button-quiet" id="copyPractice">复制练习说明</button><p id="copyStatus" role="status"></p><textarea id="practicePrompt" aria-label="练习说明，可手动复制" readonly hidden></textarea></div>
+        <details><summary>判断限制</summary><p id="boundaryNote"></p></details>
+      </section>
+    </div>
+  </main>
+  <p class="source-credit" id="sourceCredit" hidden><span id="creditAuthor"></span> · <a id="creditSource" target="_blank" rel="noreferrer">原图出处</a> · <a id="creditLicense" target="_blank" rel="noreferrer"></a>。<span id="creditChanges"></span></p>
+  <footer id="researchStatus"></footer>
+  <noscript><p class="source-credit">这个交互报告需要 JavaScript 才能显示点评与图片；不会在线上传照片或调用模型。</p></noscript>
+
+  <script id="reportData" type="application/json">{"title":"人物有呼应，前轮有点挤。","decision":"NO_STRUCTURAL_BOTTLENECK","summary":"近处两张脸，远处一个骑车人，弯道把他们连在一起。空间已经很清楚，不用为了突出人物把环境裁掉。","priority":{"title":"下次给前轮留一点位置。","body":"近处前轮被底边截断，上方树枝却留了不少。若想把骑行的姿态交代完整，可以稍早按下快门。这是取景上的尝试，不是说所有车轮都必须拍全；现有画面的人物关系已经成立。"},"strength":{"title":"前后的人，都有自己的位置。","body":"近处两人靠在一起，远处骑车人小得多，彼此没有重叠。浅色墙面又把深衣服衬出来。别裁掉后方的人，他让这条路有了深度。"},"integrity":[{"family":"边缘/裁切","verdict":"观察","basis":"近处前轮从底边出画，上方树枝的余量较多。后期裁切补不回轮子，也不宜再收底边。"},{"family":"暗部","verdict":"观察","basis":"黑外套下部、裤子与车架有局部并在一起的地方；脸、手与靠浅墙的轮廓仍可辨，不必全图提亮。"},{"family":"高光","verdict":"通过","basis":"浅墙仍能看到色差和表面痕迹。树枝间有少量亮天空，没有吞没主要人物的轮廓。"},{"family":"色彩","verdict":"通过","basis":"浅棕衣服与偏冷的墙面有区别，白墙仍接近中性；没有仅凭画面就必须纠正的全局偏色。"},{"family":"轴线/透视","verdict":"观察","basis":"道路有坡度，栏杆也向远处收拢，不能拿它们当水平尺。是否倾斜暂不确定，没有足够共同证据要求旋转照片。"},{"family":"细节","verdict":"通过","basis":"这份 1280×960 预览中，脸、车把和路砖能辨认，没有明显的大面积涂抹。无法据此认证全尺寸原片的对焦质量。"}],"observations":[{"label":"前轮与底边","priority":"首要","text":"前轮在这里出画，上方却还有树枝。下次试着早一点拍，让轮子留在画内，再比较哪张更利落。","regions":[{"x":0.58,"y":0.78,"width":0.15,"height":0.22}]},{"label":"人物的远近","priority":"要保护","text":"远处的人小，近处的两人大，之间有一段能看见的路。这个间隔比单纯把背景虚化更能交代空间。","regions":[{"x":0.37,"y":0.39,"width":0.08,"height":0.2},{"x":0.53,"y":0.32,"width":0.2,"height":0.57}]},{"label":"浅墙衬深衣","priority":"次要","text":"黑外套靠着浅墙，轮廓很好认；内部的裤子与车架稍暗。若试调，只轻提这一小块，别把黑衣服变灰。","regions":[{"x":0.54,"y":0.32,"width":0.19,"height":0.4}]},{"label":"弯道的线条","priority":"要保护","text":"左侧墙根和路砖的弧线往远处收，视线能从近处人物走到后方骑车人。路不是多余背景，不建议只留下大半身。","regions":[{"x":0.08,"y":0.48,"width":0.48,"height":0.4}]},{"label":"暖衣服与冷墙面","priority":"次要","text":"浅棕衣服在偏冷的环境里容易辨认。保留这点冷暖差就够了，不需要再把整张染成橙蓝色。"},{"label":"动作与遮挡","priority":"次要","text":"近处两张脸都露出来，手和车把也有连接。再等一瞬，前后人物可能重叠；取景放宽时要同时留意这个关系。","regions":[{"x":0.59,"y":0.34,"width":0.12,"height":0.28}]},{"label":"能读出的故事","priority":"无明显问题","text":"能看见几个人在同一条路上骑行，也能感到彼此的距离。照片本身不足以确定他们的关系，不必替他们编一段故事。"}],"learning_check":{"observation_index":2,"question":"想让黑外套和车架更容易分开，你会先试哪种调法？","options":[{"title":"把整张照片提亮","effect":"黑衣服会亮一些，浅墙、脸和浅棕衣服也会跟着变亮。","cost":"可能还没看清车架，浅墙就先变得刺眼；画面原有的明暗差别也会改变。"},{"title":"只提黑衣附近的暗部","effect":"让外套下部已有的折痕、与车架交接的边缘稍清楚，同时保留墙面和浅棕衣服的亮度。","cost":"提得太多，黑衣会变灰，也可能显出噪点；局部边缘需要柔和过渡。"}],"takeaway":"这张可以先试局部调整。看得出外套下部与车架的区别就停，不必把黑衣调成灰色。墙面偏冷、浅棕衣服偏暖，这点区别值得保留。"},"visual_guides":[{"title":"人物与空间","takeaway":"近处两人较大，后方一人较小。中间这段路，把前后分开。","boundary":"色块是人物位置与大小的简图，不是精确分割，也不表示真实身高、距离或人物关系。","areas":[{"tone":"light","points":[{"x":0.07,"y":1},{"x":0.17,"y":0.6},{"x":0.25,"y":0.46},{"x":0.43,"y":0.46},{"x":0.58,"y":0.64},{"x":0.95,"y":1}]},{"tone":"secondary","points":[{"x":0.39,"y":0.4},{"x":0.41,"y":0.4},{"x":0.415,"y":0.44},{"x":0.432,"y":0.47},{"x":0.416,"y":0.49},{"x":0.417,"y":0.55},{"x":0.405,"y":0.56},{"x":0.398,"y":0.51},{"x":0.385,"y":0.55},{"x":0.381,"y":0.54},{"x":0.388,"y":0.49},{"x":0.38,"y":0.47},{"x":0.394,"y":0.44}]},{"tone":"accent","points":[{"x":0.609,"y":0.334},{"x":0.642,"y":0.33},{"x":0.657,"y":0.37},{"x":0.654,"y":0.41},{"x":0.686,"y":0.44},{"x":0.718,"y":0.58},{"x":0.702,"y":0.63},{"x":0.69,"y":0.82},{"x":0.668,"y":0.86},{"x":0.64,"y":0.69},{"x":0.603,"y":0.7},{"x":0.593,"y":0.88},{"x":0.557,"y":0.895},{"x":0.556,"y":0.65},{"x":0.542,"y":0.57},{"x":0.55,"y":0.46},{"x":0.59,"y":0.405},{"x":0.6,"y":0.37}]},{"tone":"warm","points":[{"x":0.605,"y":0.43},{"x":0.638,"y":0.421},{"x":0.66,"y":0.45},{"x":0.658,"y":0.495},{"x":0.68,"y":0.52},{"x":0.711,"y":0.58},{"x":0.691,"y":0.6},{"x":0.669,"y":0.57},{"x":0.658,"y":0.65},{"x":0.665,"y":0.73},{"x":0.64,"y":0.76},{"x":0.617,"y":0.68},{"x":0.607,"y":0.62},{"x":0.576,"y":0.59},{"x":0.579,"y":0.54},{"x":0.6,"y":0.49}]}],"lines":[{"tone":"secondary","arrow":false,"points":[{"x":0.43,"y":0.58},{"x":0.51,"y":0.66}]}],"labels":[{"x":0.29,"y":0.36,"text":"远处 1 人","explanation":"后方的人虽然小，轮廓仍然独立。留住他，才看得出这条路有多深。"},{"x":0.8,"y":0.54,"text":"近处 2 人","explanation":"两人前后重叠，但两张脸都露了出来。与后方的小人物一比较，远近就很清楚。"},{"x":0.38,"y":0.73,"text":"中间留着一段路","explanation":"这段没有被人物挡住的路，把前后分开。别急着裁掉，它比单纯虚化背景更能交代距离。"}]},{"title":"线条与取景","takeaway":"两边墙根往远处收，路把人物串起来。再看上下余量：树枝留得多，前轮已出画。","boundary":"线条是构图讲解，不是眼动轨迹或水平校正线。底边只标出截断处，不能补回画外的轮子。","areas":[{"tone":"light","points":[{"x":0.065,"y":1},{"x":0.15,"y":0.63},{"x":0.23,"y":0.48},{"x":0.29,"y":0.456},{"x":0.435,"y":0.46},{"x":0.55,"y":0.6},{"x":0.94,"y":1}]},{"tone":"cool","points":[{"x":0.2,"y":0.02},{"x":0.72,"y":0.02},{"x":0.72,"y":0.27},{"x":0.26,"y":0.32}]}],"lines":[{"tone":"accent","arrow":false,"points":[{"x":0.065,"y":0.99},{"x":0.1,"y":0.81},{"x":0.15,"y":0.63},{"x":0.195,"y":0.53},{"x":0.23,"y":0.48},{"x":0.29,"y":0.456}]},{"tone":"accent","arrow":false,"points":[{"x":0.55,"y":0.6},{"x":0.5,"y":0.55},{"x":0.46,"y":0.5},{"x":0.435,"y":0.46}]},{"tone":"dark","arrow":false,"points":[{"x":0.61,"y":0.992},{"x":0.73,"y":0.992}]}],"labels":[{"x":0.45,"y":0.17,"text":"上方树枝的余量","explanation":"上面还留着不少树枝，下面的车轮却已经出画。下次拍时，先比较上下余量；现在只裁上边，补不回轮子。"},{"x":0.32,"y":0.61,"text":"两侧线条往里收","explanation":"沿墙根和路边往里看，能从近处走到后方的人。道路不是多余背景，只留大半身会丢掉这层联系。"},{"x":0.81,"y":0.9,"text":"前轮在底边出画","explanation":"前轮在底边被截断了。下次可以稍早按快门试一张，看看完整的骑行姿态是否更利落。"}]},{"title":"明暗与冷暖","takeaway":"浅墙衬出深衣服，偏暖的浅棕衣服又从冷墙面里分开。别把这些差别一起调没了。","boundary":"色块只解释明暗、冷暖与遮挡，不是实测色值、精确蒙版或调色后的照片。","areas":[{"tone":"light","points":[{"x":0,"y":0},{"x":0.12,"y":0},{"x":0.23,"y":0.45},{"x":0.16,"y":0.62},{"x":0.07,"y":1},{"x":0,"y":1}]},{"tone":"cool","points":[{"x":0.46,"y":0.44},{"x":0.58,"y":0.35},{"x":0.9,"y":0.24},{"x":0.99,"y":0.45},{"x":0.99,"y":0.84},{"x":0.7,"y":0.64},{"x":0.57,"y":0.54}]},{"tone":"dark","points":[{"x":0.59,"y":0.405},{"x":0.66,"y":0.405},{"x":0.69,"y":0.47},{"x":0.72,"y":0.61},{"x":0.69,"y":0.82},{"x":0.66,"y":0.86},{"x":0.64,"y":0.69},{"x":0.6,"y":0.7},{"x":0.59,"y":0.87},{"x":0.56,"y":0.89},{"x":0.55,"y":0.62},{"x":0.54,"y":0.54},{"x":0.55,"y":0.45}]},{"tone":"warm","points":[{"x":0.6,"y":0.5},{"x":0.65,"y":0.5},{"x":0.68,"y":0.54},{"x":0.71,"y":0.59},{"x":0.69,"y":0.6},{"x":0.67,"y":0.57},{"x":0.66,"y":0.65},{"x":0.62,"y":0.65},{"x":0.6,"y":0.61},{"x":0.58,"y":0.59},{"x":0.58,"y":0.55}]}],"lines":[],"labels":[{"x":0.17,"y":0.3,"text":"浅色墙面","explanation":"浅墙与深衣服拉开了明暗，人物轮廓才这么好认。不必为了让人物突出，把背景一律压暗。"},{"x":0.83,"y":0.4,"text":"偏冷的墙面","explanation":"这面墙偏冷，旁边的浅棕衣服偏暖。保留两者的区别，别把整张照片一起染暖。"},{"x":0.45,"y":0.8,"text":"深色衣服","explanation":"外套轮廓很清楚，下部与车架却有些混在一起。若试调，只轻提这一小块暗部，别把黑衣服变灰。"},{"x":0.81,"y":0.66,"text":"偏暖的浅棕衣服","explanation":"浅棕衣服既比黑外套亮，也比墙面暖，所以容易被看见。这点差别已经够用，不必再猛加饱和度。"}]}],"scores":[{"dimension":"技术可读性","interval":"3-4 / 5","reason":"脸和车把能辨认，黑衣内部稍暗。"},{"dimension":"取景与边缘控制","interval":"2-3 / 5","reason":"前轮出画，上方树枝余量较多。"},{"dimension":"注意力与形式组织","interval":"3-4 / 5","reason":"道路弧线连接前后人物。"},{"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"浅墙衬深衣，冷暖也有区分。"},{"dimension":"空间与层次","interval":"4-5 / 5","reason":"前大后小，中间有清楚的间隔。"},{"dimension":"时机与关键关系","interval":"3-4 / 5","reason":"近处两张脸与后方的人没有挤在一起。"},{"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"骑行情景可读，具体关系未知。"},{"dimension":"表达一致性与完成度","interval":"3-4 / 5","reason":"人物和道路相互支持，底边还可斟酌。"}],"reshoot":{"action":"站在不挡路的安全位置，稍早一点拍，把近处前轮留进来。","effect":"人物会稍小，但骑行姿态更完整；后方的人和弯道仍要保留。","cost":"取景更宽，环境会增多。若两个人的脸开始重叠，宁可保住这次的表情和间隔。","availability":"适用于相似的骑行场景，不要求重演原来的瞬间；不要站到车道上或倒退挡路。"},"edit":{"summary":"这张先不裁。后期只值得小幅试一下暗部。","crop":"保留现有 4:3 取景。裁掉树枝不能补回前轮，还可能削弱通道的空间。","tone_color":"若自己试调，可局部轻提黑外套下部和车架附近的暗部；看见原有折痕就停。浅墙、脸部和浅棕衣服不一起抬亮，冷暖保持原样。本示例尚未提供调色文件。","limit":"暗部抬多会让黑衣服失去重量，也会显出噪点。后期不能恢复画外的轮子；这里不使用生成补画。"},"reference":{"photographer":"André Kertész","title":"Meudon","year":"1928","url":"https://www.moma.org/collection/works/57425","looking_task":"先看近处抱着大件包裹的人，再看后方的小行人：是什么让他们没有混在一起？","match":"同样用近大远小的人物、道路和建筑交代深度。对照看人物之间的空隙，而不是照搬色调。","difference":"《Meudon》还有高架上的火车，事件分布在多个层次；这张骑行照片的关系更集中。学前后分离即可，不必往画面里塞更多东西，也不必改成黑白。"},"exercise":{"title":"下次只练人物之间的间隔。","instructions":"在安全的路边固定机位，拍一组前后两人经过的照片。选一张重叠、一张分开，缩小对照：哪张一眼能看清前后？不需要找人摆拍。"},"boundary_note":"这是公开照片的演示点评，不是盲测成绩或摄影师本人的创作说明。评分针对这份 JPEG 预览，作者意图、人物关系与速度未知。参考作品的实际画面及 MoMA 单图页面已核对，仅提供链接，不在仓库内再分发馆藏图片。","research_status":"Photography Coach 实验点评 · 分数是有依据的判断区间，不是客观审美排名。来源核对：2026-11-09。","source_credit":{"author":"Fons Heijnsbroek，2022-04-09","url":"https://commons.wikimedia.org/wiki/File:A_small_familie_is_biking_through_the_bicycle_tunnel,_in_the_city;_free_photo_Amsterdam_by_Fons_Heijnsbroek,_04-2022.jpg","license":"CC BY-SA 4.0","license_url":"https://creativecommons.org/licenses/by-sa/4.0/","changes":"使用 Wikimedia 的 1280×960 JPEG 预览，未改变画面内容。页面标记仅用于讲解；照片及含照片的示意遵循 CC BY-SA 4.0。作者未背书此点评。"},"source_asset":"assets/source.jpg","source_download":"assets/source.jpg","source_extension":"jpg","color_asset":null,"color_download":null,"color_extension":null,"treatment_asset":null,"treatment_download":null,"treatment_extension":null}</script>
+  <script>
+    const data = JSON.parse(document.querySelector('#reportData').textContent);
+    const text = (selector, value) => { document.querySelector(selector).textContent = value || ''; };
+    document.querySelector('#reportHeader').append(document.querySelector('#reportNavigation'));
+    // Reuse the existing critique/annotation/score components in one photo-first workspace.
+    document.querySelector('#dockScores').append(document.querySelector('#radarFigure'));
+    document.querySelector('#scoreHeading').replaceChildren(document.querySelector('#scoreTitle'), document.querySelector('#scoreInstruction'));
+    document.querySelector('#dockScores').append(document.querySelector('#selectedScore'), document.querySelector('#scoreDetails'));
+    document.querySelector('#scoreSection').hidden = true;
+    document.querySelector('#dockDecision').append(document.querySelector('#judgmentPanel'));
+    document.querySelector('#photoHeading').append(document.querySelector('#title'));
+    document.querySelector('#heroLayout').append(document.querySelector('#darkroomDock'));
+    document.querySelector('#stageAnnotationTools').append(document.querySelector('#inspectionToolbar'));
+    document.querySelector('#inspectionMessage').append(document.querySelector('#regionCaption'));
+    document.querySelector('#photoCanvas').append(document.querySelector('#inspection'), document.querySelector('#comparisonControl'));
+    document.querySelector('#photoStage').append(document.querySelector('#comparisonLabels'));
+    const themeButton = document.querySelector('#reportThemeToggle');
+    const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+    const activeTheme = () => document.documentElement.dataset.theme || 'dark';
+    const refreshTheme = () => {
+      const dark = activeTheme() === 'dark';
+      themeButton.textContent = dark ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', dark ? '切换为浅色主题' : '切换为深色主题');
+    };
+    themeButton.hidden = false;
+    themeButton.addEventListener('click', () => {
+      document.documentElement.dataset.theme = activeTheme() === 'dark' ? 'light' : 'dark';
+      refreshTheme();
+    });
+    systemTheme.addEventListener('change', refreshTheme);
+    refreshTheme();
+    const source = data.source_asset;
+    const treatment = data.treatment_asset || '';
+    const hasTreatment = Boolean(treatment);
+    const color = data.color_asset || '';
+    const hasColor = Boolean(color);
+    const hasEdit = hasColor || hasTreatment;
+    document.querySelector('#photoToolbar').hidden = !hasEdit;
+    document.querySelector('#darkroomDock').dataset.state = hasColor ? 'color' : hasTreatment ? 'combined' : 'advice';
+    text('#detailLabel', hasColor ? '局部对照' : '后期建议');
+    text('#dockEditStatus', hasColor ? '同一取景，只比较颜色与明暗。' : hasTreatment ? '已有综合调整版，未提供同取景调色文件。' : data.edit.tone_color);
+    document.querySelector('#toneControls').hidden = !hasColor;
+    document.querySelector('#downloadMix').hidden = !hasColor;
+    document.querySelector('#mixHelp').hidden = !hasColor;
+    document.querySelector('#dockEditStatus').hidden = hasColor;
+    const treatmentLabel = hasColor ? (data.edit.crop_region ? '裁切＋调色' : '综合调整') : '调整后';
+    text('#treatmentTab', treatmentLabel);
+    text('#treatmentCaption', treatmentLabel);
+    text('#downloadTreatment', `下载${treatmentLabel}`);
+    const versionHint = hasColor
+      ? '切换上方版本查看效果；下载按钮保存当前版本的完整图片。'
+      : hasTreatment ? '当前只有原图与调整后两版，未单独提供仅调色对照。' : '尚未生成调整图片，下面是后期建议。';
+    text('#versionHint', versionHint);
+    const decisionLabels = {
+      STRUCTURAL_BOTTLENECK: ['主要问题', '优先调整'],
+      CONDITIONAL_BRANCH: ['按拍摄目的选择', '两种调整方向'],
+      NO_STRUCTURAL_BOTTLENECK: ['无需大改', '可选调整']
+    };
+    const decisionLabelsForReport = decisionLabels[data.decision] || decisionLabels.STRUCTURAL_BOTTLENECK;
+    text('#decisionLabel', decisionLabelsForReport[0]);
+
+    document.title = `${data.title} | Photography Coach`;
+    text('#title', data.title);
+    text('#summary', data.summary);
+    text('#priorityTitle', data.priority.title);
+    text('#priorityBody', data.priority.body);
+    text('#priorityPreview', data.priority.body);
+    text('#strengthTitle', data.strength.title);
+    text('#strengthBody', data.strength.body);
+    text('#reshootAction', data.reshoot.action);
+    text('#reshootEffect', data.reshoot.effect);
+    text('#reshootCost', data.reshoot.cost);
+    text('#reshootAvailability', data.reshoot.availability);
+    text('#editTitle', hasEdit ? '调整对照' : '后期建议');
+    text('#editSummary', data.edit.summary);
+    text('#editStatus', hasColor ? '已有仅调色文件 · 可看同取景对照' : hasTreatment ? '已有调整版 · 未单独提供仅调色文件' : '仅有建议 · 尚未生成调色文件');
+    text('#editToneColor', data.edit.tone_color);
+    text('#editCrop', data.edit.crop);
+    text('#editLimit', data.edit.limit);
+    const reference = data.reference;
+    text('#referenceMeta', reference ? `${reference.photographer}, ${reference.year}` : '作品检索');
+    text('#referenceWork', reference ? reference.title : '本次未提供参考作品');
+    text('#lookingTask', reference ? reference.looking_task : data.reference_status);
+    text('#referenceMatch', reference ? reference.match : '没有已核验的作品链接。');
+    text('#referenceDifference', reference ? reference.difference : '参考作品需与本次点评相关，且来源可核验。');
+    document.querySelector('#referenceLink').hidden = !reference;
+    text('#exerciseTitle', data.exercise.title);
+    text('#exerciseInstructions', data.exercise.instructions);
+    text('#boundaryNote', data.boundary_note);
+    text('#researchStatus', data.research_status);
+    if (data.integrity) {
+      document.querySelector('#integritySection').hidden = false;
+      data.integrity.forEach(check => {
+        const badge = document.createElement('span');
+        badge.className = 'check-badge';
+        badge.dataset.verdict = check.verdict;
+        badge.textContent = `${check.family} · ${check.verdict}`;
+        document.querySelector('#integritySummary').append(badge);
+        const row = document.createElement('p');
+        const label = document.createElement('strong');
+        label.textContent = `${check.family} · ${check.verdict}`;
+        const basis = document.createElement('span');
+        basis.textContent = check.basis;
+        row.append(label, basis);
+        document.querySelector('#integrityChecks').append(row);
+      });
+    }
+    if (data.source_credit) {
+      document.querySelector('#sourceCredit').hidden = false;
+      text('#creditAuthor', data.source_credit.author);
+      text('#creditLicense', data.source_credit.license);
+      text('#creditChanges', data.source_credit.changes);
+      document.querySelector('#creditSource').href = data.source_credit.url;
+      document.querySelector('#creditLicense').href = data.source_credit.license_url;
+    }
+
+    document.querySelector('#compareSource').src = source;
+    document.querySelector('#downloadSource').href = data.source_download;
+    document.querySelector('#downloadSource').download = `photography-coach-source.${data.source_extension}`;
+    if (reference) document.querySelector('#referenceLink').href = reference.url;
+
+    for (const [kind, available] of [['color', hasColor], ['treatment', hasTreatment]]) {
+      document.querySelectorAll(`.${kind}-only`).forEach(element => element.hidden = !available);
+      if (!available) continue;
+      const suffix = kind === 'color' ? 'Color' : 'Treatment';
+      document.querySelector(`#compare${suffix}`).src = data[`${kind}_asset`];
+      document.querySelector(`#download${suffix}`).href = data[`${kind}_download`];
+      document.querySelector(`#download${suffix}`).download = `photography-coach-${kind}.${data[`${kind}_extension`]}`;
+    }
+    document.querySelectorAll('.edit-only').forEach(element => element.hidden = !hasEdit);
+    if (!hasEdit) { document.querySelector('#compare').classList.add('single'); document.querySelector('#compare').hidden = true; }
+    if (hasColor && hasTreatment) document.querySelector('#treatmentFigure').classList.add('combined');
+
+    const inspection = document.querySelector('#inspection');
+    const regionLayer = document.querySelector('#regionLayer');
+    const cropButton = document.querySelector('#showCrop');
+    const guides = data.visual_guides || [];
+    const guideOverlay = document.querySelector('#guideOverlay');
+    const guideSketch = document.querySelector('#guideSketch');
+    const guideButtons = [];
+    const guideToggle = document.querySelector('#toggleGuide');
+    document.querySelector('#guideControls').hidden = !guides.length;
+    const annotatedPhoto = document.querySelector('#annotatedPhoto');
+    const photoNote = document.querySelector('#photoNote');
+    const annotationPins = [];
+    const learning = data.learning_check;
+    let returnToLearningObservation = null;
+    let activeNote = null;
+    let activeGuide = null;
+    let marksHidden = false;
+    const closePhotoNote = (restoreFocus = false) => {
+      if (!activeNote) return;
+      const previous = activeNote;
+      activeNote = null;
+      photoNote.hidden = true;
+      document.querySelector('#noteConnector').hidden = true;
+      previous.buttons.forEach(button => button.setAttribute('aria-expanded', 'false'));
+      if (previous.onClose) previous.onClose();
+      if (restoreFocus) previous.returnFocus.focus();
+    };
+    const positionPhotoNote = () => {
+      if (!activeNote || photoNote.hidden) return;
+      const frame = annotatedPhoto.getBoundingClientRect(), mark = activeNote.trigger.getBoundingClientRect();
+      if (!frame.width || !frame.height) return;
+      const viewport = document.querySelector('#photoStage').getBoundingClientRect();
+      const enlarged = document.querySelector('#photoStage').dataset.zoom === 'detail';
+      const visible = enlarged ? {left:Math.max(8,viewport.left-frame.left+8),top:Math.max(8,viewport.top-frame.top+8),right:Math.min(frame.width-8,viewport.right-frame.left-8),bottom:Math.min(frame.height-8,viewport.bottom-frame.top-8)} : {left:8,top:8,right:frame.width-8,bottom:frame.height-8};
+      const anchor = {x:mark.left - frame.left, y:mark.top - frame.top, width:mark.width, height:mark.height};
+      photoNote.style.width = `${Math.min(290, visible.right-visible.left)}px`;
+      photoNote.style.maxHeight = `${visible.bottom-visible.top}px`;
+      let note = photoNote.getBoundingClientRect();
+      const horizontalRoom = Math.max(anchor.x - 20, frame.width - anchor.x - anchor.width - 20);
+      const verticalRoom = Math.max(anchor.y - 20, frame.height - anchor.y - anchor.height - 20);
+      // On narrow photos, fit beside the trigger or let a shorter card scroll.
+      // The expanded marker itself must stay available for the second tap.
+      if (horizontalRoom < note.width && verticalRoom < note.height) {
+        if (horizontalRoom >= 170) photoNote.style.width = `${horizontalRoom}px`;
+        else photoNote.style.maxHeight = `${Math.min(frame.height - 16, Math.max(64, verticalRoom))}px`;
+        note = photoNote.getBoundingClientRect();
+      }
+      const overlap = (a, b) => Math.max(0, Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y));
+      // Prefer nearby free space. Existing observation regions are keep-out hints,
+      // not face detection; in a small frame some overlap may be unavoidable.
+      const protectedAreas = data.observations.flatMap(item => item.regions || []).filter(r => r.width * r.height < .35).map(r => ({x:r.x * frame.width, y:r.y * frame.height, width:r.width * frame.width, height:r.height * frame.height}));
+      const candidates = [
+        [anchor.x + anchor.width + 12, anchor.y], [anchor.x - note.width - 12, anchor.y],
+        [anchor.x, anchor.y + anchor.height + 12], [anchor.x, anchor.y - note.height - 12],
+        [visible.left,visible.top], [visible.right-note.width,visible.top], [visible.left,visible.bottom-note.height], [visible.right-note.width,visible.bottom-note.height]
+      ].map(([x,y]) => {
+        const box = {x:Math.max(visible.left, Math.min(x, visible.right-note.width)), y:Math.max(visible.top, Math.min(y, visible.bottom-note.height)), width:note.width, height:note.height};
+        const score = overlap(box, anchor) / Math.max(1, anchor.width * anchor.height) * 20 + protectedAreas.reduce((sum, area) => sum + overlap(box, area) / Math.max(1, area.width * area.height), 0) + Math.hypot(box.x - anchor.x, box.y - anchor.y) / Math.max(frame.width, frame.height) * .1;
+        return {...box, score};
+      }).sort((a,b) => a.score - b.score);
+      photoNote.style.left = `${candidates[0].x}px`; photoNote.style.top = `${candidates[0].y}px`;
+      const connector = document.querySelector('#noteConnector');
+      document.querySelector('#noteConnectorSvg').setAttribute('viewBox', `0 0 ${frame.width} ${frame.height}`); connector.hidden = false;
+      const center = {x:anchor.x + anchor.width / 2, y:anchor.y + anchor.height / 2}, box = candidates[0];
+      Object.entries({x1:center.x, y1:center.y, x2:Math.max(box.x, Math.min(center.x, box.x + box.width)), y2:Math.max(box.y, Math.min(center.y, box.y + box.height))}).forEach(([key,value]) => document.querySelector('#noteLeader').setAttribute(key, String(value)));
+    };
+    const openPhotoNote = (trigger, title, body, boundary = '', options = {}) => {
+      const key = options.key || trigger;
+      if (activeNote?.key === key) { closePhotoNote(); return; }
+      closePhotoNote();
+      activeNote = {trigger, key, returnFocus:options.returnFocus || trigger, buttons:[...new Set([trigger, ...(options.buttons || [])])], onClose:options.onClose};
+      text('#photoNoteTitle', title); text('#photoNoteText', body); text('#photoNoteBoundary', boundary);
+      document.querySelector('#photoNoteEdit').hidden = !options.hasEditLink;
+      const limits = document.querySelector('#photoNoteLimits'); limits.hidden = !boundary; limits.open = false;
+      photoNote.hidden = false;
+      activeNote.buttons.forEach(button => button.setAttribute('aria-expanded', 'true'));
+      positionPhotoNote();
+    };
+    document.querySelector('#closePhotoNote').addEventListener('click', () => closePhotoNote(true));
+    document.querySelector('#photoNoteEdit').addEventListener('click', () => {
+      closePhotoNote();
+      const target = document.querySelector('#editTitle');
+      target.scrollIntoView({block:'start'}); target.focus({preventScroll:true});
+    });
+    document.addEventListener('click', event => {
+      if (activeNote && !photoNote.contains(event.target) && !activeNote.buttons.some(button => button.contains(event.target))) closePhotoNote();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && activeNote) { event.preventDefault(); closePhotoNote(true); }
+    });
+    const positionPins = () => {
+      const frame = annotatedPhoto.getBoundingClientRect();
+      if (!frame.width || !frame.height) return;
+      const placed = [];
+      annotationPins.forEach(({pin, region:r}) => {
+        const candidates = [[r.x - .04,r.y - .04], [r.x + r.width + .04,r.y - .04], [r.x - .04,r.y + r.height + .04], [r.x + r.width + .04,r.y + r.height + .04]].map(([x,y]) => {
+          const point = {x:Math.max(26, Math.min(x * frame.width, frame.width - 26)), y:Math.max(26, Math.min(y * frame.height, frame.height - 26))};
+          return {...point, penalty:placed.reduce((sum, p) => sum + Math.max(0, 52 - Math.hypot(p.x - point.x, p.y - point.y)), 0)};
+        }).sort((a,b) => a.penalty - b.penalty);
+        const point = candidates[0]; placed.push(point);
+        pin.style.left = `${point.x}px`; pin.style.top = `${point.y}px`;
+      });
+    };
+    inspection.hidden = !guides.length && !data.observations.some(item => item.regions?.length) && !data.edit.crop_region;
+    if (inspection.hidden) document.querySelector('#observationWorkspace').classList.add('text-only');
+    const inspectionSource = document.querySelector('#inspectionSource');
+    const sizeGuide = () => {
+      if (inspectionSource.naturalWidth && inspectionSource.naturalHeight) guideSketch.style.aspectRatio = `${inspectionSource.naturalWidth} / ${inspectionSource.naturalHeight}`;
+      positionPins(); positionPhotoNote();
+    };
+    inspectionSource.addEventListener('load', sizeGuide);
+    inspectionSource.src = source;
+    sizeGuide();
+    if (typeof ResizeObserver !== 'undefined') {
+      const noteResize = new ResizeObserver(sizeGuide);
+      noteResize.observe(annotatedPhoto); noteResize.observe(photoNote);
+    }
+    const drawGuide = (container, guide) => {
+      container.replaceChildren();
+      const canvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      canvas.setAttribute('viewBox', '0 0 100 100'); canvas.setAttribute('preserveAspectRatio', 'none');
+      canvas.setAttribute('class', 'guide-canvas'); canvas.setAttribute('aria-hidden', 'true');
+      container.append(canvas);
+      const palette = {accent:'#a6533b', secondary:'#54735e', dark:'#303934', light:'#d6d2c2', warm:'#b59263', cool:'#a5b8bd'};
+      const shape = (tag, points, tone, kind) => {
+        const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        node.setAttribute('points', points.map(p => `${p.x * 100},${p.y * 100}`).join(' '));
+        node.setAttribute('class', `guide-shape guide-${kind}`);
+        node.style.setProperty('--guide-tone', palette[tone]);
+        canvas.append(node);
+      };
+      guide.areas.forEach(area => shape('polygon', area.points, area.tone, 'area'));
+      guide.lines.forEach(line => {
+        shape('polyline', line.points, line.tone, 'line');
+        if (!line.arrow) return;
+        const end = line.points[line.points.length - 1], before = line.points[line.points.length - 2];
+        const angle = Math.atan2(end.y - before.y, end.x - before.x);
+        shape('polygon', [end, ...[-.5, .5].map(offset => ({x:end.x - .024 * Math.cos(angle + offset), y:end.y - .024 * Math.sin(angle + offset)}))], line.tone, 'arrow');
+      });
+      const interactive = container === guideOverlay;
+      const labels = guide.labels.length || !interactive ? guide.labels : [{x:.13, y:.12, text:'图解说明', explanation:guide.takeaway}];
+      labels.forEach(label => {
+        const chip = document.createElement(interactive ? 'button' : 'span'); chip.className = 'guide-label';
+        chip.textContent = label.text;
+        chip.style.left = `clamp(${interactive ? 68 : 58}px, ${label.x * 100}%, calc(100% - ${interactive ? 68 : 58}px))`;
+        chip.style.top = `clamp(${interactive ? 26 : 18}px, ${label.y * 100}%, calc(100% - ${interactive ? 26 : 18}px))`;
+        if (interactive) {
+          chip.type = 'button'; chip.setAttribute('aria-expanded', 'false'); chip.setAttribute('aria-controls', 'photoNote');
+          chip.setAttribute('aria-label', `${label.text}，展开或收起说明`);
+          chip.addEventListener('click', () => openPhotoNote(chip, label.text, label.explanation || guide.takeaway, guide.boundary));
+        }
+        container.append(chip);
+      });
+    };
+    const selectGuide = index => {
+      closePhotoNote();
+      activeGuide = index;
+      const guide = index === null ? null : guides[index];
+      document.querySelector('#guidePanel').hidden = !guide;
+      document.querySelector('#observationMap').hidden = Boolean(guide);
+      document.querySelector('#pinLayer').hidden = Boolean(guide) || marksHidden;
+      regionLayer.hidden = Boolean(guide);
+      guideOverlay.hidden = !guide;
+      guideToggle.hidden = !guide;
+      document.querySelector('#clearRegions').hidden = Boolean(guide);
+      cropButton.hidden = Boolean(guide) || !data.edit.crop_region;
+      guideButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(guide ? i === index : i === guides.length)));
+      if (!guide) {
+        text('#regionCaption', '点标记展开，再点收起；也可按 Esc 关闭。');
+        positionPins();
+        return;
+      }
+      drawGuide(guideOverlay, guide); drawGuide(guideSketch, guide);
+      guideSketch.setAttribute('aria-label', `${guide.title}。${guide.takeaway} ${guide.boundary}`);
+      guideToggle.setAttribute('aria-pressed', 'true'); text('#toggleGuide', '隐藏图解');
+      text('#regionCaption', '点标签看解释，再点收起。线条和色块只是讲解标记。');
+    };
+    guideToggle.addEventListener('click', () => {
+      if (activeGuide === null) return;
+      closePhotoNote();
+      guideOverlay.hidden = !guideOverlay.hidden;
+      guideToggle.setAttribute('aria-pressed', String(!guideOverlay.hidden));
+      text('#toggleGuide', guideOverlay.hidden ? '显示图解' : '隐藏图解');
+    });
+    const clearRegions = () => {
+      regionLayer.replaceChildren();
+      document.querySelectorAll('.map-item').forEach(item => item.classList.remove('selected'));
+      document.querySelectorAll('.map-item button').forEach(button => button.setAttribute('aria-pressed', 'false'));
+      document.querySelectorAll('.map-item button').forEach(button => button.setAttribute('aria-expanded', 'false'));
+      document.querySelectorAll('.photo-pin').forEach(button => button.setAttribute('aria-current', 'false'));
+      cropButton.setAttribute('aria-pressed', 'false');
+    };
+    const addRegion = (region, crop = false) => {
+      const box = document.createElement('div');
+      box.className = crop ? 'region crop' : 'region';
+      Object.entries({left: region.x, top: region.y, width: region.width, height: region.height}).forEach(([key, value]) => box.style[key] = `${value * 100}%`);
+      regionLayer.append(box);
+    };
+    document.querySelector('#clearRegions').addEventListener('click', () => {
+      closePhotoNote();
+      clearRegions();
+      marksHidden = !marksHidden;
+      document.querySelector('#pinLayer').hidden = marksHidden;
+      text('#clearRegions', marksHidden ? '显示标记' : '隐藏标记');
+      text('#regionCaption', marksHidden ? '标记已隐藏。' : '点标记展开，再点收起；也可按 Esc 关闭。');
+    });
+    if (data.edit.crop_region) {
+      cropButton.hidden = false;
+      cropButton.addEventListener('click', () => {
+        setMode('source');
+        const active = cropButton.getAttribute('aria-pressed') === 'true';
+        closePhotoNote();
+        clearRegions();
+        if (!active) { addRegion(data.edit.crop_region, true); cropButton.setAttribute('aria-pressed', 'true'); }
+        text('#regionCaption', active ? '已隐藏裁切范围。' : `虚线内为保留区域。${data.edit.crop}`);
+      });
+    }
+    const map = document.querySelector('#observationMap');
+    data.observations.forEach((observation, index) => {
+      const item = document.createElement('div');
+      item.className = `map-item${observation.priority === '首要' ? ' primary' : ''}`;
+      const body = document.createElement('p');
+      body.textContent = observation.text;
+      // Localized explanations live on the photograph, not in a duplicate paragraph.
+      body.hidden = Boolean(observation.regions?.length);
+      const locate = document.createElement('button');
+      locate.type = 'button';
+      locate.className = 'observation-toggle';
+      const number = document.createElement('span');
+      number.className = 'map-number'; number.textContent = String(index + 1).padStart(2, '0');
+      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority}`;
+      locate.append(number, label);
+      locate.setAttribute('aria-label', `${index + 1}. ${observation.regions?.length ? '在照片上看' : '展开说明'}：${observation.label}`);
+      locate.setAttribute('aria-pressed', 'false');
+      locate.setAttribute('aria-expanded', 'false');
+      locate.setAttribute('aria-controls', observation.regions?.length ? 'photoNote' : 'observationMap');
+      let pin = null;
+      const reveal = (scroll = true, trigger = locate) => {
+          setMode('source');
+          if (activeNote?.key === `observation-${index}`) { closePhotoNote(); return; }
+          if (!observation.regions?.length && locate.getAttribute('aria-pressed') === 'true') { clearRegions(); return; }
+          selectGuide(null);
+          clearRegions();
+          marksHidden = false;
+          document.querySelector('#pinLayer').hidden = false;
+          text('#clearRegions', '隐藏标记');
+          (observation.regions || []).forEach(region => addRegion(region));
+          item.classList.add('selected');
+          locate.setAttribute('aria-pressed', 'true');
+          if (pin) pin.setAttribute('aria-current', 'true');
+          if (observation.regions?.length) openPhotoNote(pin, `${index + 1}. ${observation.label}`, observation.text, '', {key:`observation-${index}`, buttons:[locate, pin], returnFocus:trigger, onClose:clearRegions, hasEditLink:learning?.observation_index === index});
+          else locate.setAttribute('aria-expanded', 'true');
+          if (scroll && observation.regions?.length) inspection.scrollIntoView({block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+      };
+      locate.addEventListener('click', () => reveal());
+      if (learning?.observation_index === index) returnToLearningObservation = () => {
+        closePhotoNote(); reveal(false);
+        const target = pin || locate;
+        (pin ? inspection : item).scrollIntoView({block:'center'}); target.focus({preventScroll:true});
+      };
+      item.append(locate, body);
+      if (observation.regions?.length) {
+        const r = observation.regions[0];
+        pin = document.createElement('button'); pin.type = 'button'; pin.className = 'photo-pin';
+        pin.textContent = String(index + 1);
+        // Place the number just outside the region, so it does not cover a face or detail.
+        pin.style.left = `${Math.max(.06, r.x - .04) * 100}%`; pin.style.top = `${Math.max(.08, r.y - .04) * 100}%`;
+        pin.setAttribute('aria-label', `查看标记 ${index + 1}：${observation.label}`);
+        pin.setAttribute('aria-controls', 'photoNote'); pin.setAttribute('aria-expanded', 'false');
+        pin.addEventListener('click', () => reveal(false, pin));
+        document.querySelector('#pinLayer').append(pin);
+        annotationPins.push({pin, region:r});
+      }
+      map.append(item);
+    });
+    positionPins();
+    if (guides.length) {
+      document.querySelector('#guideControls').hidden = false;
+      text('#readHint', '点照片上的标签，解释就在图里。再点一次收起。');
+      [...guides.map(guide => guide.title), '逐项点评'].forEach((title, index) => {
+        const button = document.createElement('button'); button.type = 'button'; button.textContent = title;
+        button.setAttribute('aria-controls', 'observationWorkspace'); button.setAttribute('aria-pressed', 'false');
+        button.addEventListener('click', () => { setMode('source'); selectGuide(index < guides.length ? index : null); });
+        guideButtons.push(button); document.querySelector('#guideControls').append(button);
+      });
+      selectGuide(null);
+    }
+
+    const scores = document.querySelector('#scores');
+    const shortDimensions = {'技术可读性':'清晰度','取景与边缘控制':'取景边缘','注意力与形式组织':'画面组织','光线影调色彩':'光线色彩','空间与层次':'空间层次','时机与关键关系':'时机关系','信息叙事情绪':'信息情绪','表达一致性与完成度':'表达完成度'};
+    const scoreIntervals = data.scores.map(score => {
+      const match = score.interval.match(/^\s*([0-5])\s*[-–]\s*([0-5])\s*\/\s*5\s*$/);
+      return match && Number(match[1]) <= Number(match[2]) ? [Number(match[1]), Number(match[2])] : null;
+    });
+    const radar = document.querySelector('#scoreRadar');
+    const svgNode = (tag, attributes) => {
+      const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, String(value)));
+      radar.append(node); return node;
+    };
+    const radarPoint = (index, value) => [250 + Math.sin(index * Math.PI / 4) * 140 * value / 5, 220 - Math.cos(index * Math.PI / 4) * 140 * value / 5];
+    const radarPolygon = values => values.map((value, index) => radarPoint(index, value).join(',')).join(' ');
+    for (let value = 1; value <= 5; value++) svgNode('polygon', {points: radarPolygon(Array(8).fill(value)), class: 'radar-grid'});
+    const radarAxes = data.scores.map((_, index) => { const [x, y] = radarPoint(index, 5); return svgNode('line', {x1: 250, y1: 220, x2: x, y2: y, class: 'radar-axis'}); });
+    if (scoreIntervals.every(Boolean)) {
+      const lower = scoreIntervals.map(interval => interval[0]), upper = scoreIntervals.map(interval => interval[1]);
+      const path = values => 'M ' + values.map((value, index) => radarPoint(index, value).join(' ')).join(' L ') + ' Z';
+      svgNode('path', {d: `${path(upper)} ${path(lower)}`, class: 'radar-band'});
+      svgNode('polygon', {points: radarPolygon(upper), class: 'radar-upper'});
+      svgNode('polygon', {points: radarPolygon(lower), class: 'radar-lower'});
+    } else {
+      // Missing evidence is not zero. Never close a polygon across an unrated axis.
+      document.querySelector('#radarCoverage').hidden = false;
+      text('#radarCoverage', '有项目尚未评分：图形在此处断开，不按零分计算。');
+      scoreIntervals.forEach((interval, index) => {
+        if (!interval) return;
+        const a = radarPoint(index, interval[0]), b = radarPoint(index, interval[1]);
+        svgNode('line', {x1:a[0], y1:a[1], x2:b[0], y2:b[1], class:'radar-interval'});
+        const next = (index + 1) % 8;
+        if (!scoreIntervals[next]) return;
+        for (const [bound, className] of [[0,'radar-lower'],[1,'radar-upper']]) {
+          const from = radarPoint(index, interval[bound]), to = radarPoint(next, scoreIntervals[next][bound]);
+          svgNode('line', {x1:from[0], y1:from[1], x2:to[0], y2:to[1], class:className});
+        }
+      });
+    }
+    const radarDots = scoreIntervals.map((interval, index) => {
+      if (!interval) return null;
+      const [cx, cy] = radarPoint(index, interval[1]);
+      return svgNode('circle', {cx, cy, r:3, class:'radar-dot'});
+    });
+    const radarButtons = [];
+    const selectScore = index => {
+      const score = data.scores[index];
+      text('#selectedDimension', score.dimension);
+      text('#selectedInterval', score.interval === 'N/A' ? '未评分' : score.interval);
+      text('#selectedReason', score.reason);
+      text('#selectedUncertainty', score.uncertainty ? `暂不能确定：${score.uncertainty}` : '');
+      document.querySelector('#selectedUncertainty').hidden = !score.uncertainty;
+      radarButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(index === i)));
+      radarAxes.forEach((axis, i) => axis.setAttribute('data-selected', String(index === i)));
+      radarDots.forEach((dot, i) => { if (dot) dot.setAttribute('r', index === i ? '5' : '3'); });
+    };
+    data.scores.forEach((score, index) => {
+      const choice = document.createElement('button'); choice.type = 'button'; choice.className = 'radar-choice';
+      choice.textContent = shortDimensions[score.dimension] || score.dimension;
+      const interval = document.createElement('span'); interval.textContent = score.interval === 'N/A' ? '未评分' : score.interval;
+      choice.append(interval);
+      choice.style.left = `${(250 + Math.sin(index * Math.PI / 4) * 185) / 500 * 100}%`;
+      choice.style.top = `${(220 - Math.cos(index * Math.PI / 4) * 185) / 460 * 100}%`;
+      choice.setAttribute('aria-label', `${score.dimension}：${score.interval}，查看理由`);
+      choice.setAttribute('aria-controls', 'selectedScore');
+      choice.addEventListener('click', () => selectScore(index));
+      radarButtons.push(choice); document.querySelector('#radarChoices').append(choice);
+    });
+    selectScore(scoreIntervals.reduce((best, interval, index) => (interval?.[0] ?? -1) > (scoreIntervals[best]?.[0] ?? -1) ? index : best, 0));
+    data.scores.forEach((score) => {
+      const item = document.createElement('div');
+      item.className = 'score';
+      const title = document.createElement('div');
+      title.className = 'score-title';
+      title.textContent = shortDimensions[score.dimension] || score.dimension;
+      title.setAttribute('title', score.dimension);
+      const value = document.createElement('span');
+      value.className = 'score-value';
+      value.textContent = score.interval;
+      const reason = document.createElement('p');
+      reason.textContent = score.reason;
+      if (score.uncertainty) {
+        const uncertainty = document.createElement('span');
+        uncertainty.className = 'uncertainty';
+        uncertainty.textContent = `暂不能确定：${score.uncertainty}`;
+        reason.append(uncertainty);
+      }
+      title.append(value);
+      item.append(title);
+      const interval = score.interval.match(/^\s*([0-5])\s*[-–]\s*([0-5])\s*\/\s*5\s*$/);
+      if (interval && Number(interval[1]) <= Number(interval[2])) {
+        const track = document.createElement('div'); track.className = 'score-track';
+        track.setAttribute('role', 'img'); track.setAttribute('aria-label', `${score.dimension}：${score.interval}，量表 0 到 5`);
+        const band = document.createElement('span'); band.className = 'score-band';
+        band.style.setProperty('--low', Number(interval[1]) === 5 ? 'calc(100% - 3px)' : `${Number(interval[1]) * 20}%`);
+        band.style.setProperty('--range', `${(Number(interval[2]) - Number(interval[1])) * 20}%`);
+        track.append(band); item.append(track);
+      }
+      item.append(reason);
+      scores.append(item);
+    });
+
+    const stage = document.querySelector('#photoStage');
+    const photoCanvas = document.querySelector('#photoCanvas');
+    const zoomButton = document.querySelector('#toggleZoom');
+    const fitCanvas = () => {
+      const mode = stage.dataset.mode === 'treatment' ? 'Treatment' : 'Source';
+      const image = document.querySelector(`#hero${mode}`);
+      const width = image.naturalWidth || inspectionSource.naturalWidth;
+      const height = image.naturalHeight || inspectionSource.naturalHeight;
+      const frame = stage.getBoundingClientRect();
+      if (!width || !height || !frame.width || !frame.height) return;
+      stage.style.setProperty('--photo-aspect', String(width / height));
+      const scale = stage.dataset.zoom === 'detail' ? Math.max(frame.width / width, frame.height / height) * 1.25 : Math.min(frame.width / width, frame.height / height);
+      photoCanvas.style.width = `${width * scale}px`;
+      photoCanvas.style.height = `${height * scale}px`;
+      positionPins(); positionPhotoNote();
+    };
+    zoomButton.addEventListener('click', () => {
+      closePhotoNote();
+      const enlarged = stage.dataset.zoom !== 'detail';
+      stage.dataset.zoom = enlarged ? 'detail' : 'fit';
+      zoomButton.setAttribute('aria-pressed', String(enlarged));
+      zoomButton.textContent = enlarged ? '完整照片' : '局部放大';
+      text('#zoomState', enlarged ? '局部视图，未修改取景' : '完整取景');
+      zoomButton.setAttribute('aria-label', enlarged ? '当前为局部放大，点击恢复完整照片' : '局部放大，完整照片始终保留');
+      fitCanvas();
+    });
+    for (const id of ['heroSource','heroColor','heroTreatment','inspectionSource']) document.querySelector(`#${id}`).addEventListener('load', fitCanvas);
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(fitCanvas).observe(stage);
+    globalThis.addEventListener?.('resize', fitCanvas);
+    const buttons = document.querySelectorAll('.tabs button');
+    const compareToggle = document.querySelector('#toggleCompare');
+    const comparisonRange = document.querySelector('#comparisonRange');
+    const showComparison = (active) => {
+      ['#comparisonControl', '#comparisonDivider', '#comparisonLabels'].forEach(selector => document.querySelector(selector).hidden = !active);
+      compareToggle.setAttribute('aria-pressed', String(active));
+      text('#toggleCompare', active ? '退出对照' : '滑动对照');
+      if (active) text('#currentVersion', '原图与仅调色');
+      document.querySelector('#heroDownload').hidden = active || !hasEdit;
+      text('#versionHint', active ? '左边是原图，右边是仅调色。裁切版不参与这个对照；切回单个版本即可下载完整文件。' : versionHint);
+    };
+    const updateComparison = () => {
+      const split = Math.max(0, Math.min(100, Number(comparisonRange.value) || 0));
+      stage.style.setProperty('--split', `${split}%`);
+      comparisonRange.setAttribute('aria-valuetext', `左侧 ${split}% 为原图，右侧为仅调色`);
+    };
+    const setMode = (mode) => {
+      if (!data[`${mode}_asset`]) return;
+      if (stage.dataset.mode !== mode) closePhotoNote();
+      showComparison(false);
+      stage.dataset.mode = mode;
+      document.querySelector('#stageAnnotationTools').hidden = inspection.hidden || mode === 'treatment';
+      // Fetch only the displayed hero version; other full-photo previews wait for use.
+      const heroSuffix = mode[0].toUpperCase() + mode.slice(1);
+      document.querySelector(`#hero${heroSuffix}`).src = data[`${mode}_asset`];
+      text('#currentVersion', {source: '原图', color: '仅调色', treatment: treatmentLabel}[mode]);
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+      for (const kind of ['source', 'color', 'treatment']) {
+        const suffix = kind[0].toUpperCase() + kind.slice(1);
+        document.querySelector(`#hero${suffix}`).setAttribute('aria-hidden', String(kind !== mode));
+      }
+      const download = document.querySelector('#heroDownload');
+      download.href = data[`${mode}_download`];
+      download.download = `photography-coach-${mode}.${data[`${mode}_extension`]}`;
+      fitCanvas();
+    };
+    buttons.forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    const enterComparison = () => {
+      if (!hasColor) return;
+      stage.dataset.mode = 'compare';
+      document.querySelector('#stageAnnotationTools').hidden = inspection.hidden;
+      document.querySelector('#heroSource').src = source;
+      document.querySelector('#heroColor').src = color;
+      showComparison(true);
+      buttons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+      document.querySelector('#heroSource').setAttribute('aria-hidden', 'false');
+      document.querySelector('#heroColor').setAttribute('aria-hidden', 'false');
+      document.querySelector('#heroTreatment').setAttribute('aria-hidden', 'true');
+      updateComparison();
+      fitCanvas();
+    };
+    compareToggle.addEventListener('click', () => {
+      if (!hasColor) return;
+      if (stage.dataset.mode === 'compare') { setMode('color'); return; }
+      enterComparison();
+    });
+    document.querySelector('#openEditCompare').addEventListener('click', () => {
+      if (!hasColor) return;
+      enterComparison();
+      stage.scrollIntoView({block:'start'}); comparisonRange.focus({preventScroll:true});
+    });
+    comparisonRange.addEventListener('input', updateComparison);
+    setMode(hasColor ? 'color' : hasTreatment ? 'treatment' : 'source');
+    const toneRange = document.querySelector('#toneMix');
+    const detailRegion = data.observations.find(item => item.regions?.some(region => region.width * region.height <= .4));
+    const detailRect = detailRegion?.regions.find(region => region.width * region.height <= .4);
+    const drawDetail = () => {
+      if (!hasColor || !detailRect) return;
+      const before = document.querySelector('#heroSource'), after = document.querySelector('#heroColor');
+      if (!before.naturalWidth || !after.naturalWidth) return;
+      const ratioBefore = before.naturalWidth / before.naturalHeight;
+      const ratioAfter = after.naturalWidth / after.naturalHeight;
+      if (Math.abs(ratioBefore - ratioAfter) > .01) return;
+      text('#detailLabel', `局部对照：${detailRegion.label}`);
+      for (const [id, image] of [['detailBefore', before], ['detailAfter', after]]) {
+        const canvas = document.querySelector(`#${id}`), context = canvas.getContext('2d');
+        const r = detailRect;
+        canvas.width = 280; canvas.height = Math.max(1,Math.round(280 * r.height * before.naturalHeight / (r.width * before.naturalWidth)));
+        if (!context) return;
+        if (id === 'detailAfter') {
+          context.drawImage(before, r.x * before.naturalWidth, r.y * before.naturalHeight, r.width * before.naturalWidth, r.height * before.naturalHeight, 0,0,canvas.width,canvas.height);
+          context.globalAlpha = Number(toneRange.value) / 100;
+        }
+        context.drawImage(image, r.x * image.naturalWidth, r.y * image.naturalHeight, r.width * image.naturalWidth, r.height * image.naturalHeight, 0,0,canvas.width,canvas.height);
+        context.globalAlpha = 1;
+      }
+      document.querySelector('#detailPair').hidden = false;
+    };
+    if (hasColor) {
+      // Same-framing preview images are loaded only when the comparison feature exists.
+      document.querySelector('#heroSource').src = source;
+      document.querySelector('#heroColor').src = color;
+      document.querySelector('#heroSource').addEventListener('load', drawDetail);
+      document.querySelector('#heroColor').addEventListener('load', drawDetail);
+      drawDetail();
+    }
+    toneRange.addEventListener('input', () => {
+      if (!hasColor) return;
+      if (!['color','compare'].includes(stage.dataset.mode)) setMode('color');
+      const amount = Math.max(0,Math.min(100,Number(toneRange.value) || 0));
+      stage.style.setProperty('--tone-opacity', String(amount / 100));
+      text('#toneMixValue', `${amount}%`);
+      drawDetail();
+    });
+    document.querySelector('#downloadMix').addEventListener('click', async () => {
+      if (!hasColor) return;
+      const button = document.querySelector('#downloadMix'); button.disabled = true;
+      text('#mixStatus','正在本机合成完整尺寸图片，不调用模型。');
+      try {
+        const load = url => new Promise((resolve,reject) => { const image = new Image(); image.onload=()=>resolve(image); image.onerror=reject; image.src=url; });
+        const [before,after] = await Promise.all([load(data.source_download),load(data.color_download)]);
+        if (before.naturalWidth !== after.naturalWidth || before.naturalHeight !== after.naturalHeight || before.naturalWidth * before.naturalHeight > 40000000) throw new Error('dimensions');
+        const canvas = document.createElement('canvas'); canvas.width=before.naturalWidth; canvas.height=before.naturalHeight;
+        const context = canvas.getContext('2d'); if (!context) throw new Error('canvas');
+        context.drawImage(before,0,0); context.globalAlpha=Number(toneRange.value)/100; context.drawImage(after,0,0);
+        const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.94));
+        if (!blob) throw new Error('export');
+        const url=URL.createObjectURL(blob), link=document.createElement('a');
+        link.href=url; link.download=`photography-coach-tone-${toneRange.value}.jpg`; link.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+        text('#mixStatus','已导出当前强度，原图与原始调色文件仍保留。');
+      } catch {
+        text('#mixStatus','当前浏览器无法导出混合预览。请下载已生成的调色文件；原图不受影响。');
+      } finally { button.disabled=false; }
+    });
+    if (learning) {
+      const check = document.querySelector('#learningCheck'); check.hidden = false;
+      text('#learningQuestion', learning.question); text('#learningTakeaway', learning.takeaway);
+      const observation = data.observations[learning.observation_index];
+      text('#learningPhotoCaption', `原图 · ${observation.label}`);
+      // Load only when this optional exercise is opened, not on every report visit.
+      check.addEventListener('toggle', () => { if (check.open) document.querySelector('#learningSource').src = source; });
+      (observation.regions || []).forEach(region => {
+        const box = document.createElement('div'); box.className = 'region';
+        Object.entries({left:region.x, top:region.y, width:region.width, height:region.height}).forEach(([key,value]) => box.style[key] = `${value * 100}%`);
+        document.querySelector('#learningRegions').append(box);
+      });
+      const choices = [], explanations = [];
+      const revealLearning = selected => {
+        document.querySelector('#learningAnswer').hidden = false;
+        document.querySelector('#skipLearning').hidden = true;
+        document.querySelector('#skipLearning').setAttribute('aria-expanded', 'true');
+        choices.forEach((button, index) => button.setAttribute('aria-pressed', String(index === selected)));
+        explanations.forEach((item, index) => item.dataset.selected = String(index === selected));
+        text('#learningState', selected === null ? '没有作答也可以看完整解释。' : `你先选了 ${String.fromCharCode(65 + selected)}。两种做法的变化和代价都在下面，不计对错。`);
+      };
+      learning.options.forEach((option, index) => {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'learning-option';
+        const letter = document.createElement('span'); letter.textContent = String.fromCharCode(65 + index);
+        const title = document.createElement('span'); title.textContent = option.title;
+        button.append(letter, title); button.setAttribute('aria-pressed', 'false'); button.setAttribute('aria-controls', 'learningAnswer');
+        button.addEventListener('click', () => revealLearning(index)); choices.push(button);
+        document.querySelector('#learningOptions').append(button);
+        const detail = document.createElement('article');
+        const heading = document.createElement('h4'); heading.textContent = `${letter.textContent} · ${option.title}`; detail.append(heading);
+        for (const [label, value] of [['会怎样', option.effect], ['代价', option.cost]]) {
+          const paragraph = document.createElement('p'), prefix = document.createElement('b'), body = document.createElement('span');
+          prefix.textContent = `${label}：`; body.textContent = value; paragraph.append(prefix, body); detail.append(paragraph);
+        }
+        explanations.push(detail); document.querySelector('#learningFeedback').append(detail);
+      });
+      document.querySelector('#skipLearning').addEventListener('click', () => {
+        revealLearning(null); document.querySelector('#learningQuestion').focus({preventScroll:true});
+      });
+      document.querySelector('#learningBack').addEventListener('click', event => {
+        // This external button opens a photo note; do not let the same click
+        // reach the document's outside-click handler and immediately close it.
+        event.stopPropagation(); returnToLearningObservation?.();
+      });
+    }
+    const practicePrompt = document.querySelector('#practicePrompt');
+    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
+    document.querySelector('#copyPractice').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(practicePrompt.value);
+        text('#copyStatus', '已复制。发新照片时粘贴这段说明即可。');
+      } catch {
+        practicePrompt.hidden = false;
+        practicePrompt.focus();
+        practicePrompt.select();
+        text('#copyStatus', '浏览器未允许自动复制，请复制下面选中的文字。');
+      }
+    });
+  </script>
+</body>
+</html>

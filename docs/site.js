@@ -1,15 +1,15 @@
 // The project home is a static showcase. It does not upload photos or call AI.
 const versions = {
-  source: {label: '原图', note: '弯道、大小和远近的关系已经清楚。先保留它，不用一上来就重新构图。', alt: '原图：从近处车头向远处弯曲延伸的列车'},
-  color: {label: '仅调色', note: '先让车头多露一点细节，再收一点旁边的亮绿。完整保留原图取景和内容。', alt: '仅调色版：弯道上的列车，车头暗部略微提亮，外围绿叶颜色收敛'},
-  treatment: {label: '裁切＋调色', note: '沿用同一调色，只另外去掉顶部和右侧少量环境。裁切的收益与损失要单独判断。', alt: '裁切加调色版：同一列车照片，顶部和右侧少量环境被裁去'}
+  workbench: {src: 'images/workbench-browser.jpg', label: '工作台', note: '左侧看完整照片，右侧看建议和评分理由。公开案例无需密钥即可查看。', alt: '暗房工作台实际截图：左侧为完整骑行街拍，右侧为建议、八维评分和具体理由'},
+  annotation: {src: 'images/report-annotation-browser.jpg', label: '图上点评', note: '在照片上点击标记，展开对应位置的具体分析；再次点击或按 Escape 收起。', alt: '真实报告截图：照片上的标记展开点评说明，并用连线指向讨论位置'},
+  scores: {src: 'images/report-scores-browser.jpg', label: '八维评分', note: '点击雷达图维度查看理由。区间反映判断的不确定性，面积不代表总分。', alt: '真实报告截图：八维区间雷达图和当前维度的评分依据'}
 };
 document.querySelector('#sampleControls').hidden = false;
 document.querySelectorAll('[data-version]').forEach(button => button.addEventListener('click', () => {
   const version = button.dataset.version;
   const selected = versions[version];
   if (!selected) return;
-  document.querySelector('#sampleImage').src = `demo/assets/${version}-preview.jpg`;
+  document.querySelector('#sampleImage').src = selected.src;
   document.querySelector('#sampleImage').alt = selected.alt;
   document.querySelector('#sampleVersion').textContent = selected.label;
   document.querySelector('#sampleNote').textContent = selected.note;
@@ -36,10 +36,10 @@ document.querySelectorAll('[data-copy]').forEach(button => {
 });
 const themeButton = document.querySelector('#themeToggle');
 themeButton.hidden = false;
-const preferredTheme = () => matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+const preferredTheme = () => 'dark';
 const refreshThemeLabel = () => {
   const isDark = (document.documentElement.dataset.theme || preferredTheme()) === 'dark';
-  themeButton.textContent = isDark ? '☀' : '☾';
+  themeButton.textContent = isDark ? '浅色' : '深色';
   themeButton.setAttribute('aria-label', isDark ? '切换为浅色主题' : '切换为深色主题');
 };
 themeButton.addEventListener('click', () => {
