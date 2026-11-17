@@ -8,6 +8,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProductCopyTest(unittest.TestCase):
+    def test_current_product_name_is_consistent(self):
+        # Earlier screenshots/archives remain historical; current HTML uses the agreed name.
+        for name in ('app/static/index.html', 'assets/visual-report-template.html',
+                     'docs/index.html', 'docs/demo/index.html', 'docs/demo-street/index.html'):
+            with self.subTest(file=name):
+                html = (ROOT / name).read_text(encoding='utf-8')
+                self.assertNotIn('见一张', html)
+                self.assertIn('摄影教练', html)
+                self.assertIn('Photography Coach', html)
+
     def test_removed_stock_phrases_stay_out_of_current_surfaces(self):
         # Historical documents and the style guide's before/after examples are excluded.
         paths = ('app/static/index.html', 'app/static/app.js', 'app/workbench.py',

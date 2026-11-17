@@ -1,6 +1,6 @@
 ---
 name: photography-coach
-description: Evidence-based critique and deliberate-practice coaching for a user-supplied photograph, with an optional local visual report and faithful crop/color treatment. Use when the user uploads or points to a photo and asks whether it works, what is wrong, how to reshoot or edit it, how to improve composition/light/tone/story/portrait treatment, for a score or objective assessment, for a visual critique page, or for comparable masterwork/reference examples. Also use for a second-pass critique after the user reveals intent. Do not use for camera-shopping advice, generic photography lessons without a target image, image generation/editing without critique, or claims of authenticating authorship.
+description: Open the bundled Photography Coach local web app, or give an evidence-based photo critique with scores, faithful crop/color treatment, references and practice. Use for “打开摄影教练”, “启动摄影工作台”, or requests to use its upload interface or demo; no photograph is needed to open the app. Also use for a supplied photo's composition, light, tone, space, moment or story assessment, reshoot/edit advice, visual critique reports, comparable exact-work references, or a second pass after intent is revealed. Do not use for camera shopping, generic lessons without a target image, standalone image generation/editing, or authorship authentication.
 ---
 
 # Photography Coach
@@ -9,9 +9,16 @@ description: Evidence-based critique and deliberate-practice coaching for a user
 
 Turn one photograph into a prioritized but whole-frame critique, a falsifiable diagnosis, and one practical exercise. Separate visible facts from viewing effects and preferences. The skill is a research prototype, not an expert certification or an objective taste score.
 
+## Choose the entry point first
+
+- **Open the application:** When asked to open/start Photography Coach, use its web interface, upload through a page, or view its demo, read `references/web-workbench.md` and run the bundled launcher. No photograph or API key is required for this route. Do not ask for a photo first, generate a replacement interface, or clone a second repository. Installing the skill alone does not authorize a background service; start it after the user's open/start request.
+- **Critique in conversation:** When a photograph is supplied for feedback, follow the workflow below. Do not force the user into the web app. A request for a visual report about that photograph still uses the critique renderer, unless the user explicitly asks for the upload application.
+
+Both routes use the same bundled project. The launcher opens the independent local app; it does not transfer the host's subscription, login, API key or photo into that app. A host without local command execution cannot start it: give the local launch command instead of claiming success.
+
 ## Required inputs
 
-- Require one viewable photograph. If none is available, ask the user to attach one and stop.
+- For a conversational critique, require one viewable photograph. If none is available, ask the user to attach one and stop. This does not apply to opening the application.
 - Do not require a title, EXIF, capture story, or the reason for pressing the shutter.
 - Analyze one image at a time unless the user explicitly requests comparison or sequencing.
 

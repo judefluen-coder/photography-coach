@@ -7,11 +7,11 @@ import json
 import os
 import re
 import secrets
-import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from app.launcher import PRODUCT, PROTOCOL, LaunchError, default_data_dir, single_instance, workbench_id
 from app.workbench import ROOT, Workbench, WorkbenchError
 from core.images import MAX_BYTES
 
@@ -21,20 +21,13 @@ MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", 
 ASSETS = {"source.png", "source.jpg", "source-preview.jpg", "color.jpg", "color-preview.jpg", "treatment.jpg", "treatment-preview.jpg"}
 
 
-def default_data_dir() -> Path:
-    if sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / "Photography Coach" / "workbench"
-    if os.name == "nt":
-        return Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "Photography Coach" / "workbench"
-    return Path.home() / ".local" / "share" / "photography-coach" / "workbench"
-
-
 class LocalServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
     def __init__(self, port: int, workbench: Workbench):
         self.workbench = workbench
+        self.workbench_id = workbench_id(workbench.root)
         self.token = secrets.token_urlsafe(32)
         super().__init__(("127.0.0.1", port), Handler)
         self.host = f"127.0.0.1:{self.server_port}"
@@ -130,6 +123,9 @@ class Handler(BaseHTTPRequestHandler):
             path = parts.path  # No filesystem paths derived from untrusted URL segments.
             workbench = self.server.workbench
             if not mutation:
+                if path == "/api/health":
+                    return self._json({"product": PRODUCT, "protocol": PROTOCOL,
+                                       "workbench_id": self.server.workbench_id, "pid": os.getpid()})
                 if path in ("/", "/index.html", "/app.css", "/app.js"):
                     return self._file(STATIC / ("index.html" if path in ("/", "/index.html") else path[1:]))
                 if path == "/api/state":
@@ -187,18 +183,19 @@ def main():
         parser.error("port must be between 1 and 65535")
     os.umask(0o077)
     try:
-        server = LocalServer(args.port, Workbench(args.data_dir))
-    except (ValueError, OSError) as exc:
+        with single_instance(args.data_dir):
+            server = LocalServer(args.port, Workbench(args.data_dir))
+            print(f"Photography Coach: {server.origin}", flush=True)
+            print(f"私人记录目录: {server.workbench.root}", flush=True)
+            print("只在本机开放；模型密钥仅存于进程内存。按 Ctrl+C 关闭。", flush=True)
+            try:
+                server.serve_forever()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                server.server_close()
+    except (LaunchError, ValueError, OSError) as exc:
         parser.error(str(exc))
-    print(f"Photography Coach: {server.origin}", flush=True)
-    print(f"私人记录目录: {server.workbench.root}", flush=True)
-    print("只在本机开放；模型密钥仅存于进程内存。按 Ctrl+C 关闭。", flush=True)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
 
 
 if __name__ == "__main__":

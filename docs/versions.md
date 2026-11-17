@@ -4,7 +4,7 @@
 
 | 对象 | 版本与位置 | 含义 |
 |---|---|---|
-| 开发快照 | `main` · 2026-11-16 | 独立本机暗房工作台与 Skill 共用报告；真实 API、实时参考检索和新摄影质量验收未完成，不是新 Release |
+| 开发快照 | `main` · 2026-11-17 | Skill 可启动随附独立本机暗房工作台，保留对话点评与共用报告；真实 API、实时参考检索和新摄影质量验收未完成，不是新 Release |
 | 项目发行版 | [v0.1.0](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.1.0) | 首次研究预览，保留原标签 |
 | 项目发行版 | [v0.2.0-alpha.1](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.1) | 视觉展示与实验底层模块快照；工作台未接通 |
 | 项目发行版 | [v0.2.0-alpha.2](https://github.com/judefluen-coder/photography-coach/releases/tag/v0.2.0-alpha.2) | 同一仓库内整理历史原型与研究资料，隔离本地数据；不是新增自动评图能力 |

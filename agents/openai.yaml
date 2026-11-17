@@ -1,4 +1,4 @@
 interface:
   display_name: "摄影教练"
-  short_description: "全画面诊断照片，输出评分、调整成片、精确参考和视觉报告"
-  default_prompt: "请使用 $photography-coach 完整点评这张照片，给出八维评分、精确参考、忠实的裁切调色成片，并生成可打开的视觉报告。"
+  short_description: "打开独立摄影工作台上传照片，也可在对话中获取评分、调整建议和作品参考"
+  default_prompt: "请使用 $photography-coach 打开摄影教练的 Web 应用。"

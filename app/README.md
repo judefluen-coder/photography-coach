@@ -8,7 +8,33 @@
 
 ## 启动
 
+### 装好 Skill 后，用一句话打开
+
+在支持本机命令执行的 Codex 中发送「请用 $photography-coach 打开摄影教练」。Skill 会启动这里的同一个应用，不会生成另一个展示页、复制第二份源码或要求先上传照片。它不会把 Codex 订阅／额度转给 Web 应用，也不会读取 Codex 凭据。
+
+### 不使用 Codex，也能启动
+
 需要 Python 3.11 或更新版本。在仓库根目录运行（macOS / Linux）：
+
+```bash
+python3 scripts/open_workbench.py --setup
+```
+
+Windows 使用 `py -3 scripts/open_workbench.py --setup`。启动后自动请求打开浏览器；如果宿主不能打开浏览器，点击终端输出的地址。`--setup` 仅在缺依赖时创建／使用项目 `.venv` 并安装 `app/requirements.txt`，不修改系统 Python；已有符合版本的环境直接复用。首次安装依赖需要网络和相应权限。没有 Python 时需先安装 Python，本项目不会代装系统运行时。
+
+默认在本机 `8768–8788` 端口内查找已启动的同项目、同数据目录服务；未找到则选择空闲端口。其他程序不会被关闭；如果识别到无法核实数据目录的旧版摄影工作台，会提示先关闭它，而非同时打开第二个进程。新版服务读取记录前会锁定专用数据目录，不允许其他新版服务并行读写，进程退出后自动释放锁。重复打开不新增同一服务，也不调用模型。可使用：
+
+```bash
+python3 scripts/open_workbench.py --demo
+python3 scripts/open_workbench.py --status --no-browser --json
+python3 scripts/open_workbench.py --port 8790 --no-browser
+```
+
+第一条直接看免密钥演示；第二条只检查状态，不启动或安装；第三条指定端口，只输出地址。代理环境变量不会改变本机健康检查的目的地。采用自选 `--port`／`--data-dir` 时，后续打开和查询使用同样参数。
+
+后台服务不会随关闭标签停止；启动结果包含 PID，可以在系统进程管理器中结束该进程。不要按端口或程序名称批量结束其他服务。需要保留终端、用 Ctrl+C 停止，或者调试 Python 源码时，可使用下面的原有前台方式；更新 Python 源码后应重启服务。
+
+### 手动前台启动（仍保留）
 
 ```bash
 python3 -m venv .venv
@@ -19,7 +45,7 @@ python -m app.server
 
 Windows 使用 `py -3 -m venv .venv`，然后在 PowerShell 执行 `.venv\Scripts\Activate.ps1`；后两条命令相同。打开 **http://127.0.0.1:8768/**，保持终端运行。无需 Node、数据库或 Codex。不要双击 `app/static/index.html`：选图、记录和模型调用需要本机服务。
 
-端口占用时使用 `python -m app.server --port 8769`，按终端显示的地址打开。
+端口占用时使用 `python -m app.server --port 8769`，按终端显示的地址打开。前台方式不自动回退端口或打开浏览器。
 
 ## 使用方法
 
@@ -84,4 +110,4 @@ node --check app/static/app.js
 
 服务测试启动真实 loopback HTTP 服务，将模型传输替换为明确的测试响应，覆盖上传、费用确认、密钥边界、取消、刷新／重启、重复请求、失败、追问、实际调色和导出；不访问模型服务，不产生 API 费用。测试替身不是运行时选项，也不是演示模式的数据来源。
 
-代码位置：[`server.py`](server.py)（HTTP 与文件白名单）、[`workbench.py`](workbench.py)（会话／任务）、[`static/`](static/)（界面）、[`../core/`](../core/)（共用规则、校验与图像处理）。
+代码位置：[`launcher.py`](launcher.py)（Skill／命令行共用启动器）、[`server.py`](server.py)（HTTP 与文件白名单）、[`workbench.py`](workbench.py)（会话／任务）、[`static/`](static/)（界面）、[`../core/`](../core/)（共用规则、校验与图像处理）。
