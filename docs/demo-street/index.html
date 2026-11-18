@@ -229,6 +229,7 @@ SOFTWARE.
     .check-badge { font-size: 11px; color: var(--muted); }
     .check-badge::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; background: currentColor; }
     .check-badge[data-verdict="观察"], .check-badge[data-verdict="问题"] { color: var(--accent); }
+    .check-badge[data-verdict="无法判断"]::before { background:transparent; border:1px dashed currentColor; box-sizing:border-box; }
     .inline-detail { margin-top: 12px; padding-top: 10px; border-top: 0; }
     .inline-detail summary { color: var(--muted); font-size: 12px; font-weight: 400; }
     .keep-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin-bottom: 20px; }
@@ -555,13 +556,13 @@ SOFTWARE.
         <div class="hero-copy" id="judgmentPanel">
           <p class="kicker">点评概要</p>
           <h1 id="title"></h1>
+          <p class="lead" id="summary"></p>
           <div class="priority">
             <span class="priority-label" id="decisionLabel">主要问题</span>
             <strong id="priorityTitle"></strong>
             <p class="priority-preview" id="priorityPreview"></p>
             <details class="inline-detail"><summary>展开完整理由</summary><p id="priorityBody"></p></details>
           </div>
-          <details class="inline-detail"><summary>看片结论</summary><p class="lead" id="summary"></p></details>
         </div>
       </div>
       <div class="darkroom-dock" id="darkroomDock">
@@ -591,10 +592,10 @@ SOFTWARE.
           <aside class="selected-score" id="selectedScore" aria-live="polite" aria-atomic="true">
             <p class="score-instruction">点图周围的名称，查看这一项。</p>
             <h3 id="selectedDimension"></h3><strong class="selected-value" id="selectedInterval"></strong>
-            <p id="selectedReason"></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
+            <p id="selectedReason"></p><p class="uncertainty" id="selectedConfidence" hidden></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
           </aside>
         </div>
-        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。</p></details>
+        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。“判断把握”是本次点评的自我评估，不是准确率。</p></details>
       </section>
 
       <section aria-labelledby="readTitle">
@@ -682,6 +683,8 @@ SOFTWARE.
       <section aria-labelledby="practiceTitle">
         <div class="section-head"><h2 id="practiceTitle">拍摄练习</h2><p>按下面的方法做一组对照，检查建议是否有效。</p></div>
         <p class="practice"><strong id="exerciseTitle"></strong> <span id="exerciseInstructions"></span></p>
+        <p class="muted" id="practiceConnection" hidden></p>
+        <p id="practiceCriterion" hidden></p>
         <div class="practice-return"><p>复制练习说明，下次上传新照片时一并提供，便于比较前后的变化。这个报告页本身不接收上传。</p><button type="button" class="button-quiet" id="copyPractice">复制练习说明</button><p id="copyStatus" role="status"></p><textarea id="practicePrompt" aria-label="练习说明，可手动复制" readonly hidden></textarea></div>
         <details><summary>判断限制</summary><p id="boundaryNote"></p></details>
       </section>
@@ -691,7 +694,7 @@ SOFTWARE.
   <footer id="researchStatus"></footer>
   <noscript><p class="source-credit">这个交互报告需要 JavaScript 才能显示点评与图片；不会在线上传照片或调用模型。</p></noscript>
 
-  <script id="reportData" type="application/json">{"title":"人物有呼应，前轮有点挤。","decision":"NO_STRUCTURAL_BOTTLENECK","summary":"近处两张脸，远处一个骑车人，弯道把他们连在一起。空间已经很清楚，不用为了突出人物把环境裁掉。","priority":{"title":"下次给前轮留一点位置。","body":"近处前轮被底边截断，上方树枝却留了不少。若想把骑行的姿态交代完整，可以稍早按下快门。这是取景上的尝试，不是说所有车轮都必须拍全；现有画面的人物关系已经成立。"},"strength":{"title":"前后的人，都有自己的位置。","body":"近处两人靠在一起，远处骑车人小得多，彼此没有重叠。浅色墙面又把深衣服衬出来。别裁掉后方的人，他让这条路有了深度。"},"integrity":[{"family":"边缘/裁切","verdict":"观察","basis":"近处前轮从底边出画，上方树枝的余量较多。后期裁切补不回轮子，也不宜再收底边。"},{"family":"暗部","verdict":"观察","basis":"黑外套下部、裤子与车架有局部并在一起的地方；脸、手与靠浅墙的轮廓仍可辨，不必全图提亮。"},{"family":"高光","verdict":"通过","basis":"浅墙仍能看到色差和表面痕迹。树枝间有少量亮天空，没有吞没主要人物的轮廓。"},{"family":"色彩","verdict":"通过","basis":"浅棕衣服与偏冷的墙面有区别，白墙仍接近中性；没有仅凭画面就必须纠正的全局偏色。"},{"family":"轴线/透视","verdict":"观察","basis":"道路有坡度，栏杆也向远处收拢，不能拿它们当水平尺。是否倾斜暂不确定，没有足够共同证据要求旋转照片。"},{"family":"细节","verdict":"通过","basis":"这份 1280×960 预览中，脸、车把和路砖能辨认，没有明显的大面积涂抹。无法据此认证全尺寸原片的对焦质量。"}],"observations":[{"label":"前轮与底边","priority":"首要","text":"前轮在这里出画，上方却还有树枝。下次试着早一点拍，让轮子留在画内，再比较哪张更利落。","regions":[{"x":0.58,"y":0.78,"width":0.15,"height":0.22}]},{"label":"人物的远近","priority":"要保护","text":"远处的人小，近处的两人大，之间有一段能看见的路。这个间隔比单纯把背景虚化更能交代空间。","regions":[{"x":0.37,"y":0.39,"width":0.08,"height":0.2},{"x":0.53,"y":0.32,"width":0.2,"height":0.57}]},{"label":"浅墙衬深衣","priority":"次要","text":"黑外套靠着浅墙，轮廓很好认；内部的裤子与车架稍暗。若试调，只轻提这一小块，别把黑衣服变灰。","regions":[{"x":0.54,"y":0.32,"width":0.19,"height":0.4}]},{"label":"弯道的线条","priority":"要保护","text":"左侧墙根和路砖的弧线往远处收，视线能从近处人物走到后方骑车人。路不是多余背景，不建议只留下大半身。","regions":[{"x":0.08,"y":0.48,"width":0.48,"height":0.4}]},{"label":"暖衣服与冷墙面","priority":"次要","text":"浅棕衣服在偏冷的环境里容易辨认。保留这点冷暖差就够了，不需要再把整张染成橙蓝色。"},{"label":"动作与遮挡","priority":"次要","text":"近处两张脸都露出来，手和车把也有连接。再等一瞬，前后人物可能重叠；取景放宽时要同时留意这个关系。","regions":[{"x":0.59,"y":0.34,"width":0.12,"height":0.28}]},{"label":"能读出的故事","priority":"无明显问题","text":"能看见几个人在同一条路上骑行，也能感到彼此的距离。照片本身不足以确定他们的关系，不必替他们编一段故事。"}],"learning_check":{"observation_index":2,"question":"想让黑外套和车架更容易分开，你会先试哪种调法？","options":[{"title":"把整张照片提亮","effect":"黑衣服会亮一些，浅墙、脸和浅棕衣服也会跟着变亮。","cost":"可能还没看清车架，浅墙就先变得刺眼；画面原有的明暗差别也会改变。"},{"title":"只提黑衣附近的暗部","effect":"让外套下部已有的折痕、与车架交接的边缘稍清楚，同时保留墙面和浅棕衣服的亮度。","cost":"提得太多，黑衣会变灰，也可能显出噪点；局部边缘需要柔和过渡。"}],"takeaway":"这张可以先试局部调整。看得出外套下部与车架的区别就停，不必把黑衣调成灰色。墙面偏冷、浅棕衣服偏暖，这点区别值得保留。"},"visual_guides":[{"title":"人物与空间","takeaway":"近处两人较大，后方一人较小。中间这段路，把前后分开。","boundary":"色块是人物位置与大小的简图，不是精确分割，也不表示真实身高、距离或人物关系。","areas":[{"tone":"light","points":[{"x":0.07,"y":1},{"x":0.17,"y":0.6},{"x":0.25,"y":0.46},{"x":0.43,"y":0.46},{"x":0.58,"y":0.64},{"x":0.95,"y":1}]},{"tone":"secondary","points":[{"x":0.39,"y":0.4},{"x":0.41,"y":0.4},{"x":0.415,"y":0.44},{"x":0.432,"y":0.47},{"x":0.416,"y":0.49},{"x":0.417,"y":0.55},{"x":0.405,"y":0.56},{"x":0.398,"y":0.51},{"x":0.385,"y":0.55},{"x":0.381,"y":0.54},{"x":0.388,"y":0.49},{"x":0.38,"y":0.47},{"x":0.394,"y":0.44}]},{"tone":"accent","points":[{"x":0.609,"y":0.334},{"x":0.642,"y":0.33},{"x":0.657,"y":0.37},{"x":0.654,"y":0.41},{"x":0.686,"y":0.44},{"x":0.718,"y":0.58},{"x":0.702,"y":0.63},{"x":0.69,"y":0.82},{"x":0.668,"y":0.86},{"x":0.64,"y":0.69},{"x":0.603,"y":0.7},{"x":0.593,"y":0.88},{"x":0.557,"y":0.895},{"x":0.556,"y":0.65},{"x":0.542,"y":0.57},{"x":0.55,"y":0.46},{"x":0.59,"y":0.405},{"x":0.6,"y":0.37}]},{"tone":"warm","points":[{"x":0.605,"y":0.43},{"x":0.638,"y":0.421},{"x":0.66,"y":0.45},{"x":0.658,"y":0.495},{"x":0.68,"y":0.52},{"x":0.711,"y":0.58},{"x":0.691,"y":0.6},{"x":0.669,"y":0.57},{"x":0.658,"y":0.65},{"x":0.665,"y":0.73},{"x":0.64,"y":0.76},{"x":0.617,"y":0.68},{"x":0.607,"y":0.62},{"x":0.576,"y":0.59},{"x":0.579,"y":0.54},{"x":0.6,"y":0.49}]}],"lines":[{"tone":"secondary","arrow":false,"points":[{"x":0.43,"y":0.58},{"x":0.51,"y":0.66}]}],"labels":[{"x":0.29,"y":0.36,"text":"远处 1 人","explanation":"后方的人虽然小，轮廓仍然独立。留住他，才看得出这条路有多深。"},{"x":0.8,"y":0.54,"text":"近处 2 人","explanation":"两人前后重叠，但两张脸都露了出来。与后方的小人物一比较，远近就很清楚。"},{"x":0.38,"y":0.73,"text":"中间留着一段路","explanation":"这段没有被人物挡住的路，把前后分开。别急着裁掉，它比单纯虚化背景更能交代距离。"}]},{"title":"线条与取景","takeaway":"两边墙根往远处收，路把人物串起来。再看上下余量：树枝留得多，前轮已出画。","boundary":"线条是构图讲解，不是眼动轨迹或水平校正线。底边只标出截断处，不能补回画外的轮子。","areas":[{"tone":"light","points":[{"x":0.065,"y":1},{"x":0.15,"y":0.63},{"x":0.23,"y":0.48},{"x":0.29,"y":0.456},{"x":0.435,"y":0.46},{"x":0.55,"y":0.6},{"x":0.94,"y":1}]},{"tone":"cool","points":[{"x":0.2,"y":0.02},{"x":0.72,"y":0.02},{"x":0.72,"y":0.27},{"x":0.26,"y":0.32}]}],"lines":[{"tone":"accent","arrow":false,"points":[{"x":0.065,"y":0.99},{"x":0.1,"y":0.81},{"x":0.15,"y":0.63},{"x":0.195,"y":0.53},{"x":0.23,"y":0.48},{"x":0.29,"y":0.456}]},{"tone":"accent","arrow":false,"points":[{"x":0.55,"y":0.6},{"x":0.5,"y":0.55},{"x":0.46,"y":0.5},{"x":0.435,"y":0.46}]},{"tone":"dark","arrow":false,"points":[{"x":0.61,"y":0.992},{"x":0.73,"y":0.992}]}],"labels":[{"x":0.45,"y":0.17,"text":"上方树枝的余量","explanation":"上面还留着不少树枝，下面的车轮却已经出画。下次拍时，先比较上下余量；现在只裁上边，补不回轮子。"},{"x":0.32,"y":0.61,"text":"两侧线条往里收","explanation":"沿墙根和路边往里看，能从近处走到后方的人。道路不是多余背景，只留大半身会丢掉这层联系。"},{"x":0.81,"y":0.9,"text":"前轮在底边出画","explanation":"前轮在底边被截断了。下次可以稍早按快门试一张，看看完整的骑行姿态是否更利落。"}]},{"title":"明暗与冷暖","takeaway":"浅墙衬出深衣服，偏暖的浅棕衣服又从冷墙面里分开。别把这些差别一起调没了。","boundary":"色块只解释明暗、冷暖与遮挡，不是实测色值、精确蒙版或调色后的照片。","areas":[{"tone":"light","points":[{"x":0,"y":0},{"x":0.12,"y":0},{"x":0.23,"y":0.45},{"x":0.16,"y":0.62},{"x":0.07,"y":1},{"x":0,"y":1}]},{"tone":"cool","points":[{"x":0.46,"y":0.44},{"x":0.58,"y":0.35},{"x":0.9,"y":0.24},{"x":0.99,"y":0.45},{"x":0.99,"y":0.84},{"x":0.7,"y":0.64},{"x":0.57,"y":0.54}]},{"tone":"dark","points":[{"x":0.59,"y":0.405},{"x":0.66,"y":0.405},{"x":0.69,"y":0.47},{"x":0.72,"y":0.61},{"x":0.69,"y":0.82},{"x":0.66,"y":0.86},{"x":0.64,"y":0.69},{"x":0.6,"y":0.7},{"x":0.59,"y":0.87},{"x":0.56,"y":0.89},{"x":0.55,"y":0.62},{"x":0.54,"y":0.54},{"x":0.55,"y":0.45}]},{"tone":"warm","points":[{"x":0.6,"y":0.5},{"x":0.65,"y":0.5},{"x":0.68,"y":0.54},{"x":0.71,"y":0.59},{"x":0.69,"y":0.6},{"x":0.67,"y":0.57},{"x":0.66,"y":0.65},{"x":0.62,"y":0.65},{"x":0.6,"y":0.61},{"x":0.58,"y":0.59},{"x":0.58,"y":0.55}]}],"lines":[],"labels":[{"x":0.17,"y":0.3,"text":"浅色墙面","explanation":"浅墙与深衣服拉开了明暗，人物轮廓才这么好认。不必为了让人物突出，把背景一律压暗。"},{"x":0.83,"y":0.4,"text":"偏冷的墙面","explanation":"这面墙偏冷，旁边的浅棕衣服偏暖。保留两者的区别，别把整张照片一起染暖。"},{"x":0.45,"y":0.8,"text":"深色衣服","explanation":"外套轮廓很清楚，下部与车架却有些混在一起。若试调，只轻提这一小块暗部，别把黑衣服变灰。"},{"x":0.81,"y":0.66,"text":"偏暖的浅棕衣服","explanation":"浅棕衣服既比黑外套亮，也比墙面暖，所以容易被看见。这点差别已经够用，不必再猛加饱和度。"}]}],"scores":[{"dimension":"技术可读性","interval":"3-4 / 5","reason":"脸和车把能辨认，黑衣内部稍暗。"},{"dimension":"取景与边缘控制","interval":"2-3 / 5","reason":"前轮出画，上方树枝余量较多。"},{"dimension":"注意力与形式组织","interval":"3-4 / 5","reason":"道路弧线连接前后人物。"},{"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"浅墙衬深衣，冷暖也有区分。"},{"dimension":"空间与层次","interval":"4-5 / 5","reason":"前大后小，中间有清楚的间隔。"},{"dimension":"时机与关键关系","interval":"3-4 / 5","reason":"近处两张脸与后方的人没有挤在一起。"},{"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"骑行情景可读，具体关系未知。"},{"dimension":"表达一致性与完成度","interval":"3-4 / 5","reason":"人物和道路相互支持，底边还可斟酌。"}],"reshoot":{"action":"站在不挡路的安全位置，稍早一点拍，把近处前轮留进来。","effect":"人物会稍小，但骑行姿态更完整；后方的人和弯道仍要保留。","cost":"取景更宽，环境会增多。若两个人的脸开始重叠，宁可保住这次的表情和间隔。","availability":"适用于相似的骑行场景，不要求重演原来的瞬间；不要站到车道上或倒退挡路。"},"edit":{"summary":"这张先不裁。后期只值得小幅试一下暗部。","crop":"保留现有 4:3 取景。裁掉树枝不能补回前轮，还可能削弱通道的空间。","tone_color":"若自己试调，可局部轻提黑外套下部和车架附近的暗部；看见原有折痕就停。浅墙、脸部和浅棕衣服不一起抬亮，冷暖保持原样。本示例尚未提供调色文件。","limit":"暗部抬多会让黑衣服失去重量，也会显出噪点。后期不能恢复画外的轮子；这里不使用生成补画。"},"reference":{"photographer":"André Kertész","title":"Meudon","year":"1928","url":"https://www.moma.org/collection/works/57425","looking_task":"先看近处抱着大件包裹的人，再看后方的小行人：是什么让他们没有混在一起？","match":"同样用近大远小的人物、道路和建筑交代深度。对照看人物之间的空隙，而不是照搬色调。","difference":"《Meudon》还有高架上的火车，事件分布在多个层次；这张骑行照片的关系更集中。学前后分离即可，不必往画面里塞更多东西，也不必改成黑白。"},"exercise":{"title":"下次只练人物之间的间隔。","instructions":"在安全的路边固定机位，拍一组前后两人经过的照片。选一张重叠、一张分开，缩小对照：哪张一眼能看清前后？不需要找人摆拍。"},"boundary_note":"这是公开照片的演示点评，不是盲测成绩或摄影师本人的创作说明。评分针对这份 JPEG 预览，作者意图、人物关系与速度未知。参考作品的实际画面及 MoMA 单图页面已核对，仅提供链接，不在仓库内再分发馆藏图片。","research_status":"Photography Coach 实验点评 · 分数是有依据的判断区间，不是客观审美排名。来源核对：2026-11-09。","source_credit":{"author":"Fons Heijnsbroek，2022-04-09","url":"https://commons.wikimedia.org/wiki/File:A_small_familie_is_biking_through_the_bicycle_tunnel,_in_the_city;_free_photo_Amsterdam_by_Fons_Heijnsbroek,_04-2022.jpg","license":"CC BY-SA 4.0","license_url":"https://creativecommons.org/licenses/by-sa/4.0/","changes":"使用 Wikimedia 的 1280×960 JPEG 预览，未改变画面内容。页面标记仅用于讲解；照片及含照片的示意遵循 CC BY-SA 4.0。作者未背书此点评。"},"source_asset":"assets/source.jpg","source_download":"assets/source.jpg","source_extension":"jpg","color_asset":null,"color_download":null,"color_extension":null,"treatment_asset":null,"treatment_download":null,"treatment_extension":null}</script>
+  <script id="reportData" type="application/json">{"title":"弯道把前后的人连在了一起。","decision":"NO_STRUCTURAL_BOTTLENECK","summary":"近处两人与后方骑车人分得开，弯道把前后串了起来。空间关系已经成立；下次可以比较前轮留全的版本，但先保住现在的人物间隔。","priority":{"title":"稍早拍一张，比较前轮余量。","body":"近处前轮被底边截断，上方树枝余量较多。它不能靠后期补回，所以下次可先试按快门的时机；暗部还有可辨轮廓，只需小幅尝试。这不是必须修正的失败：若早拍会让脸或前后人物重叠，现有的人物间隔更值得保留。"},"coaching":{"action_type":"可选尝试","observation_index":0,"exercise_observation_index":0,"exercise_mode":"围绕重点","exercise_connection":"这次只比较快门时机是否改善前轮余量，同时检查人物间隔有没有被破坏。","success_criterion":"前轮留进来，近处两张脸和后方人物仍分得开。若人物重叠、变得过小或道路联系变弱，就不值得只为轮子完整换掉原来的取景。"},"strength":{"title":"前后的人，都有自己的位置。","body":"近处两人靠在一起，远处骑车人小得多，彼此没有重叠。浅色墙面又把深衣服衬出来。别裁掉后方的人，他让这条路有了深度。"},"integrity":[{"family":"边缘/裁切","verdict":"观察","basis":"近处前轮从底边出画，上方树枝的余量较多。后期裁切补不回轮子，也不宜再收底边。"},{"family":"暗部","verdict":"观察","basis":"黑外套下部、裤子与车架有局部并在一起的地方；脸、手与靠浅墙的轮廓仍可辨，不必全图提亮。"},{"family":"高光","verdict":"通过","basis":"浅墙仍能看到色差和表面痕迹。树枝间有少量亮天空，没有吞没主要人物的轮廓。"},{"family":"色彩","verdict":"通过","basis":"浅棕衣服与偏冷的墙面有区别，白墙仍接近中性；没有仅凭画面就必须纠正的全局偏色。"},{"family":"轴线/透视","verdict":"无法判断","basis":"道路有坡度，栏杆也向远处收拢，不能拿它们当水平尺。缺少可靠横竖参照来确认共同倾斜；不据此要求旋转，也不把它写成已通过水平检查。"},{"family":"细节","verdict":"通过","basis":"这份 1280×960 预览中，脸、车把和路砖能辨认，没有明显的大面积涂抹。无法据此认证全尺寸原片的对焦质量。"}],"observations":[{"label":"前轮与底边","priority":"首要","text":"前轮在这里出画，上方却还有树枝。下次试着早一点拍，让轮子留在画内，再比较哪张更利落。","regions":[{"x":0.58,"y":0.78,"width":0.15,"height":0.22}]},{"label":"人物的远近","priority":"要保护","text":"远处的人小，近处的两人大，之间有一段能看见的路。这个间隔比单纯把背景虚化更能交代空间。","regions":[{"x":0.37,"y":0.39,"width":0.08,"height":0.2},{"x":0.53,"y":0.32,"width":0.2,"height":0.57}]},{"label":"浅墙衬深衣","priority":"次要","text":"黑外套靠着浅墙，轮廓很好认；内部的裤子与车架稍暗。若试调，只轻提这一小块，别把黑衣服变灰。","regions":[{"x":0.54,"y":0.32,"width":0.19,"height":0.4}]},{"label":"弯道的线条","priority":"要保护","text":"左侧墙根和路砖的弧线往远处收，视线能从近处人物走到后方骑车人。路不是多余背景，不建议只留下大半身。","regions":[{"x":0.08,"y":0.48,"width":0.48,"height":0.4}]},{"label":"暖衣服与冷墙面","priority":"次要","text":"浅棕衣服在偏冷的环境里容易辨认。保留这点冷暖差就够了，不需要再把整张染成橙蓝色。"},{"label":"动作与遮挡","priority":"次要","text":"近处两张脸都露出来，手和车把也有连接。再等一瞬，前后人物可能重叠；取景放宽时要同时留意这个关系。","regions":[{"x":0.59,"y":0.34,"width":0.12,"height":0.28}]},{"label":"能读出的故事","priority":"无明显问题","text":"能看见几个人在同一条路上骑行，也能感到彼此的距离。照片本身不足以确定他们的关系，不必替他们编一段故事。"}],"learning_check":{"observation_index":2,"question":"想让黑外套和车架更容易分开，你会先试哪种调法？","options":[{"title":"把整张照片提亮","effect":"黑衣服会亮一些，浅墙、脸和浅棕衣服也会跟着变亮。","cost":"可能还没看清车架，浅墙就先变得刺眼；画面原有的明暗差别也会改变。"},{"title":"只提黑衣附近的暗部","effect":"让外套下部已有的折痕、与车架交接的边缘稍清楚，同时保留墙面和浅棕衣服的亮度。","cost":"提得太多，黑衣会变灰，也可能显出噪点；局部边缘需要柔和过渡。"}],"takeaway":"这张可以先试局部调整。看得出外套下部与车架的区别就停，不必把黑衣调成灰色。墙面偏冷、浅棕衣服偏暖，这点区别值得保留。"},"visual_guides":[{"title":"人物与空间","takeaway":"近处两人较大，后方一人较小。中间这段路，把前后分开。","boundary":"色块是人物位置与大小的简图，不是精确分割，也不表示真实身高、距离或人物关系。","areas":[{"tone":"light","points":[{"x":0.07,"y":1},{"x":0.17,"y":0.6},{"x":0.25,"y":0.46},{"x":0.43,"y":0.46},{"x":0.58,"y":0.64},{"x":0.95,"y":1}]},{"tone":"secondary","points":[{"x":0.39,"y":0.4},{"x":0.41,"y":0.4},{"x":0.415,"y":0.44},{"x":0.432,"y":0.47},{"x":0.416,"y":0.49},{"x":0.417,"y":0.55},{"x":0.405,"y":0.56},{"x":0.398,"y":0.51},{"x":0.385,"y":0.55},{"x":0.381,"y":0.54},{"x":0.388,"y":0.49},{"x":0.38,"y":0.47},{"x":0.394,"y":0.44}]},{"tone":"accent","points":[{"x":0.609,"y":0.334},{"x":0.642,"y":0.33},{"x":0.657,"y":0.37},{"x":0.654,"y":0.41},{"x":0.686,"y":0.44},{"x":0.718,"y":0.58},{"x":0.702,"y":0.63},{"x":0.69,"y":0.82},{"x":0.668,"y":0.86},{"x":0.64,"y":0.69},{"x":0.603,"y":0.7},{"x":0.593,"y":0.88},{"x":0.557,"y":0.895},{"x":0.556,"y":0.65},{"x":0.542,"y":0.57},{"x":0.55,"y":0.46},{"x":0.59,"y":0.405},{"x":0.6,"y":0.37}]},{"tone":"warm","points":[{"x":0.605,"y":0.43},{"x":0.638,"y":0.421},{"x":0.66,"y":0.45},{"x":0.658,"y":0.495},{"x":0.68,"y":0.52},{"x":0.711,"y":0.58},{"x":0.691,"y":0.6},{"x":0.669,"y":0.57},{"x":0.658,"y":0.65},{"x":0.665,"y":0.73},{"x":0.64,"y":0.76},{"x":0.617,"y":0.68},{"x":0.607,"y":0.62},{"x":0.576,"y":0.59},{"x":0.579,"y":0.54},{"x":0.6,"y":0.49}]}],"lines":[{"tone":"secondary","arrow":false,"points":[{"x":0.43,"y":0.58},{"x":0.51,"y":0.66}]}],"labels":[{"x":0.29,"y":0.36,"text":"远处 1 人","explanation":"后方的人虽然小，轮廓仍然独立。留住他，才看得出这条路有多深。"},{"x":0.8,"y":0.54,"text":"近处 2 人","explanation":"两人前后重叠，但两张脸都露了出来。与后方的小人物一比较，远近就很清楚。"},{"x":0.38,"y":0.73,"text":"中间留着一段路","explanation":"这段没有被人物挡住的路，把前后分开。别急着裁掉，它比单纯虚化背景更能交代距离。"}]},{"title":"线条与取景","takeaway":"两边墙根往远处收，路把人物串起来。再看上下余量：树枝留得多，前轮已出画。","boundary":"线条是构图讲解，不是眼动轨迹或水平校正线。底边只标出截断处，不能补回画外的轮子。","areas":[{"tone":"light","points":[{"x":0.065,"y":1},{"x":0.15,"y":0.63},{"x":0.23,"y":0.48},{"x":0.29,"y":0.456},{"x":0.435,"y":0.46},{"x":0.55,"y":0.6},{"x":0.94,"y":1}]},{"tone":"cool","points":[{"x":0.2,"y":0.02},{"x":0.72,"y":0.02},{"x":0.72,"y":0.27},{"x":0.26,"y":0.32}]}],"lines":[{"tone":"accent","arrow":false,"points":[{"x":0.065,"y":0.99},{"x":0.1,"y":0.81},{"x":0.15,"y":0.63},{"x":0.195,"y":0.53},{"x":0.23,"y":0.48},{"x":0.29,"y":0.456}]},{"tone":"accent","arrow":false,"points":[{"x":0.55,"y":0.6},{"x":0.5,"y":0.55},{"x":0.46,"y":0.5},{"x":0.435,"y":0.46}]},{"tone":"dark","arrow":false,"points":[{"x":0.61,"y":0.992},{"x":0.73,"y":0.992}]}],"labels":[{"x":0.45,"y":0.17,"text":"上方树枝的余量","explanation":"上面还留着不少树枝，下面的车轮却已经出画。下次拍时，先比较上下余量；现在只裁上边，补不回轮子。"},{"x":0.32,"y":0.61,"text":"两侧线条往里收","explanation":"沿墙根和路边往里看，能从近处走到后方的人。道路不是多余背景，只留大半身会丢掉这层联系。"},{"x":0.81,"y":0.9,"text":"前轮在底边出画","explanation":"前轮在底边被截断了。下次可以稍早按快门试一张，看看完整的骑行姿态是否更利落。"}]},{"title":"明暗与冷暖","takeaway":"浅墙衬出深衣服，偏暖的浅棕衣服又从冷墙面里分开。别把这些差别一起调没了。","boundary":"色块只解释明暗、冷暖与遮挡，不是实测色值、精确蒙版或调色后的照片。","areas":[{"tone":"light","points":[{"x":0,"y":0},{"x":0.12,"y":0},{"x":0.23,"y":0.45},{"x":0.16,"y":0.62},{"x":0.07,"y":1},{"x":0,"y":1}]},{"tone":"cool","points":[{"x":0.46,"y":0.44},{"x":0.58,"y":0.35},{"x":0.9,"y":0.24},{"x":0.99,"y":0.45},{"x":0.99,"y":0.84},{"x":0.7,"y":0.64},{"x":0.57,"y":0.54}]},{"tone":"dark","points":[{"x":0.59,"y":0.405},{"x":0.66,"y":0.405},{"x":0.69,"y":0.47},{"x":0.72,"y":0.61},{"x":0.69,"y":0.82},{"x":0.66,"y":0.86},{"x":0.64,"y":0.69},{"x":0.6,"y":0.7},{"x":0.59,"y":0.87},{"x":0.56,"y":0.89},{"x":0.55,"y":0.62},{"x":0.54,"y":0.54},{"x":0.55,"y":0.45}]},{"tone":"warm","points":[{"x":0.6,"y":0.5},{"x":0.65,"y":0.5},{"x":0.68,"y":0.54},{"x":0.71,"y":0.59},{"x":0.69,"y":0.6},{"x":0.67,"y":0.57},{"x":0.66,"y":0.65},{"x":0.62,"y":0.65},{"x":0.6,"y":0.61},{"x":0.58,"y":0.59},{"x":0.58,"y":0.55}]}],"lines":[],"labels":[{"x":0.17,"y":0.3,"text":"浅色墙面","explanation":"浅墙与深衣服拉开了明暗，人物轮廓才这么好认。不必为了让人物突出，把背景一律压暗。"},{"x":0.83,"y":0.4,"text":"偏冷的墙面","explanation":"这面墙偏冷，旁边的浅棕衣服偏暖。保留两者的区别，别把整张照片一起染暖。"},{"x":0.45,"y":0.8,"text":"深色衣服","explanation":"外套轮廓很清楚，下部与车架却有些混在一起。若试调，只轻提这一小块暗部，别把黑衣服变灰。"},{"x":0.81,"y":0.66,"text":"偏暖的浅棕衣服","explanation":"浅棕衣服既比黑外套亮，也比墙面暖，所以容易被看见。这点差别已经够用，不必再猛加饱和度。"}]}],"scores":[{"dimension":"技术可读性","interval":"3-4 / 5","reason":"当前预览中脸和车把可辨，黑衣内部有局部合并；不能据小图认证原片细节。","confidence":"中","uncertainty":"只有 1280×960 JPEG 预览，无法判断全尺寸原片的细部对焦和暗部恢复余量。"},{"dimension":"取景与边缘控制","interval":"2-3 / 5","reason":"前轮在底边出画，上方树枝余量较多，形体完整性有限；但这不否定当前人物关系。","confidence":"高","uncertainty":null},{"dimension":"注意力与形式组织","interval":"3-4 / 5","reason":"墙根弧线连接前后人物；右上栏杆和树枝还有较多碎线，组织并非只剩单一路径。","confidence":"高","uncertainty":null},{"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"浅墙衬深衣、浅棕衣服与冷墙面分开；黑外套下部和车架的明暗分离仍有限。","confidence":"中","uncertainty":"这里只判断 JPEG 中的关系，不据此认定现场真实颜色或原始文件是否还能恢复暗部。"},{"dimension":"空间与层次","interval":"4-5 / 5","reason":"人物近大远小，中间路面没有被挡住，墙根又往后收；三条线索一起交代纵深。","confidence":"高","uncertainty":null},{"dimension":"时机与关键关系","interval":"3-4 / 5","reason":"近处两张脸与后方人物都能分开；当前时机保住了人物，却没保住完整前轮。","confidence":"中","uncertainty":"没有前后连拍，不能断言更早的一帧会同时保住人物间隔和轮子。"},{"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"骑行场景和前后联系可读，更多靠日常相遇与空间呼应，而不是画面内明确的事件转折。","confidence":"中","uncertainty":"情绪和故事是观看推测；人物身份与关系未知，不因此扣分。"},{"dimension":"表达一致性与完成度","interval":"3-4 / 5","reason":"人物、道路和明暗都支持同一场景；底边截断使形体完整性仍有取舍，不等于整张失败。","confidence":"中","uncertainty":"是否需要完整交代自行车取决于用途，作者目的未提供；本次保留原评分，不作新的校准宣称。"}],"reshoot":{"action":"站在不挡路的安全位置，稍早一点拍，把近处前轮留进来。","effect":"人物会稍小，但骑行姿态更完整；后方的人和弯道仍要保留。","cost":"机位和取景不变时，早拍通常会让人物更小、环境所占比例增多。若人物开始重叠，宁可保住这次脸部清楚、前后分开的关系。","availability":"适用于相似的骑行场景，不要求重演原来的瞬间；不要站到车道上或倒退挡路。"},"edit":{"summary":"这张先不裁。后期只值得小幅试一下暗部。","crop":"保留现有 4:3 取景。裁掉树枝不能补回前轮，还可能削弱通道的空间。","tone_color":"若自己试调，可局部轻提黑外套下部和车架附近的暗部；看见原有折痕就停。浅墙、脸部和浅棕衣服不一起抬亮，冷暖保持原样。本示例尚未提供调色文件。","limit":"暗部抬多会让黑衣服失去重量，也会显出噪点。后期不能恢复画外的轮子；这里不使用生成补画。"},"reference":{"photographer":"André Kertész","title":"Meudon","year":"1928","url":"https://www.moma.org/collection/works/57425","looking_task":"先看近处抱着大件包裹的人，再看后方的小行人：是什么让他们没有混在一起？","match":"同样用近大远小的人物、道路和建筑交代深度。对照看人物之间的空隙，而不是照搬色调。","difference":"《Meudon》还有高架上的火车，事件分布在多个层次；这张骑行照片的关系更集中。学前后分离即可，不必往画面里塞更多东西，也不必改成黑白。"},"exercise":{"title":"20 分钟，只练按快门的时机。","instructions":"站在不挡路的安全位置，固定机位和取景，拍约 12 张骑行者经过的照片。选出前轮余量不同的两三张，先比较轮子与底边，再检查脸和前后人物是否仍分开。只改变按快门的时机，不同时换位置或改焦段；不要求重演原来的场景。"},"boundary_note":"这是公开照片的演示点评，不是盲测成绩或摄影师本人的创作说明。评分针对这份 JPEG 预览，作者意图、人物关系与速度未知。参考作品的实际画面及 MoMA 单图页面已核对，仅提供链接，不在仓库内再分发馆藏图片。","research_status":"Photography Coach 实验点评 · 分数是有依据的判断区间，不是客观审美排名。来源核对：2026-11-09。","source_credit":{"author":"Fons Heijnsbroek，2022-04-09","url":"https://commons.wikimedia.org/wiki/File:A_small_familie_is_biking_through_the_bicycle_tunnel,_in_the_city;_free_photo_Amsterdam_by_Fons_Heijnsbroek,_04-2022.jpg","license":"CC BY-SA 4.0","license_url":"https://creativecommons.org/licenses/by-sa/4.0/","changes":"使用 Wikimedia 的 1280×960 JPEG 预览，未改变画面内容。页面标记仅用于讲解；照片及含照片的示意遵循 CC BY-SA 4.0。作者未背书此点评。"},"source_asset":"assets/source.jpg","source_download":"assets/source.jpg","source_extension":"jpg","color_asset":null,"color_download":null,"color_extension":null,"treatment_asset":null,"treatment_download":null,"treatment_extension":null}</script>
   <script>
     const data = JSON.parse(document.querySelector('#reportData').textContent);
     const text = (selector, value) => { document.querySelector(selector).textContent = value || ''; };
@@ -732,11 +735,11 @@ SOFTWARE.
     document.querySelector('#photoToolbar').hidden = !hasEdit;
     document.querySelector('#darkroomDock').dataset.state = hasColor ? 'color' : hasTreatment ? 'combined' : 'advice';
     text('#detailLabel', hasColor ? '局部对照' : '后期建议');
-    text('#dockEditStatus', hasColor ? '同一取景，只比较颜色与明暗。' : hasTreatment ? '已有综合调整版，未提供同取景调色文件。' : data.edit.tone_color);
+    text('#dockEditStatus', hasColor ? '已提供调色文件。请对照原图确认改善，也留意损失。' : hasTreatment ? '已有综合调整版；不能单独证明调色改善。' : data.edit.tone_color);
     document.querySelector('#toneControls').hidden = !hasColor;
     document.querySelector('#downloadMix').hidden = !hasColor;
     document.querySelector('#mixHelp').hidden = !hasColor;
-    document.querySelector('#dockEditStatus').hidden = hasColor;
+    document.querySelector('#dockEditStatus').hidden = false;
     const treatmentLabel = hasColor ? (data.edit.crop_region ? '裁切＋调色' : '综合调整') : '调整后';
     text('#treatmentTab', treatmentLabel);
     text('#treatmentCaption', treatmentLabel);
@@ -751,7 +754,7 @@ SOFTWARE.
       NO_STRUCTURAL_BOTTLENECK: ['无需大改', '可选调整']
     };
     const decisionLabelsForReport = decisionLabels[data.decision] || decisionLabels.STRUCTURAL_BOTTLENECK;
-    text('#decisionLabel', decisionLabelsForReport[0]);
+    text('#decisionLabel', data.coaching?.action_type || decisionLabelsForReport[0]);
 
     document.title = `${data.title} | Photography Coach`;
     text('#title', data.title);
@@ -759,6 +762,9 @@ SOFTWARE.
     text('#priorityTitle', data.priority.title);
     text('#priorityBody', data.priority.body);
     text('#priorityPreview', data.priority.body);
+    // The visible whole-photo summary already supplies first-screen context.
+    // Keep the complete action rationale in its disclosure instead of repeating it.
+    document.querySelector('#priorityPreview').hidden = Boolean(data.coaching);
     text('#strengthTitle', data.strength.title);
     text('#strengthBody', data.strength.body);
     text('#reshootAction', data.reshoot.action);
@@ -780,6 +786,13 @@ SOFTWARE.
     document.querySelector('#referenceLink').hidden = !reference;
     text('#exerciseTitle', data.exercise.title);
     text('#exerciseInstructions', data.exercise.instructions);
+    const coaching = data.coaching;
+    document.querySelector('#practiceConnection').hidden = !coaching;
+    document.querySelector('#practiceCriterion').hidden = !coaching;
+    if (coaching) {
+      text('#practiceConnection', `${coaching.exercise_mode} · ${data.observations[coaching.exercise_observation_index].label}：${coaching.exercise_connection}`);
+      text('#practiceCriterion', `怎么看改对了：${coaching.success_criterion}`);
+    }
     text('#boundaryNote', data.boundary_note);
     text('#researchStatus', data.research_status);
     if (data.integrity) {
@@ -1055,7 +1068,7 @@ SOFTWARE.
       locate.className = 'observation-toggle';
       const number = document.createElement('span');
       number.className = 'map-number'; number.textContent = String(index + 1).padStart(2, '0');
-      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority}`;
+      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority === '首要' && data.coaching ? data.coaching.action_type : observation.priority}`;
       locate.append(number, label);
       locate.setAttribute('aria-label', `${index + 1}. ${observation.regions?.length ? '在照片上看' : '展开说明'}：${observation.label}`);
       locate.setAttribute('aria-pressed', 'false');
@@ -1162,6 +1175,8 @@ SOFTWARE.
       text('#selectedDimension', score.dimension);
       text('#selectedInterval', score.interval === 'N/A' ? '未评分' : score.interval);
       text('#selectedReason', score.reason);
+      text('#selectedConfidence', score.confidence ? `判断把握：${score.confidence}` : '');
+      document.querySelector('#selectedConfidence').hidden = !score.confidence;
       text('#selectedUncertainty', score.uncertainty ? `暂不能确定：${score.uncertainty}` : '');
       document.querySelector('#selectedUncertainty').hidden = !score.uncertainty;
       radarButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(index === i)));
@@ -1193,6 +1208,11 @@ SOFTWARE.
       value.textContent = score.interval;
       const reason = document.createElement('p');
       reason.textContent = score.reason;
+      if (score.confidence) {
+        const confidence = document.createElement('span'); confidence.className = 'uncertainty';
+        confidence.textContent = `判断把握：${score.confidence}`;
+        reason.append(confidence);
+      }
       if (score.uncertainty) {
         const uncertainty = document.createElement('span');
         uncertainty.className = 'uncertainty';
@@ -1414,7 +1434,7 @@ SOFTWARE.
       });
     }
     const practicePrompt = document.querySelector('#practicePrompt');
-    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
+    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n${coaching ? `练习关联：${coaching.exercise_connection}\n检查标准：${coaching.success_criterion}\n` : ''}上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
     document.querySelector('#copyPractice').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(practicePrompt.value);

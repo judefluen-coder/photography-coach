@@ -294,6 +294,41 @@ class WorkbenchServerTest(unittest.TestCase):
         self.assertEqual(len(self.transport.calls),1)
         self.assertEqual(self.request('GET',result['original_url'])[0],200)
 
+    def test_contradictory_judgment_is_not_shown_or_automatically_retried(self):
+        output = fixture()
+        output['report']['summary'] = '无需调整，当前画面没有明显问题。'
+        output['report']['priority']['title'] = '必须重构画面。'
+        session_id = self.upload()
+        self.configure()
+        with patch(f'{__name__}.fixture', return_value=output):
+            self.start(session_id)
+            result = self.finish(session_id)
+        self.assertEqual(result['state'], 'error')
+        self.assertIn('前后不一致', result['error'])
+        self.assertIn('没有自动', result['error'])
+        self.assertIn('计费', result['error'])
+        self.assertEqual(result['usage'][0]['total_tokens'], 50)
+        self.assertIsNone(result['report_url'])
+        self.assertEqual(len(self.transport.calls), 1)
+        self.assertEqual(self.request('GET', result['original_url'])[0], 200)
+
+    def test_quality_links_and_unresolved_check_survive_real_http_rendering(self):
+        output = fixture()
+        output['report']['integrity'][4].update(verdict='无法判断', basis='测试缩图缺少可核实的横竖参照。')
+        output['report']['scores'][0].update(confidence='低', uncertainty='这是合成测试响应，未执行真实看片。')
+        session_id = self.upload()
+        self.configure()
+        with patch(f'{__name__}.fixture', return_value=output):
+            self.start(session_id)
+            result = self.finish(session_id)
+        self.assertEqual(result['state'], 'ready', result['error'])
+        _, html, _ = self.request('GET', result['report_url'])
+        report = json.loads(re.search(rb'<script id="reportData" type="application/json">(.*?)</script>', html, re.S)[1])
+        self.assertEqual(report['coaching'], output['report']['coaching'])
+        self.assertEqual(report['scores'][0]['confidence'], '低')
+        self.assertEqual(report['integrity'][4]['verdict'], '无法判断')
+        self.assertEqual(len(self.transport.calls), 1)
+
     def test_render_failure_preserves_reported_usage_without_retry(self):
         session_id = self.upload()
         self.configure()

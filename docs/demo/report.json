@@ -1,6 +1,7 @@
 {
   "title":"弯道已经拍出来了，先让车头更好读。",
   "decision":"NO_STRUCTURAL_BOTTLENECK",
+  "coaching":{"action_type":"局部修正","observation_index":0,"exercise_observation_index":0,"exercise_mode":"围绕重点","exercise_connection":"把主建议里的车头暗部可读性，变成只改变暗部强度的一组对照。","success_criterion":"号码与黑面边界更容易辨认，同时车身仍明显暗于亮车顶。若黑车变灰、亮顶变刺眼或出现光晕，就退回更轻的版本；有像素变化不等于更好。"},
   "visual_guides":[],
   "learning_check":{
     "observation_index":0,
@@ -40,14 +41,14 @@
     {"label":"静止的一张与运动感","priority":"无明显问题","text":"轮廓和线路让画面有向前延伸的感觉，但一张成片不能证明车速。没有明显拖影，不代表必须补上运动模糊。"}
   ],
   "scores":[
-    {"dimension":"技术可读性","interval":"3-4 / 5","reason":"号码、管线与窗框可辨；局部黑面和细小人物的可读性有限。"},
-    {"dimension":"取景与边缘控制","interval":"3-4 / 5","reason":"整段弯道保住了，车头前方和底部余量偏紧。"},
-    {"dimension":"注意力与形式组织","interval":"4-5 / 5","reason":"大车头、弯曲车顶、小窗格形成明确的观看顺序。"},
-    {"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"车顶和车身体积清楚；暗车头与外围亮绿的竞争可小调。"},
-    {"dimension":"空间与层次","interval":"4-5 / 5","reason":"近大远小、车厢相接、前景护栏一起交代纵深。"},
-    {"dimension":"时机与关键关系","interval":"4-5 / 5","reason":"车頭与后段车厢同时进入视野，转弯关系完整。"},
-    {"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"能看懂列车与沿线环境，小人补充尺度；不强求一张图讲出事件。"},
-    {"dimension":"表达一致性与完成度","interval":"4-5 / 5","reason":"机械结构和整列车的曲线都得到交代，调整宜克制。"}
+    {"dimension":"技术可读性","interval":"3-4 / 5","reason":"号码、管线与窗框可辨；局部黑面和细小人物的可读性有限。","confidence":"中","uncertainty":"JPEG 中能看清大轮廓，不能据此确认原始文件的细字与暗部恢复能力。"},
+    {"dimension":"取景与边缘控制","interval":"3-4 / 5","reason":"整段弯道保住了，车头前方和底部余量偏紧。","confidence":"高","uncertainty":null},
+    {"dimension":"注意力与形式组织","interval":"4-5 / 5","reason":"大车头、弯曲车顶、小窗格形成明确的观看顺序。","confidence":"高","uncertainty":null},
+    {"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"车顶和车身体积清楚；暗车头与外围亮绿的竞争可小调。","confidence":"高","uncertainty":null},
+    {"dimension":"空间与层次","interval":"4-5 / 5","reason":"近大远小、车厢相接、前景护栏一起交代纵深。","confidence":"高","uncertainty":null},
+    {"dimension":"时机与关键关系","interval":"4-5 / 5","reason":"车头与后段车厢同时进入视野，转弯关系完整。","confidence":"高","uncertainty":null},
+    {"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"能看懂列车与沿线环境，小人补充尺度；不强求一张图讲出事件。","confidence":"中","uncertainty":"画面不能证明速度、人物经历或拍摄意图，观看联想不当作事实。"},
+    {"dimension":"表达一致性与完成度","interval":"4-5 / 5","reason":"机械结构和整列车的曲线都得到交代，调整宜克制。","confidence":"高","uncertainty":null}
   ],
   "reshoot":{"action":"在允许拍摄的安全观景点，先给车头前方多留一点空间，再等后面几节车厢也进入弯道。按下前看一眼：车头、车轮、远端车厢都还在不在。","effect":"既保住长弧线，也让车头前方不那么紧。不是越近越有冲击力。","cost":"取景宽一点，列车在画面里会小一些，环境也更多。这个瞬间不一定还能重来。","availability":"相似场景；不进入轨道、不探身越过护栏，不假定原拍摄位置对公众开放。"},
   "edit":{"summary":"先在顶部切“原图 / 仅调色”：看车头号码下面的黑面，以及右侧亮绿叶。车头稍清楚，绿叶稍收敛，亮车顶没有一起被推亮。再切“裁切＋调色”，单独判断是否要收右边和上面的小条环境。","crop":"仅调色保留 3992×2992 全画幅。裁切版只去掉上方 60 像素、右侧 120 像素；左边和底边完全不动，保护车头前方钢轨。这个小裁切是可选的。","crop_region":{"x":0,"y":0.020053475935828877,"width":0.969939879759519,"height":0.9799465240641712},"tone_color":"已做两件事：局部提车头已有的暗部层次，黑缝和灯心不跟着抬；外围亮绿叶降低饱和度（蒙版最强处 24%）和亮度（最多约 0.32 档），保护中间车厢的绿色及下方红色。没有套统一滤镜或添加细节。","limit":"调色会少一点原来的硬朗和鲜亮；裁切会少一点沿线环境。后期无法恢复被护栏遮住的细节、看不清的表情，也补不回画外空间。示例公开包将原尺寸 PNG 调整图转成高质量 JPEG，页面另使用缩小 JPEG 预览。"},

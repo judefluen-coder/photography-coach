@@ -403,6 +403,8 @@ for (const [index, choice] of radarChoices.entries()) {
   assert.equal(byId.get('#selectedReason').textContent, score.reason);
   assert.equal(byId.get('#selectedInterval').textContent, score.interval === 'N/A' ? '未评分' : score.interval);
   assert.equal(byId.get('#selectedUncertainty').hidden, !score.uncertainty);
+  assert.equal(byId.get('#selectedConfidence').hidden, !score.confidence);
+  if (score.confidence) assert.ok(byId.get('#selectedConfidence').textContent.includes(score.confidence));
   assert.equal(choice.attrs['aria-pressed'], 'true');
   assert.equal(radarChoices.filter(button => button.attrs['aria-pressed'] === 'true').length, 1);
   assert.equal(radarNodes.filter(node => node.attrs.class === 'radar-axis' && node.attrs['data-selected'] === 'true').length, 1);
@@ -433,6 +435,17 @@ if (data.integrity) {
   assert.equal(byId.get('#integritySection').hidden, false);
   assert.equal(byId.get('#integrityChecks').children.length, 6);
   assert.equal(byId.get('#integritySummary').children.length, 6);
+}
+assert.equal(byId.get('#summary').textContent, data.summary);
+assert.equal(byId.get('#summary').hidden, false);
+assert.equal(byId.get('#priorityPreview').hidden, Boolean(data.coaching));
+assert.equal(byId.get('#practiceConnection').hidden, !data.coaching);
+assert.equal(byId.get('#practiceCriterion').hidden, !data.coaching);
+if (data.coaching) {
+  assert.equal(byId.get('#decisionLabel').textContent, data.coaching.action_type);
+  assert.ok(byId.get('#practiceConnection').textContent.includes(data.coaching.exercise_connection));
+  assert.ok(byId.get('#practiceCriterion').textContent.includes(data.coaching.success_criterion));
+  assert.ok(copied.includes(data.coaching.success_criterion));
 }
 if (data.source_credit) {
   assert.equal(byId.get('#sourceCredit').hidden, false);

@@ -2,6 +2,8 @@
 
 本地工作台的默认演示案例；无需 API，不会产生模型调用费用，也不写入私人点评记录。直接打开 `index.html` 可离线查看。
 
+2026-11-18 改版：总评先解释人物与弯道为何成立，前轮余量明确标为可选尝试；练习改为比较按快门的时机，并列出保护人物间隔的检查标准。八项原评分区间、照片与参考作品未改；评分只补充理由、把握和信息限制。轴线缺少可靠参照时显示“无法判断”，不算已通过。这是内容与合同修正，不是一次新模型评测或盲测。
+
 - 照片：Fons Heijnsbroek，2022-04-09，[Wikimedia 原作品页](https://commons.wikimedia.org/wiki/File:A_small_familie_is_biking_through_the_bicycle_tunnel,_in_the_city;_free_photo_Amsterdam_by_Fons_Heijnsbroek,_04-2022.jpg)。仓库使用其 1280×960 JPEG 预览，不是全尺寸相机原片。
 - 许可：[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。保留署名、来源、许可与修改说明；作者未背书本项目。照片未裁切、未调色，页面的数字与区域框是可隐藏的讲解层。
 - 点评：重新针对这张照片编写，未沿用列车示例的结论或评分。八项区间分、七项观察、六项图像检查；标注说明默认收起，点击照片上的标签或数字展开，再点收起。

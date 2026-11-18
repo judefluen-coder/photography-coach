@@ -65,6 +65,55 @@ class ReportError(ValueError):
     """Raised when the visual report payload cannot be rendered safely."""
 
 
+class JudgmentError(ReportError):
+    """Bounded, authored consistency errors safe to display in the local workbench."""
+
+
+def validate_coaching(data: dict) -> None:
+    """Check explicit links and a narrow contradiction sentinel, not arbitrary semantics."""
+    decision = data["decision"]
+    # Sentence starts avoid treating “不必重构” or a quoted alternative as an obligation.
+    severe = re.compile(r"(?:^|[。！？；\n])\s*(?:(?:当前(?:的)?(?:构图|画面)|这张(?:照片)?|整张(?:照片)?)[，,:：]?)?(?:必须(?:大幅裁切|重构|重拍|重新构图)|完全不成立)")
+    if decision == "NO_STRUCTURAL_BOTTLENECK" and severe.search(data["priority"]["title"] + "\n" + data["priority"]["body"]):
+        raise JudgmentError("点评前后不一致：一边判断无需重构，一边要求必须重构或重拍。本次未展示矛盾报告；没有自动再次调用模型。")
+    no_fault = re.compile(r"(?:^|[。！？；\n])\s*(?:(?:这张(?:照片)?|整张(?:照片)?|当前(?:画面|构图))[，,:：]?)?(?:无需任何调整|不需要任何调整|完全没有问题|没有任何问题|所有方面均无明显问题)\s*(?:[。！？；]|$)")
+    if decision == "STRUCTURAL_BOTTLENECK" and no_fault.search(data["summary"]):
+        raise JudgmentError("点评前后不一致：总结声称完全没有问题，决策却判定存在结构瓶颈。本次未展示矛盾报告；没有自动再次调用模型。")
+    coaching = data.get("coaching")
+    if coaching is None:
+        return  # Older offline reports remain readable; no invented linkage or confidence.
+    if not isinstance(coaching, dict):
+        raise JudgmentError("点评的练习关联格式无效。")
+    allowed = {
+        "STRUCTURAL_BOTTLENECK": {"优先修正"},
+        "CONDITIONAL_BRANCH": {"按目的选择"},
+        "NO_STRUCTURAL_BOTTLENECK": {"局部修正", "可选尝试", "保留"},
+    }
+    if coaching.get("action_type") not in allowed[decision]:
+        raise JudgmentError("点评的总体判断与建议性质不一致。本次未展示矛盾报告；没有自动再次调用模型。")
+    observations = data["observations"]
+    for key in ("observation_index", "exercise_observation_index"):
+        value = coaching.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value < len(observations):
+            raise JudgmentError("点评或练习没有关联到有效的画面观察。")
+    target = observations[coaching["observation_index"]]
+    if target["priority"] != "首要" and not (coaching["action_type"] == "保留" and target["priority"] == "要保护"):
+        raise JudgmentError("主建议没有关联到本次重点或明确保留项。")
+    mode = coaching.get("exercise_mode")
+    if mode == "围绕重点":
+        if coaching["exercise_observation_index"] != coaching["observation_index"]:
+            raise JudgmentError("练习与主建议没有对齐。若有意巩固优点，需明确说明并关联保留项。")
+    elif mode == "巩固优点":
+        if observations[coaching["exercise_observation_index"]]["priority"] != "要保护":
+            raise JudgmentError("巩固练习必须关联一项已经成立、值得保留的关系。")
+    else:
+        raise JudgmentError("练习需要说明是围绕重点还是巩固优点。")
+    for key in ("exercise_connection", "success_criterion"):
+        value = coaching.get(key)
+        if not isinstance(value, str) or not value.strip() or len(value) > 600:
+            raise JudgmentError("练习缺少具体关联理由或可观察的检查标准。")
+
+
 def nonempty_text(value: Any, field: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ReportError(f"{field} must be a non-empty string")
@@ -133,7 +182,7 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
         for index, (check, family) in enumerate(zip(checks, families)):
             if not isinstance(check, dict) or check.get("family") != family:
                 raise ReportError("integrity must use the six families in documented order")
-            if check.get("verdict") not in {"通过", "观察", "问题"}:
+            if check.get("verdict") not in {"通过", "观察", "问题", "无法判断"}:
                 raise ReportError(f"integrity[{index}].verdict is invalid")
             check["basis"] = nonempty_text(check.get("basis"), f"integrity[{index}].basis")
     if "source_credit" in data:
@@ -189,10 +238,16 @@ def validate_report(data: Any, base_dir: Path) -> tuple[dict[str, Any], Path, Pa
             if not match or int(match[1]) > int(match[2]):
                 raise ReportError(f"scores[{index}].interval must be an ordered 0-5 integer interval or N/A")
         dimensions.append(item["dimension"])
-        if "uncertainty" in item:
+        if item.get("uncertainty") is not None:
             item["uncertainty"] = nonempty_text(item["uncertainty"], f"scores[{index}].uncertainty")
+        if "confidence" in item:
+            if item["confidence"] not in {"高", "中", "低"}:
+                raise ReportError(f"scores[{index}].confidence is invalid")
+            if item["confidence"] != "高" and not item.get("uncertainty"):
+                raise JudgmentError("评分把握不足时，需要说明具体缺少什么信息。")
     if dimensions != SCORE_DIMENSIONS:
         raise ReportError("scores must use all eight stable dimensions in the documented order")
+    validate_coaching(data)
 
     source_path = resolve_image(data["source_image"], "source_image", base_dir)
     treatment_path: Path | None = None

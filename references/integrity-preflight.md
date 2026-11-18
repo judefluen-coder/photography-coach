@@ -4,6 +4,8 @@ Use this compact preflight on every finished photograph before interpreting mood
 
 For each family, record internally `absent`, `plausible`, or `evidenced`. `Evidenced` requires at least two independent observations. One vague impression is not enough.
 
+If the relevant pixels or a reliable comparison are unavailable, leave the family unresolved rather than calling it absent. Use the public verdict `无法判断` with the missing evidence named; it is neither a pass nor proof of a defect. Partial visibility can support a limited observation without certifying the original file.
+
 ## Fact-naming gate
 
 Before the six families, underline mentally every role, relationship, state or process, emotion or meaning, time or place, material or content, age or wear, cause or purpose, speed, and outcome label you are about to use. Keep it as fact only when the pixels directly support that class. Otherwise replace it with location, contour, colour, posture, contact, spacing, or surface description and, if useful, add a clearly marked viewing hypothesis. A later unknowns section cannot neutralize an unsupported assertion made earlier.

@@ -262,11 +262,11 @@ def validate(
         if not family_line:
             errors.append(f"integrity check missing family: {family}")
         else:
-            verdict_match = re.search(r"通过|观察|问题", family_line)
+            verdict_match = re.search(r"通过|观察|问题|无法判断", family_line)
             if verdict_match:
                 family_verdicts[family] = verdict_match.group(0)
         if family_line and family not in family_verdicts:
-            errors.append(f"integrity family needs 通过/观察/问题 verdict: {family}")
+            errors.append(f"integrity family needs 通过/观察/问题/无法判断 verdict: {family}")
         if require_integrity_probe and family_line:
             audit_label = INTEGRITY_AUDIT_LABELS[family]
             if audit_label not in family_line or "与" not in family_line:

@@ -229,6 +229,7 @@ SOFTWARE.
     .check-badge { font-size: 11px; color: var(--muted); }
     .check-badge::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; background: currentColor; }
     .check-badge[data-verdict="观察"], .check-badge[data-verdict="问题"] { color: var(--accent); }
+    .check-badge[data-verdict="无法判断"]::before { background:transparent; border:1px dashed currentColor; box-sizing:border-box; }
     .inline-detail { margin-top: 12px; padding-top: 10px; border-top: 0; }
     .inline-detail summary { color: var(--muted); font-size: 12px; font-weight: 400; }
     .keep-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin-bottom: 20px; }
@@ -555,13 +556,13 @@ SOFTWARE.
         <div class="hero-copy" id="judgmentPanel">
           <p class="kicker">点评概要</p>
           <h1 id="title"></h1>
+          <p class="lead" id="summary"></p>
           <div class="priority">
             <span class="priority-label" id="decisionLabel">主要问题</span>
             <strong id="priorityTitle"></strong>
             <p class="priority-preview" id="priorityPreview"></p>
             <details class="inline-detail"><summary>展开完整理由</summary><p id="priorityBody"></p></details>
           </div>
-          <details class="inline-detail"><summary>看片结论</summary><p class="lead" id="summary"></p></details>
         </div>
       </div>
       <div class="darkroom-dock" id="darkroomDock">
@@ -591,10 +592,10 @@ SOFTWARE.
           <aside class="selected-score" id="selectedScore" aria-live="polite" aria-atomic="true">
             <p class="score-instruction">点图周围的名称，查看这一项。</p>
             <h3 id="selectedDimension"></h3><strong class="selected-value" id="selectedInterval"></strong>
-            <p id="selectedReason"></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
+            <p id="selectedReason"></p><p class="uncertainty" id="selectedConfidence" hidden></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
           </aside>
         </div>
-        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。</p></details>
+        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。“判断把握”是本次点评的自我评估，不是准确率。</p></details>
       </section>
 
       <section aria-labelledby="readTitle">
@@ -682,6 +683,8 @@ SOFTWARE.
       <section aria-labelledby="practiceTitle">
         <div class="section-head"><h2 id="practiceTitle">拍摄练习</h2><p>按下面的方法做一组对照，检查建议是否有效。</p></div>
         <p class="practice"><strong id="exerciseTitle"></strong> <span id="exerciseInstructions"></span></p>
+        <p class="muted" id="practiceConnection" hidden></p>
+        <p id="practiceCriterion" hidden></p>
         <div class="practice-return"><p>复制练习说明，下次上传新照片时一并提供，便于比较前后的变化。这个报告页本身不接收上传。</p><button type="button" class="button-quiet" id="copyPractice">复制练习说明</button><p id="copyStatus" role="status"></p><textarea id="practicePrompt" aria-label="练习说明，可手动复制" readonly hidden></textarea></div>
         <details><summary>判断限制</summary><p id="boundaryNote"></p></details>
       </section>
@@ -732,11 +735,11 @@ SOFTWARE.
     document.querySelector('#photoToolbar').hidden = !hasEdit;
     document.querySelector('#darkroomDock').dataset.state = hasColor ? 'color' : hasTreatment ? 'combined' : 'advice';
     text('#detailLabel', hasColor ? '局部对照' : '后期建议');
-    text('#dockEditStatus', hasColor ? '同一取景，只比较颜色与明暗。' : hasTreatment ? '已有综合调整版，未提供同取景调色文件。' : data.edit.tone_color);
+    text('#dockEditStatus', hasColor ? '已提供调色文件。请对照原图确认改善，也留意损失。' : hasTreatment ? '已有综合调整版；不能单独证明调色改善。' : data.edit.tone_color);
     document.querySelector('#toneControls').hidden = !hasColor;
     document.querySelector('#downloadMix').hidden = !hasColor;
     document.querySelector('#mixHelp').hidden = !hasColor;
-    document.querySelector('#dockEditStatus').hidden = hasColor;
+    document.querySelector('#dockEditStatus').hidden = false;
     const treatmentLabel = hasColor ? (data.edit.crop_region ? '裁切＋调色' : '综合调整') : '调整后';
     text('#treatmentTab', treatmentLabel);
     text('#treatmentCaption', treatmentLabel);
@@ -751,7 +754,7 @@ SOFTWARE.
       NO_STRUCTURAL_BOTTLENECK: ['无需大改', '可选调整']
     };
     const decisionLabelsForReport = decisionLabels[data.decision] || decisionLabels.STRUCTURAL_BOTTLENECK;
-    text('#decisionLabel', decisionLabelsForReport[0]);
+    text('#decisionLabel', data.coaching?.action_type || decisionLabelsForReport[0]);
 
     document.title = `${data.title} | Photography Coach`;
     text('#title', data.title);
@@ -759,6 +762,9 @@ SOFTWARE.
     text('#priorityTitle', data.priority.title);
     text('#priorityBody', data.priority.body);
     text('#priorityPreview', data.priority.body);
+    // The visible whole-photo summary already supplies first-screen context.
+    // Keep the complete action rationale in its disclosure instead of repeating it.
+    document.querySelector('#priorityPreview').hidden = Boolean(data.coaching);
     text('#strengthTitle', data.strength.title);
     text('#strengthBody', data.strength.body);
     text('#reshootAction', data.reshoot.action);
@@ -780,6 +786,13 @@ SOFTWARE.
     document.querySelector('#referenceLink').hidden = !reference;
     text('#exerciseTitle', data.exercise.title);
     text('#exerciseInstructions', data.exercise.instructions);
+    const coaching = data.coaching;
+    document.querySelector('#practiceConnection').hidden = !coaching;
+    document.querySelector('#practiceCriterion').hidden = !coaching;
+    if (coaching) {
+      text('#practiceConnection', `${coaching.exercise_mode} · ${data.observations[coaching.exercise_observation_index].label}：${coaching.exercise_connection}`);
+      text('#practiceCriterion', `怎么看改对了：${coaching.success_criterion}`);
+    }
     text('#boundaryNote', data.boundary_note);
     text('#researchStatus', data.research_status);
     if (data.integrity) {
@@ -1055,7 +1068,7 @@ SOFTWARE.
       locate.className = 'observation-toggle';
       const number = document.createElement('span');
       number.className = 'map-number'; number.textContent = String(index + 1).padStart(2, '0');
-      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority}`;
+      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority === '首要' && data.coaching ? data.coaching.action_type : observation.priority}`;
       locate.append(number, label);
       locate.setAttribute('aria-label', `${index + 1}. ${observation.regions?.length ? '在照片上看' : '展开说明'}：${observation.label}`);
       locate.setAttribute('aria-pressed', 'false');
@@ -1162,6 +1175,8 @@ SOFTWARE.
       text('#selectedDimension', score.dimension);
       text('#selectedInterval', score.interval === 'N/A' ? '未评分' : score.interval);
       text('#selectedReason', score.reason);
+      text('#selectedConfidence', score.confidence ? `判断把握：${score.confidence}` : '');
+      document.querySelector('#selectedConfidence').hidden = !score.confidence;
       text('#selectedUncertainty', score.uncertainty ? `暂不能确定：${score.uncertainty}` : '');
       document.querySelector('#selectedUncertainty').hidden = !score.uncertainty;
       radarButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(index === i)));
@@ -1193,6 +1208,11 @@ SOFTWARE.
       value.textContent = score.interval;
       const reason = document.createElement('p');
       reason.textContent = score.reason;
+      if (score.confidence) {
+        const confidence = document.createElement('span'); confidence.className = 'uncertainty';
+        confidence.textContent = `判断把握：${score.confidence}`;
+        reason.append(confidence);
+      }
       if (score.uncertainty) {
         const uncertainty = document.createElement('span');
         uncertainty.className = 'uncertainty';
@@ -1414,7 +1434,7 @@ SOFTWARE.
       });
     }
     const practicePrompt = document.querySelector('#practicePrompt');
-    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
+    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n${coaching ? `练习关联：${coaching.exercise_connection}\n检查标准：${coaching.success_criterion}\n` : ''}上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
     document.querySelector('#copyPractice').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(practicePrompt.value);

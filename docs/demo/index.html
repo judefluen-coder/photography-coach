@@ -229,6 +229,7 @@ SOFTWARE.
     .check-badge { font-size: 11px; color: var(--muted); }
     .check-badge::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; background: currentColor; }
     .check-badge[data-verdict="观察"], .check-badge[data-verdict="问题"] { color: var(--accent); }
+    .check-badge[data-verdict="无法判断"]::before { background:transparent; border:1px dashed currentColor; box-sizing:border-box; }
     .inline-detail { margin-top: 12px; padding-top: 10px; border-top: 0; }
     .inline-detail summary { color: var(--muted); font-size: 12px; font-weight: 400; }
     .keep-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin-bottom: 20px; }
@@ -555,13 +556,13 @@ SOFTWARE.
         <div class="hero-copy" id="judgmentPanel">
           <p class="kicker">点评概要</p>
           <h1 id="title"></h1>
+          <p class="lead" id="summary"></p>
           <div class="priority">
             <span class="priority-label" id="decisionLabel">主要问题</span>
             <strong id="priorityTitle"></strong>
             <p class="priority-preview" id="priorityPreview"></p>
             <details class="inline-detail"><summary>展开完整理由</summary><p id="priorityBody"></p></details>
           </div>
-          <details class="inline-detail"><summary>看片结论</summary><p class="lead" id="summary"></p></details>
         </div>
       </div>
       <div class="darkroom-dock" id="darkroomDock">
@@ -591,10 +592,10 @@ SOFTWARE.
           <aside class="selected-score" id="selectedScore" aria-live="polite" aria-atomic="true">
             <p class="score-instruction">点图周围的名称，查看这一项。</p>
             <h3 id="selectedDimension"></h3><strong class="selected-value" id="selectedInterval"></strong>
-            <p id="selectedReason"></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
+            <p id="selectedReason"></p><p class="uncertainty" id="selectedConfidence" hidden></p><p class="uncertainty" id="selectedUncertainty" hidden></p>
           </aside>
         </div>
-        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。</p></details>
+        <details class="score-details" id="scoreDetails"><summary>查看全部分数与理由</summary><div class="scores" id="scores"></div><p class="score-legend">0 未成立 · 3 基本成立 · 5 高度统一。评分是判断区间，不是精确测量或审美排名。“判断把握”是本次点评的自我评估，不是准确率。</p></details>
       </section>
 
       <section aria-labelledby="readTitle">
@@ -682,6 +683,8 @@ SOFTWARE.
       <section aria-labelledby="practiceTitle">
         <div class="section-head"><h2 id="practiceTitle">拍摄练习</h2><p>按下面的方法做一组对照，检查建议是否有效。</p></div>
         <p class="practice"><strong id="exerciseTitle"></strong> <span id="exerciseInstructions"></span></p>
+        <p class="muted" id="practiceConnection" hidden></p>
+        <p id="practiceCriterion" hidden></p>
         <div class="practice-return"><p>复制练习说明，下次上传新照片时一并提供，便于比较前后的变化。这个报告页本身不接收上传。</p><button type="button" class="button-quiet" id="copyPractice">复制练习说明</button><p id="copyStatus" role="status"></p><textarea id="practicePrompt" aria-label="练习说明，可手动复制" readonly hidden></textarea></div>
         <details><summary>判断限制</summary><p id="boundaryNote"></p></details>
       </section>
@@ -691,7 +694,7 @@ SOFTWARE.
   <footer id="researchStatus"></footer>
   <noscript><p class="source-credit">这个交互报告需要 JavaScript 才能显示点评与图片；不会在线上传照片或调用模型。</p></noscript>
 
-  <script id="reportData" type="application/json">{"title":"弯道已经拍出来了，先让车头更好读。","decision":"NO_STRUCTURAL_BOTTLENECK","visual_guides":[],"learning_check":{"observation_index":0,"question":"车头不够显眼时，你会先试哪种调法？","options":[{"title":"整张增加对比和饱和度","effect":"绿叶和红色零件会更鲜艳，明暗也更强烈。","cost":"绿叶可能更抢眼，车头黑面却更难分辨；颜色更浓不等于车头更清楚。"},{"title":"提车头暗部，收外围绿叶","effect":"让号码下方的黑面稍清楚，同时让右侧亮绿叶不那么突出。","cost":"会少一点原图的鲜亮和硬朗。车头提过头会发灰，叶子收太多会失去层次。"}],"takeaway":"先比较号码下方黑面的层次，再看右侧绿叶有没有抢过车头。两处关系都改善才保留，不必把整张图调得更浓。"},"source_credit":{"author":"Reinhold Möller（Ermell）","url":"https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg","license":"CC BY-SA 4.0","license_url":"https://creativecommons.org/licenses/by-sa/4.0/","changes":"本示例基于公开图 JPEG 副本作局部影调色彩调整，另版裁上方及右侧。衍生图同以 CC BY-SA 4.0 提供，作者未背书此点评或调整。"},"summary":"我先看到近处圆形车头，再沿着车顶往右上转，最后看到远处一节节小车厢。大与小、直与弯的关系都在。这张不用重构；可以试着把车头暗面稍微打开，让它不只剩一个黑色轮廓。","priority":{"title":"车头多露一点细节，旁边的绿别那么抢眼。","body":"车头号码还能读，但它下面的黑色面、管线之间的暗缝，在小图里分得费劲；右侧大片亮绿叶又比这些细节更容易被看见。先轻提车头里已有的暗部层次，再收一点外围绿叶。它比裁切更值得先试，因为裁掉绿叶也不会让车头内部更清楚。别把黑色车身修成灰色。"},"strength":{"title":"保住从大车头绕到小车厢的整条弧线。","body":"近处车头占得大，远处车窗变成一列小竖格；车顶在右上折回，能看出整列车怎样转弯。下方钢轨接近车轮，上方车厢接回树林，前后是连着的，不是一辆孤立的车头。"},"integrity":[{"family":"边缘/裁切","verdict":"观察","basis":"车头前部和最下方钢轨离底边较近，右边却有一大片植被余量。车头未被截断，但不能再收底边；右侧可小幅试裁。"},{"family":"暗部","verdict":"观察","basis":"量化触发暗部复核；圆形车头下半部与下方连接处很深。号码、外圈及部分管线仍分得开，因此是局部可读性调整，不是整辆车消失。"},{"family":"高光","verdict":"通过","basis":"近处浅车顶还有连续亮暗条纹；左侧路面仍与白边分开。三个灯心很亮，但不据此要求压暗整个画面。"},{"family":"色彩","verdict":"观察","basis":"右边亮黄绿叶与上方较深的树叶有色差，绿色没有全并成一块；不过右侧碎亮点相对暗车头更抢眼。调整是取舍，不是判定真实颜色错误。"},{"family":"轴线/透视","verdict":"通过","basis":"车厢和护栏随弯道改变方向，没有可靠水平线与竖线同时支持同向滚转。不能按铁轨斜线把整张旋正。"},{"family":"细节","verdict":"观察","basis":"局部放大后，号码和管线轮廓可辨，但细字与远端小人信息有限；不靠锐化补造细节。相近大小的近处细管与较远窗框都没有明显大块涂抹。"}],"observations":[{"label":"车头与亮叶","priority":"首要","text":"左下车头内部偏深，右侧碎亮叶面积大。先让暗面多出一点变化、外围绿稍收敛，视线更容易留在车上。","regions":[{"x":0.12,"y":0.43,"width":0.34,"height":0.42},{"x":0.85,"y":0.36,"width":0.15,"height":0.6}]},{"label":"弧线与重复","priority":"要保护","text":"近处长车顶向右上转，再接回远处一列小车厢。重复的窗格配合方向变化，交代了弯道，不要只裁出车头。","regions":[{"x":0.4,"y":0.12,"width":0.44,"height":0.26},{"x":0.56,"y":0.29,"width":0.28,"height":0.35}]},{"label":"前方留白","priority":"次要","text":"车头和前方钢轨已经靠近下边；右侧绿地比下边余量宽得多。可以动右边，但底部再收，会让车头更像撞向边框。","regions":[{"x":0.06,"y":0.8,"width":0.4,"height":0.2},{"x":0.9,"y":0.05,"width":0.1,"height":0.95}]},{"label":"亮车顶与黑车身","priority":"要保护","text":"车顶上长条反光与下面黑色车身相接，已经说明圆弧和体积。提暗部时保留这一级亮暗差，不做全图平均提亮。","regions":[{"x":0.52,"y":0.27,"width":0.3,"height":0.26},{"x":0.29,"y":0.43,"width":0.29,"height":0.21}]},{"label":"红、绿与黑","priority":"次要","text":"下方红色构件把黑色车身和绿色环境隔开；右边叶子又比车厢更偏黄绿。只轻收外围叶子，保留红色这条线和车厢自己的绿。"},{"label":"护栏、道路与遮挡","priority":"次要","text":"前景护栏斜着经过车轮附近，后面的路面则沿左岸展开。它们说明车所处的位置；栏杆也遮住少量下部细节，现有文件不能靠调色把它挪开。"},{"label":"小人和观看距离","priority":"次要","text":"远处车窗旁能辨认几个很小的人形，它们让车厢的大小更好理解；不足以读清表情，也不据此编造旅途故事。主角仍是列车在弯道上的形状。"},{"label":"静止的一张与运动感","priority":"无明显问题","text":"轮廓和线路让画面有向前延伸的感觉，但一张成片不能证明车速。没有明显拖影，不代表必须补上运动模糊。"}],"scores":[{"dimension":"技术可读性","interval":"3-4 / 5","reason":"号码、管线与窗框可辨；局部黑面和细小人物的可读性有限。"},{"dimension":"取景与边缘控制","interval":"3-4 / 5","reason":"整段弯道保住了，车头前方和底部余量偏紧。"},{"dimension":"注意力与形式组织","interval":"4-5 / 5","reason":"大车头、弯曲车顶、小窗格形成明确的观看顺序。"},{"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"车顶和车身体积清楚；暗车头与外围亮绿的竞争可小调。"},{"dimension":"空间与层次","interval":"4-5 / 5","reason":"近大远小、车厢相接、前景护栏一起交代纵深。"},{"dimension":"时机与关键关系","interval":"4-5 / 5","reason":"车頭与后段车厢同时进入视野，转弯关系完整。"},{"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"能看懂列车与沿线环境，小人补充尺度；不强求一张图讲出事件。"},{"dimension":"表达一致性与完成度","interval":"4-5 / 5","reason":"机械结构和整列车的曲线都得到交代，调整宜克制。"}],"reshoot":{"action":"在允许拍摄的安全观景点，先给车头前方多留一点空间，再等后面几节车厢也进入弯道。按下前看一眼：车头、车轮、远端车厢都还在不在。","effect":"既保住长弧线，也让车头前方不那么紧。不是越近越有冲击力。","cost":"取景宽一点，列车在画面里会小一些，环境也更多。这个瞬间不一定还能重来。","availability":"相似场景；不进入轨道、不探身越过护栏，不假定原拍摄位置对公众开放。"},"edit":{"summary":"先在顶部切“原图 / 仅调色”：看车头号码下面的黑面，以及右侧亮绿叶。车头稍清楚，绿叶稍收敛，亮车顶没有一起被推亮。再切“裁切＋调色”，单独判断是否要收右边和上面的小条环境。","crop":"仅调色保留 3992×2992 全画幅。裁切版只去掉上方 60 像素、右侧 120 像素；左边和底边完全不动，保护车头前方钢轨。这个小裁切是可选的。","crop_region":{"x":0,"y":0.020053475935828877,"width":0.969939879759519,"height":0.9799465240641712},"tone_color":"已做两件事：局部提车头已有的暗部层次，黑缝和灯心不跟着抬；外围亮绿叶降低饱和度（蒙版最强处 24%）和亮度（最多约 0.32 档），保护中间车厢的绿色及下方红色。没有套统一滤镜或添加细节。","limit":"调色会少一点原来的硬朗和鲜亮；裁切会少一点沿线环境。后期无法恢复被护栏遮住的细节、看不清的表情，也补不回画外空间。示例公开包将原尺寸 PNG 调整图转成高质量 JPEG，页面另使用缩小 JPEG 预览。"},"reference":{"photographer":"Alfred Stieglitz","title":"The Hand of Man","year":"1902，1910 年印制","url":"https://www.nga.gov/artworks/35420-hand-man","looking_task":"看 30 秒：从画面底部选一条亮轨线，沿着它走到中间偏右的暗机车，再看机车上方的深色烟柱。暗车没有被整体提亮，为什么仍然容易找到？","match":"学保留，也给提暗部划一道界限：本图近处黑车头借亮车顶、红色构件和弧线显形；参考图的暗机车借下方亮轨线与后方较浅的背景显形。两张都提醒我们，主体清楚不等于它每个角落都得亮。","difference":"参考的机车小、环境和烟柱占重要位置；本图机械细节本身更重要，可以多露一点暗面。学的是明暗边界与路径，不是把本图转黑白或压成剪影。可迁移实验：只改暗部强度，选既能读出号码、又保留黑车身重量的版本。"},"exercise":{"title":"20 分钟，只练黑色主体的明暗。","instructions":"用这张图或自己拍的一件黑色物体，固定构图和颜色，只做原样、轻提、中提、重提四个暗部版本。缩小再放大看：关键标记和表面边界能读出，同时主体仍比旁边浅表面明显暗，就停。自己即可复盘，不需要邀人评审。"},"boundary_note":"本次是换题材示例，不是新增盲测。原图沿用已 materialize 的无测试变体 JPEG 副本，不冒充相机原始文件。作者 Reinhold Möller（Ermell），公开来源与 CC BY-SA 4.0 许可于 2026-09-14 核对；新调色、裁切衍生图同许可，作者未背书。评分只针对示例源图，作者意图和速度不由画面推断。参考单作已查看实际画面，因该馆未提供此图的开放下载许可，仅提供官方单图链接。","research_status":"Photography Coach 实验示例；不是专家认证、客观审美排名或学习效果证明。使用直接像素调色，无生成式重画。图像与页面逻辑核对不等于真实浏览器布局验收。","source_asset":"assets/source-preview.jpg","source_download":"assets/source.jpg","source_extension":"jpg","color_asset":"assets/color-preview.jpg","color_download":"assets/color.jpg","color_extension":"jpg","treatment_asset":"assets/treatment-preview.jpg","treatment_download":"assets/treatment.jpg","treatment_extension":"jpg"}</script>
+  <script id="reportData" type="application/json">{"title":"弯道已经拍出来了，先让车头更好读。","decision":"NO_STRUCTURAL_BOTTLENECK","coaching":{"action_type":"局部修正","observation_index":0,"exercise_observation_index":0,"exercise_mode":"围绕重点","exercise_connection":"把主建议里的车头暗部可读性，变成只改变暗部强度的一组对照。","success_criterion":"号码与黑面边界更容易辨认，同时车身仍明显暗于亮车顶。若黑车变灰、亮顶变刺眼或出现光晕，就退回更轻的版本；有像素变化不等于更好。"},"visual_guides":[],"learning_check":{"observation_index":0,"question":"车头不够显眼时，你会先试哪种调法？","options":[{"title":"整张增加对比和饱和度","effect":"绿叶和红色零件会更鲜艳，明暗也更强烈。","cost":"绿叶可能更抢眼，车头黑面却更难分辨；颜色更浓不等于车头更清楚。"},{"title":"提车头暗部，收外围绿叶","effect":"让号码下方的黑面稍清楚，同时让右侧亮绿叶不那么突出。","cost":"会少一点原图的鲜亮和硬朗。车头提过头会发灰，叶子收太多会失去层次。"}],"takeaway":"先比较号码下方黑面的层次，再看右侧绿叶有没有抢过车头。两处关系都改善才保留，不必把整张图调得更浓。"},"source_credit":{"author":"Reinhold Möller（Ermell）","url":"https://commons.wikimedia.org/wiki/File:Behringersm%C3%BChle_Dampfeisenbahn-20220731-RM-111152.jpg","license":"CC BY-SA 4.0","license_url":"https://creativecommons.org/licenses/by-sa/4.0/","changes":"本示例基于公开图 JPEG 副本作局部影调色彩调整，另版裁上方及右侧。衍生图同以 CC BY-SA 4.0 提供，作者未背书此点评或调整。"},"summary":"我先看到近处圆形车头，再沿着车顶往右上转，最后看到远处一节节小车厢。大与小、直与弯的关系都在。这张不用重构；可以试着把车头暗面稍微打开，让它不只剩一个黑色轮廓。","priority":{"title":"车头多露一点细节，旁边的绿别那么抢眼。","body":"车头号码还能读，但它下面的黑色面、管线之间的暗缝，在小图里分得费劲；右侧大片亮绿叶又比这些细节更容易被看见。先轻提车头里已有的暗部层次，再收一点外围绿叶。它比裁切更值得先试，因为裁掉绿叶也不会让车头内部更清楚。别把黑色车身修成灰色。"},"strength":{"title":"保住从大车头绕到小车厢的整条弧线。","body":"近处车头占得大，远处车窗变成一列小竖格；车顶在右上折回，能看出整列车怎样转弯。下方钢轨接近车轮，上方车厢接回树林，前后是连着的，不是一辆孤立的车头。"},"integrity":[{"family":"边缘/裁切","verdict":"观察","basis":"车头前部和最下方钢轨离底边较近，右边却有一大片植被余量。车头未被截断，但不能再收底边；右侧可小幅试裁。"},{"family":"暗部","verdict":"观察","basis":"量化触发暗部复核；圆形车头下半部与下方连接处很深。号码、外圈及部分管线仍分得开，因此是局部可读性调整，不是整辆车消失。"},{"family":"高光","verdict":"通过","basis":"近处浅车顶还有连续亮暗条纹；左侧路面仍与白边分开。三个灯心很亮，但不据此要求压暗整个画面。"},{"family":"色彩","verdict":"观察","basis":"右边亮黄绿叶与上方较深的树叶有色差，绿色没有全并成一块；不过右侧碎亮点相对暗车头更抢眼。调整是取舍，不是判定真实颜色错误。"},{"family":"轴线/透视","verdict":"通过","basis":"车厢和护栏随弯道改变方向，没有可靠水平线与竖线同时支持同向滚转。不能按铁轨斜线把整张旋正。"},{"family":"细节","verdict":"观察","basis":"局部放大后，号码和管线轮廓可辨，但细字与远端小人信息有限；不靠锐化补造细节。相近大小的近处细管与较远窗框都没有明显大块涂抹。"}],"observations":[{"label":"车头与亮叶","priority":"首要","text":"左下车头内部偏深，右侧碎亮叶面积大。先让暗面多出一点变化、外围绿稍收敛，视线更容易留在车上。","regions":[{"x":0.12,"y":0.43,"width":0.34,"height":0.42},{"x":0.85,"y":0.36,"width":0.15,"height":0.6}]},{"label":"弧线与重复","priority":"要保护","text":"近处长车顶向右上转，再接回远处一列小车厢。重复的窗格配合方向变化，交代了弯道，不要只裁出车头。","regions":[{"x":0.4,"y":0.12,"width":0.44,"height":0.26},{"x":0.56,"y":0.29,"width":0.28,"height":0.35}]},{"label":"前方留白","priority":"次要","text":"车头和前方钢轨已经靠近下边；右侧绿地比下边余量宽得多。可以动右边，但底部再收，会让车头更像撞向边框。","regions":[{"x":0.06,"y":0.8,"width":0.4,"height":0.2},{"x":0.9,"y":0.05,"width":0.1,"height":0.95}]},{"label":"亮车顶与黑车身","priority":"要保护","text":"车顶上长条反光与下面黑色车身相接，已经说明圆弧和体积。提暗部时保留这一级亮暗差，不做全图平均提亮。","regions":[{"x":0.52,"y":0.27,"width":0.3,"height":0.26},{"x":0.29,"y":0.43,"width":0.29,"height":0.21}]},{"label":"红、绿与黑","priority":"次要","text":"下方红色构件把黑色车身和绿色环境隔开；右边叶子又比车厢更偏黄绿。只轻收外围叶子，保留红色这条线和车厢自己的绿。"},{"label":"护栏、道路与遮挡","priority":"次要","text":"前景护栏斜着经过车轮附近，后面的路面则沿左岸展开。它们说明车所处的位置；栏杆也遮住少量下部细节，现有文件不能靠调色把它挪开。"},{"label":"小人和观看距离","priority":"次要","text":"远处车窗旁能辨认几个很小的人形，它们让车厢的大小更好理解；不足以读清表情，也不据此编造旅途故事。主角仍是列车在弯道上的形状。"},{"label":"静止的一张与运动感","priority":"无明显问题","text":"轮廓和线路让画面有向前延伸的感觉，但一张成片不能证明车速。没有明显拖影，不代表必须补上运动模糊。"}],"scores":[{"dimension":"技术可读性","interval":"3-4 / 5","reason":"号码、管线与窗框可辨；局部黑面和细小人物的可读性有限。","confidence":"中","uncertainty":"JPEG 中能看清大轮廓，不能据此确认原始文件的细字与暗部恢复能力。"},{"dimension":"取景与边缘控制","interval":"3-4 / 5","reason":"整段弯道保住了，车头前方和底部余量偏紧。","confidence":"高","uncertainty":null},{"dimension":"注意力与形式组织","interval":"4-5 / 5","reason":"大车头、弯曲车顶、小窗格形成明确的观看顺序。","confidence":"高","uncertainty":null},{"dimension":"光线影调色彩","interval":"3-4 / 5","reason":"车顶和车身体积清楚；暗车头与外围亮绿的竞争可小调。","confidence":"高","uncertainty":null},{"dimension":"空间与层次","interval":"4-5 / 5","reason":"近大远小、车厢相接、前景护栏一起交代纵深。","confidence":"高","uncertainty":null},{"dimension":"时机与关键关系","interval":"4-5 / 5","reason":"车头与后段车厢同时进入视野，转弯关系完整。","confidence":"高","uncertainty":null},{"dimension":"信息叙事情绪","interval":"3-4 / 5","reason":"能看懂列车与沿线环境，小人补充尺度；不强求一张图讲出事件。","confidence":"中","uncertainty":"画面不能证明速度、人物经历或拍摄意图，观看联想不当作事实。"},{"dimension":"表达一致性与完成度","interval":"4-5 / 5","reason":"机械结构和整列车的曲线都得到交代，调整宜克制。","confidence":"高","uncertainty":null}],"reshoot":{"action":"在允许拍摄的安全观景点，先给车头前方多留一点空间，再等后面几节车厢也进入弯道。按下前看一眼：车头、车轮、远端车厢都还在不在。","effect":"既保住长弧线，也让车头前方不那么紧。不是越近越有冲击力。","cost":"取景宽一点，列车在画面里会小一些，环境也更多。这个瞬间不一定还能重来。","availability":"相似场景；不进入轨道、不探身越过护栏，不假定原拍摄位置对公众开放。"},"edit":{"summary":"先在顶部切“原图 / 仅调色”：看车头号码下面的黑面，以及右侧亮绿叶。车头稍清楚，绿叶稍收敛，亮车顶没有一起被推亮。再切“裁切＋调色”，单独判断是否要收右边和上面的小条环境。","crop":"仅调色保留 3992×2992 全画幅。裁切版只去掉上方 60 像素、右侧 120 像素；左边和底边完全不动，保护车头前方钢轨。这个小裁切是可选的。","crop_region":{"x":0,"y":0.020053475935828877,"width":0.969939879759519,"height":0.9799465240641712},"tone_color":"已做两件事：局部提车头已有的暗部层次，黑缝和灯心不跟着抬；外围亮绿叶降低饱和度（蒙版最强处 24%）和亮度（最多约 0.32 档），保护中间车厢的绿色及下方红色。没有套统一滤镜或添加细节。","limit":"调色会少一点原来的硬朗和鲜亮；裁切会少一点沿线环境。后期无法恢复被护栏遮住的细节、看不清的表情，也补不回画外空间。示例公开包将原尺寸 PNG 调整图转成高质量 JPEG，页面另使用缩小 JPEG 预览。"},"reference":{"photographer":"Alfred Stieglitz","title":"The Hand of Man","year":"1902，1910 年印制","url":"https://www.nga.gov/artworks/35420-hand-man","looking_task":"看 30 秒：从画面底部选一条亮轨线，沿着它走到中间偏右的暗机车，再看机车上方的深色烟柱。暗车没有被整体提亮，为什么仍然容易找到？","match":"学保留，也给提暗部划一道界限：本图近处黑车头借亮车顶、红色构件和弧线显形；参考图的暗机车借下方亮轨线与后方较浅的背景显形。两张都提醒我们，主体清楚不等于它每个角落都得亮。","difference":"参考的机车小、环境和烟柱占重要位置；本图机械细节本身更重要，可以多露一点暗面。学的是明暗边界与路径，不是把本图转黑白或压成剪影。可迁移实验：只改暗部强度，选既能读出号码、又保留黑车身重量的版本。"},"exercise":{"title":"20 分钟，只练黑色主体的明暗。","instructions":"用这张图或自己拍的一件黑色物体，固定构图和颜色，只做原样、轻提、中提、重提四个暗部版本。缩小再放大看：关键标记和表面边界能读出，同时主体仍比旁边浅表面明显暗，就停。自己即可复盘，不需要邀人评审。"},"boundary_note":"本次是换题材示例，不是新增盲测。原图沿用已 materialize 的无测试变体 JPEG 副本，不冒充相机原始文件。作者 Reinhold Möller（Ermell），公开来源与 CC BY-SA 4.0 许可于 2026-09-14 核对；新调色、裁切衍生图同许可，作者未背书。评分只针对示例源图，作者意图和速度不由画面推断。参考单作已查看实际画面，因该馆未提供此图的开放下载许可，仅提供官方单图链接。","research_status":"Photography Coach 实验示例；不是专家认证、客观审美排名或学习效果证明。使用直接像素调色，无生成式重画。图像与页面逻辑核对不等于真实浏览器布局验收。","source_asset":"assets/source-preview.jpg","source_download":"assets/source.jpg","source_extension":"jpg","color_asset":"assets/color-preview.jpg","color_download":"assets/color.jpg","color_extension":"jpg","treatment_asset":"assets/treatment-preview.jpg","treatment_download":"assets/treatment.jpg","treatment_extension":"jpg"}</script>
   <script>
     const data = JSON.parse(document.querySelector('#reportData').textContent);
     const text = (selector, value) => { document.querySelector(selector).textContent = value || ''; };
@@ -732,11 +735,11 @@ SOFTWARE.
     document.querySelector('#photoToolbar').hidden = !hasEdit;
     document.querySelector('#darkroomDock').dataset.state = hasColor ? 'color' : hasTreatment ? 'combined' : 'advice';
     text('#detailLabel', hasColor ? '局部对照' : '后期建议');
-    text('#dockEditStatus', hasColor ? '同一取景，只比较颜色与明暗。' : hasTreatment ? '已有综合调整版，未提供同取景调色文件。' : data.edit.tone_color);
+    text('#dockEditStatus', hasColor ? '已提供调色文件。请对照原图确认改善，也留意损失。' : hasTreatment ? '已有综合调整版；不能单独证明调色改善。' : data.edit.tone_color);
     document.querySelector('#toneControls').hidden = !hasColor;
     document.querySelector('#downloadMix').hidden = !hasColor;
     document.querySelector('#mixHelp').hidden = !hasColor;
-    document.querySelector('#dockEditStatus').hidden = hasColor;
+    document.querySelector('#dockEditStatus').hidden = false;
     const treatmentLabel = hasColor ? (data.edit.crop_region ? '裁切＋调色' : '综合调整') : '调整后';
     text('#treatmentTab', treatmentLabel);
     text('#treatmentCaption', treatmentLabel);
@@ -751,7 +754,7 @@ SOFTWARE.
       NO_STRUCTURAL_BOTTLENECK: ['无需大改', '可选调整']
     };
     const decisionLabelsForReport = decisionLabels[data.decision] || decisionLabels.STRUCTURAL_BOTTLENECK;
-    text('#decisionLabel', decisionLabelsForReport[0]);
+    text('#decisionLabel', data.coaching?.action_type || decisionLabelsForReport[0]);
 
     document.title = `${data.title} | Photography Coach`;
     text('#title', data.title);
@@ -759,6 +762,9 @@ SOFTWARE.
     text('#priorityTitle', data.priority.title);
     text('#priorityBody', data.priority.body);
     text('#priorityPreview', data.priority.body);
+    // The visible whole-photo summary already supplies first-screen context.
+    // Keep the complete action rationale in its disclosure instead of repeating it.
+    document.querySelector('#priorityPreview').hidden = Boolean(data.coaching);
     text('#strengthTitle', data.strength.title);
     text('#strengthBody', data.strength.body);
     text('#reshootAction', data.reshoot.action);
@@ -780,6 +786,13 @@ SOFTWARE.
     document.querySelector('#referenceLink').hidden = !reference;
     text('#exerciseTitle', data.exercise.title);
     text('#exerciseInstructions', data.exercise.instructions);
+    const coaching = data.coaching;
+    document.querySelector('#practiceConnection').hidden = !coaching;
+    document.querySelector('#practiceCriterion').hidden = !coaching;
+    if (coaching) {
+      text('#practiceConnection', `${coaching.exercise_mode} · ${data.observations[coaching.exercise_observation_index].label}：${coaching.exercise_connection}`);
+      text('#practiceCriterion', `怎么看改对了：${coaching.success_criterion}`);
+    }
     text('#boundaryNote', data.boundary_note);
     text('#researchStatus', data.research_status);
     if (data.integrity) {
@@ -1055,7 +1068,7 @@ SOFTWARE.
       locate.className = 'observation-toggle';
       const number = document.createElement('span');
       number.className = 'map-number'; number.textContent = String(index + 1).padStart(2, '0');
-      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority}`;
+      const label = document.createElement('span'); label.textContent = `${observation.label} · ${observation.priority === '首要' && data.coaching ? data.coaching.action_type : observation.priority}`;
       locate.append(number, label);
       locate.setAttribute('aria-label', `${index + 1}. ${observation.regions?.length ? '在照片上看' : '展开说明'}：${observation.label}`);
       locate.setAttribute('aria-pressed', 'false');
@@ -1162,6 +1175,8 @@ SOFTWARE.
       text('#selectedDimension', score.dimension);
       text('#selectedInterval', score.interval === 'N/A' ? '未评分' : score.interval);
       text('#selectedReason', score.reason);
+      text('#selectedConfidence', score.confidence ? `判断把握：${score.confidence}` : '');
+      document.querySelector('#selectedConfidence').hidden = !score.confidence;
       text('#selectedUncertainty', score.uncertainty ? `暂不能确定：${score.uncertainty}` : '');
       document.querySelector('#selectedUncertainty').hidden = !score.uncertainty;
       radarButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(index === i)));
@@ -1193,6 +1208,11 @@ SOFTWARE.
       value.textContent = score.interval;
       const reason = document.createElement('p');
       reason.textContent = score.reason;
+      if (score.confidence) {
+        const confidence = document.createElement('span'); confidence.className = 'uncertainty';
+        confidence.textContent = `判断把握：${score.confidence}`;
+        reason.append(confidence);
+      }
       if (score.uncertainty) {
         const uncertainty = document.createElement('span');
         uncertainty.className = 'uncertainty';
@@ -1414,7 +1434,7 @@ SOFTWARE.
       });
     }
     const practicePrompt = document.querySelector('#practicePrompt');
-    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
+    practicePrompt.value = `这是我完成摄影练习后的新照片。上次点评：${data.title}\n练习：${data.exercise.title} ${data.exercise.instructions}\n${coaching ? `练习关联：${coaching.exercise_connection}\n检查标准：${coaching.success_criterion}\n` : ''}上次建议：${data.reshoot.action}\n请先独立看这张，再对照本次练习说明实际改善和仍待解决的地方。若要比较分数，请确认题材和评分标准可比；需要旧图才能判断时请明确说明。`;
     document.querySelector('#copyPractice').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(practicePrompt.value);

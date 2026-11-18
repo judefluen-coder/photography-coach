@@ -44,11 +44,19 @@ All text uses the user's language. `source_image` and `treatment_image` may be a
     "title": "One relation to protect.",
     "body": "Two localized observations and what they preserve."
   },
+  "coaching": {
+    "action_type": "优先修正",
+    "observation_index": 0,
+    "exercise_observation_index": 0,
+    "exercise_mode": "围绕重点",
+    "exercise_connection": "Why this one-variable drill addresses the same observed relation.",
+    "success_criterion": "What to compare in the new frames, including a protected strength."
+  },
   "observations": [
     {"label": "构图", "priority": "首要", "text": "Visible fact and likely effect."}
   ],
   "scores": [
-    {"dimension": "技术可读性", "interval": "3-4 / 5", "reason": "Image-specific reason."}
+    {"dimension": "技术可读性", "interval": "3-4 / 5", "reason": "Localized support and a real limit on the upper tier.", "confidence": "中", "uncertainty": "What this preview cannot establish."}
   ],
   "reshoot": {
     "action": "Scene-ready instruction.",
@@ -93,7 +101,9 @@ All text uses the user's language. `source_image` and `treatment_image` may be a
 - Present `edit.tone_color` separately from `edit.crop`, with an explicit asset-availability label. A real `color_image` enables a jump to the same-framing slider; source-only and legacy crop-only reports must not acquire a simulated color comparison. Diagrams, A/B method descriptions, and the existence of an edit recipe are not evidence of an actual developed file.
 - `edit.crop_region` uses the same coordinates and marks the retained area. It must describe the actual crop when a treatment is supplied.
 - Each score may carry a plain-language `uncertainty` string. Do not invent confidence percentages.
-- Optional `integrity` carries six `{ "family": "暗部", "verdict": "观察", "basis": "Localized evidence" }` records, ordered as `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, `细节`; use only `通过`, `观察`, or `问题`. Supply it for new critiques so the six-check summary survives rendering; older reports without it remain supported.
+- New API reports include a `confidence` label (`高/中/低`) and nullable `uncertainty` on each score. Medium/low footing names a concrete information limit. These are evidence self-descriptions, not calibrated confidence probabilities. Legacy reports keep missing labels missing.
+- New reports also include the `coaching` object described in [`coaching-quality.md`](coaching-quality.md): explicit priority/practice observation links, action nature, exercise mode, connection and a visible success criterion. The renderer checks these links and narrow explicit contradictions; it does not certify prose correctness or aesthetic quality. The summary is visible above the action, and copying the exercise includes its target and check criterion. Older reports without the object still open without guessed linkage.
+- Optional `integrity` carries six `{ "family": "暗部", "verdict": "观察", "basis": "Localized evidence" }` records, ordered as `边缘/裁切`, `暗部`, `高光`, `色彩`, `轴线/透视`, `细节`; use only `通过`, `观察`, `问题`, or `无法判断`. Supply it for new critiques so the six-check summary survives rendering; older reports without it remain supported.
 - For third-party example images, `source_credit` carries `author`, direct `url`, `license`, `license_url`, and `changes` (including derivative-license terms and no endorsement). It is displayed as text and validated links, never raw HTML. Preserve attribution when moving an example from a custom page into the common renderer.
 - The practice section copies a self-contained follow-up prompt for use with a new photograph in Codex. It is not an upload endpoint or automatic progress tracker.
 

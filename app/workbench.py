@@ -15,7 +15,7 @@ from pathlib import Path
 from core.contracts import CRITIQUE_SCHEMA, TEXT, critique_instructions, obj, validate_critique
 from core.images import make_treatment, preview_bytes, read_photo
 from core.provider import ProviderError, ResponsesProvider, validated_url
-from scripts.render_visual_report import render_report
+from scripts.render_visual_report import JudgmentError, render_report
 
 ROOT = Path(__file__).resolve().parents[1]
 ID = re.compile(r"[a-f0-9]{32}\Z")
@@ -288,7 +288,9 @@ class Workbench:
                     session["usage"].append({"task": task, "model": settings["model"], **reported_usage})
                 if session["state"] != "cancelled":
                     # Only expose bounded, authored errors, never provider bodies or file paths.
-                    message = str(exc) if isinstance(exc, (ProviderError, WorkbenchError)) else "处理未完成，原图和已有点评仍保留。没有自动重试；若已请求模型，可能已产生费用。"
+                    message = str(exc) if isinstance(exc, (ProviderError, WorkbenchError, JudgmentError)) else "处理未完成，原图和已有点评仍保留。没有自动重试；若已请求模型，可能已产生费用。"
+                    if isinstance(exc, JudgmentError):
+                        message += " 该次模型请求可能已计费，已返回的用量仍保留。"
                     session.update(state="error", error=message)
                 self._save(session)
         finally:

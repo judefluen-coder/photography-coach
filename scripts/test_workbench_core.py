@@ -53,6 +53,13 @@ class WorkbenchContractsTest(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ReportError):
                 check_schema(value, schema)
 
+    def test_observation_integer_contract_does_not_accept_boolean_or_fraction(self) -> None:
+        schema = obj({'index': {'type': 'integer'}})
+        check_schema({'index': 0}, schema)
+        for value in (True, .5, '0'):
+            with self.subTest(value=value), self.assertRaises(ReportError):
+                check_schema({'index': value}, schema)
+
     def test_recipe_limits_and_visible_relationships_are_enforced(self) -> None:
         validate_recipe(None)
         validate_recipe(recipe())
@@ -77,6 +84,13 @@ class WorkbenchContractsTest(unittest.TestCase):
             report['decision'] = 'CONDITIONAL_BRANCH'
             report['visual_guides'] = []
             report['learning_check'] = None
+            report['coaching'] = {
+                'action_type': '按目的选择', 'observation_index': 0, 'exercise_observation_index': 0,
+                'exercise_mode': '围绕重点', 'exercise_connection': '测试结构关联，不是实际看片。',
+                'success_criterion': '在两种局部关系之间做明确对照。',
+            }
+            for score in report['scores']:
+                score.update(confidence='中', uncertainty='这是合成测试数据，不是实际视觉判断。')
             report['integrity'] = [{'family': f, 'verdict': '观察', 'basis': '仍需回看原图。'} for f in FAMILIES]
             for observation in report['observations']:
                 observation['regions'] = []
